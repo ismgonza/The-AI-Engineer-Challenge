@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'AI Engineer Challenge - Retro Terminal',
-  description: 'A retro-future style console terminal for the AI Engineer Challenge',
+  title: 'AI Engineer Challenge - Mario World Terminal',
+  description: 'A Mario World style console terminal for the AI Engineer Challenge',
 }
 
 export default function RootLayout({
@@ -13,9 +13,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="terminal-bg crt-effect">
-        <div className="scan-line"></div>
-        {children}
+      <body className="mario-bg">
+        <div className="mario-container">
+          {children}
+        </div>
       </body>
     </html>
   )

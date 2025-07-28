@@ -2,12 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
 
 :root {
-  --foreground-rgb: 0, 255, 0;
-  --background-start-rgb: 10, 10, 10;
-  --background-end-rgb: 0, 0, 0;
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 135, 206, 235;
+  --background-end-rgb: 173, 216, 230;
 }
 
 * {
@@ -20,17 +20,17 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  font-family: 'Orbitron', 'Courier New', monospace;
+  font-family: 'VT323', 'Courier New', monospace;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,
-      transparent,
+      rgb(var(--background-start-rgb)),
       rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+    );
+  background-attachment: fixed;
 }
 
 a {
@@ -38,96 +38,153 @@ a {
   text-decoration: none;
 }
 
-/* Custom terminal styles */
-.terminal-bg {
-  background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
-  background-size: 200% 200%;
-  animation: pulse 4s ease-in-out infinite;
-}
-
-.terminal-text {
-  text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
-  animation: glow 2s ease-in-out infinite alternate;
-}
-
-.terminal-border {
-  border: 2px solid #00ff00;
-  box-shadow: 
-    inset 0 0 20px rgba(0, 255, 0, 0.1),
-    0 0 20px rgba(0, 255, 0, 0.3),
-    0 0 40px rgba(0, 255, 0, 0.1);
-}
-
-.scan-line {
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(to right, transparent, #00ff00, transparent);
-  animation: scan 3s linear infinite;
-  pointer-events: none;
-}
-
-.crt-effect {
+/* Mario World styles */
+.mario-bg {
+  background: linear-gradient(180deg, #87ceeb 0%, #98d8e8 50%, #b0e0e6 100%);
+  background-size: 100% 100%;
   position: relative;
-  overflow: hidden;
 }
 
-.crt-effect::before {
+.mario-bg::before {
   content: "";
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.15),
-    rgba(0, 0, 0, 0.15) 1px,
-    transparent 1px,
-    transparent 2px
-  );
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
   pointer-events: none;
-  z-index: 10;
+  z-index: 1;
 }
 
-.cursor-blink {
-  animation: blink 1s infinite;
+.mario-container {
+  position: relative;
+  z-index: 2;
 }
 
-@keyframes pulse {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+.mario-border {
+  border: 4px solid #8b4513;
+  border-radius: 12px;
+  box-shadow: 
+    inset 0 0 20px rgba(139, 69, 19, 0.2),
+    0 0 20px rgba(139, 69, 19, 0.4),
+    0 8px 16px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(145deg, #f0f8ff 0%, #e6f3ff 100%);
 }
 
-@keyframes glow {
-  from { text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 15px #00ff00; }
-  to { text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00; }
+.mario-header {
+  background: linear-gradient(90deg, #ff0000 0%, #ff6600 50%, #ffff00 100%);
+  border-radius: 8px 8px 0 0;
+  border-bottom: 3px solid #8b4513;
 }
 
-@keyframes scan {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
+.mario-text {
+  text-shadow: 0.5px 0.5px 0px #000, -0.5px -0.5px 0px #000, 0.5px -0.5px 0px #000, -0.5px 0.5px 0px #000;
+  font-family: 'Press Start 2P', monospace;
+  font-weight: 400;
 }
 
-@keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+.mario-text-small {
+  text-shadow: 0.25px 0.25px 0px #000, -0.25px -0.25px 0px #000, 0.25px -0.25px 0px #000, -0.25px 0.25px 0px #000;
+  font-family: 'VT323', monospace;
+  font-weight: 400;
+}
+
+.mario-button {
+  background: linear-gradient(145deg, #ff6600 0%, #ff0000 100%);
+  border: 3px solid #8b4513;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.mario-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  animation: mario-jump 0.3s ease-out;
+}
+
+.mario-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.mario-input {
+  background: rgba(255, 255, 255, 0.9);
+  border: 3px solid #8b4513;
+  border-radius: 8px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mario-input:focus {
+  outline: none;
+  border-color: #ff6600;
+  box-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+}
+
+.mario-message {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #8b4513;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mario-coin {
+  display: inline-block;
+  animation: coin-spin 2s linear infinite;
+}
+
+.mario-star {
+  display: inline-block;
+  animation: star-twinkle 1.5s ease-in-out infinite;
+}
+
+.mario-power-up {
+  display: inline-block;
+  animation: power-up 2s ease-in-out infinite;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: #f0f8ff;
+  border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #00ff00;
-  border-radius: 4px;
+  background: linear-gradient(145deg, #ff6600 0%, #ff0000 100%);
+  border-radius: 6px;
+  border: 2px solid #8b4513;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #00cc00;
+  background: linear-gradient(145deg, #ff8800 0%, #ff2200 100%);
+}
+
+/* Mario animations */
+@keyframes mario-jump {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes coin-spin {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.2); }
+}
+
+@keyframes power-up {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.1); filter: brightness(1.3); }
 } 
