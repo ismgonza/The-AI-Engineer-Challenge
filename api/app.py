@@ -43,7 +43,7 @@ async def chat(request: ChatRequest):
             stream = client.chat.completions.create(
                 model=request.model,
                 messages=[
-                    {"role": "developer", "content": request.developer_message},
+                    {"role": "system", "content": request.developer_message},
                     {"role": "user", "content": request.user_message}
                 ],
                 stream=True  # Enable streaming response

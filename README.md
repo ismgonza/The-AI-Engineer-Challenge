@@ -8,6 +8,24 @@
 
 ## 🤖 Your First Vibe Coding LLM Application
 
+> **🎮 NEW: We've built you a sick retro-future terminal interface!** Check out the "Running the Retro Terminal Frontend" section below to experience the cyberpunk vibes! ✨
+
+### 🚀 Quick Start (For the Impatient!)
+
+Want to see the magic right now? Here's the fastest path:
+
+1. **Start the backend:**
+   ```bash
+   cd api && pip install -r requirements.txt && uvicorn app:app --host 127.0.0.1 --port 8000
+   ```
+
+2. **Start the frontend (in a new terminal):**
+   ```bash
+   cd frontend && npm install && npm run dev
+   ```
+
+3. **Open your browser to `http://localhost:3000` and start vibing!** 🎮
+
 > If you are a novice, and need a bit more help to get your dev environment off the ground, check out this [Setup Guide](docs/GIT_SETUP.md). This guide will walk you through the 'git' setup you need to get started.
 
 > For additional context on LLM development environments and API key setup, you can also check out our [Interactive Dev Environment for LLM Development](https://github.com/AI-Maker-Space/Interactive-Dev-Environment-for-AI-Engineers).
@@ -122,6 +140,130 @@ While it is a bit counter-intuitive to set things up before jumping into vibe-co
 > NOTE: If you run into any errors, copy and paste them back into the Cursor chat window - and ask Cursor to fix them!
 
 > NOTE: You have been provided with a backend in the `/api` folder - please ensure your Front End integrates with it!
+
+</details>
+
+<details>
+  <summary>🎮 Running the Retro Terminal Frontend</summary>
+
+Great news! We've already created a **sick retro-future terminal interface** for you! Here's how to get it running:
+
+### Prerequisites
+- Make sure you have Node.js 18+ installed
+- The backend API should be running on `http://localhost:8000`
+
+### Quick Start
+
+1. **Navigate to the frontend directory:**
+   ```bash
+   cd frontend
+   ```
+
+2. **Install dependencies (if you haven't already):**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser and go to:**
+   ```
+   http://localhost:3000
+   ```
+
+### 🎯 What You'll See
+
+- A **cyberpunk-style terminal** with glowing green text and CRT effects
+- **Real-time streaming chat** with AI models (text appears character by character!)
+- **Built-in terminal commands** like `/help`, `/clear`, `/settings`, `/status`
+- **Retro animations** including scan lines and pulsing effects
+- **Secure password input** for your OpenAI API key
+- **Responsive design** that works on all devices
+
+### 🔧 Configuration
+
+1. Type `/settings` in the terminal to open the config panel
+2. Enter your OpenAI API key (required for chat functionality)
+3. Select your preferred AI model (GPT-4, GPT-4.1-mini, GPT-3.5-turbo)
+4. Customize the system prompt/developer message
+5. Start chatting! 🤖
+
+### 🚨 Troubleshooting
+
+- **"npm run dev" not working?** Make sure you're in the `frontend` directory, not the root!
+- **API connection issues?** Ensure the backend is running on port 8000 (see backend setup below)
+- **Styling looks weird?** Run `npm install` to ensure all dependencies are installed
+- **TypeScript errors?** The app should still work, but run `npm install` to fix type definitions
+
+The terminal is fully functional and ready to rock! 🚀
+
+</details>
+
+<details>
+  <summary>🐍 Setting Up the Backend API</summary>
+
+Before your frontend can work its magic, you need to get the backend running! Here's how:
+
+### Prerequisites
+- Python 3.8+ installed
+- pip package manager
+
+### Quick Setup
+
+1. **Navigate to the API directory:**
+   ```bash
+   cd api
+   ```
+
+2. **Install Python dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Start the backend server:**
+   ```bash
+   uvicorn app:app --host 127.0.0.1 --port 8000
+   ```
+
+4. **Verify it's working:**
+   ```bash
+   curl http://localhost:8000/api/health
+   ```
+   You should see: `{"status": "ok"}`
+
+### 🎯 What the Backend Does
+
+- **FastAPI-powered** REST API
+- **Streaming responses** from OpenAI's API
+- **CORS enabled** for frontend communication
+- **Health check endpoint** for monitoring
+- **Error handling** with proper HTTP status codes
+
+### 🚨 Backend Troubleshooting
+
+- **"No module named uvicorn"?** Run `pip install -r requirements.txt` again
+- **Port 8000 already in use?** Kill existing processes: `pkill -f uvicorn`
+- **Import errors?** Make sure you're in the `api` directory when running commands
+- **Connection refused?** Check that the server is running on the correct host/port
+
+### 🔧 Alternative Startup Methods
+
+If the above doesn't work, try:
+```bash
+# Method 1: Direct Python execution
+python app.py
+
+# Method 2: Different host binding
+uvicorn app:app --host 0.0.0.0 --port 8000
+
+# Method 3: With reload for development
+uvicorn app:app --host 127.0.0.1 --port 8000 --reload
+```
+
+Once both frontend and backend are running, you're ready to experience the full retro terminal magic! ✨
 
 </details>
 
