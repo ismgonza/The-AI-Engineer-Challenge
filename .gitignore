@@ -164,3 +164,9 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 .vercel
+
+# Frontend specific
+frontend/node_modules/
+frontend/.next/
+frontend/build/
+frontend/dist/
