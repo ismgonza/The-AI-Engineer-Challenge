@@ -14,17 +14,52 @@
 
 Want to see the magic right now? Here's the fastest path:
 
-1. **Start the backend:**
+1. **Start the backend (Terminal 1):**
    ```bash
-   cd api && pip install -r requirements.txt && uvicorn app:app --host 127.0.0.1 --port 8000
+   cd api
+   pip install -r requirements.txt
+   uvicorn app:app --host 127.0.0.1 --port 8000
    ```
 
-2. **Start the frontend (in a new terminal):**
+2. **Start the frontend (Terminal 2 - open a new terminal):**
    ```bash
-   cd frontend && npm install && npm run dev
+   cd frontend
+   npm install
+   npm run dev
    ```
 
 3. **Open your browser to `http://localhost:3000` and start vibing!** 🎮
+
+4. **Configure your OpenAI API key:**
+   - Type `/settings` in the terminal interface
+   - Enter your OpenAI API key
+   - Start chatting with the AI!
+
+### 🔧 Local Development Quick Fixes
+
+**Backend not starting?**
+```bash
+# Make sure you're in the right directory
+cd api
+# Try with reload for development
+uvicorn app:app --host 127.0.0.1 --port 8000 --reload
+```
+
+**Frontend not starting?**
+```bash
+# Make sure you're in the frontend directory
+cd frontend
+# Clear node modules and reinstall if needed
+rm -rf node_modules package-lock.json
+npm install
+npm run dev
+```
+
+**Backend health check:**
+```bash
+curl http://localhost:8000/api/health
+# Should return: {"status":"ok"}
+```
 
 > If you are a novice, and need a bit more help to get your dev environment off the ground, check out this [Setup Guide](docs/GIT_SETUP.md). This guide will walk you through the 'git' setup you need to get started.
 
