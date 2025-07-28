@@ -254,7 +254,7 @@ export default function Home() {
       {/* Input Area */}
       <form onSubmit={handleSubmit} className="border-2 border-terminal-green rounded-lg p-4 bg-terminal-gray">
         <div className="flex items-center space-x-2">
-          <span className="text-terminal-green font-bold">></span>
+          <span className="text-terminal-green font-bold">{'>'}</span>
           <input
             type="text"
             value={input}
