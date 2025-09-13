@@ -451,7 +451,7 @@ Before responding, ask yourself:
                <div className="flex items-center justify-center space-x-4">
                  <span>🍄 AI ENGINEER CHALLENGE</span>
                  <span className="mario-star">⭐</span>
-                 <span>SUPER MARIO WORLD v1.0.0</span>
+                 <span>SUPER MARIO WORLD v1.1.0</span>
                  <span className="mario-coin">🪙</span>
                </div>
              </div>
