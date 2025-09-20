@@ -512,7 +512,7 @@ QUICK RESPONSE MODE ⚡:
                           case '/help':
                 setMessages(prev => [...prev, {
                   role: 'system',
-                  content: '🎯 Available commands:\n- **/help**: Show this help\n- **/clear**: Clear screen & reset conversation memory\n- **/status**: Show connection status\n- **/files**: Show uploaded files\n- **/files filename**: Analyze specific file\n- **/files #**: Analyze file by number\n\n📚 Features:\n- **RAG Mode**: Upload documents (PDF, TXT, CSV, JSON, XML) and chat with them (toggle in header)\n- **Power-Up Mode**: Critical thinking vs quick answers (toggle in header)\n- **File Analysis**: Get suggested questions and summaries\n- **Memory Reset**: Use `/clear` for fresh conversations\n- **Multi-Format Support**: PDF, TXT, CSV, JSON, XML files\n- Use toggles in header to switch between modes',
+                  content: '🎯 Available commands:\n- **/help**: Show this help\n- **/clear**: Clear screen & reset conversation memory\n- **/status**: Show connection status\n- **/files**: Show uploaded files\n- **/files filename**: Analyze specific file\n- **/files #**: Analyze file by number\n\n⌨️ Keyboard Shortcuts:\n- **ENTER**: Send message\n- **SHIFT+ENTER**: New line in message\n\n📚 Features:\n- **RAG Mode**: Upload documents (PDF, TXT, CSV, JSON, XML) and chat with them (toggle in input area)\n- **Power-Up Mode**: Critical thinking vs quick answers (toggle in input area)\n- **File Analysis**: Get suggested questions and summaries\n- **Memory Reset**: Use `/clear` for fresh conversations\n- **Multi-Format Support**: PDF, TXT, CSV, JSON, XML files\n- **Multi-line Input**: Use Shift+Enter for longer messages',
                   timestamp: new Date()
                 }])
                 break
@@ -549,13 +549,19 @@ QUICK RESPONSE MODE ⚡:
         }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      if (input.startsWith('/')) {
-        handleCommand(input)
-        setInput('')
+    if (e.key === 'Enter') {
+      if (e.shiftKey) {
+        // Allow shift+enter for new lines - don't prevent default
+        return
       } else {
-        handleSubmit(e)
+        // Regular enter submits the form
+        e.preventDefault()
+        if (input.startsWith('/')) {
+          handleCommand(input)
+          setInput('')
+        } else {
+          handleSubmit(e)
+        }
       }
     }
   }
@@ -719,19 +725,39 @@ QUICK RESPONSE MODE ⚡:
                             onDragOver={handleDrag}
                             onDrop={handleDrop}
                           >
-                            <div className="space-y-3">
-                              <div className={`text-4xl transition-transform duration-300 ${dragActive ? 'animate-bounce' : 'hover:scale-110'}`}>
-                                {isUploading ? '🔄' : '📄'}
+                            <div className="space-y-4">
+                              <div className={`text-5xl transition-transform duration-300 ${dragActive ? 'animate-bounce' : 'hover:scale-110'}`}>
+                                {isUploading ? '🔄' : dragActive ? '📥' : '📄'}
                               </div>
-                              <div className="mario-text-small font-normal text-sm">
+                              <div className="space-y-2">
                                 {isUploading ? (
-                                  <div className="text-blue-600 font-bold animate-pulse">🔄 Processing files...</div>
+                                  <div className="text-blue-600 font-bold animate-pulse text-base">
+                                    🔄 Processing files...
+                                  </div>
                                 ) : (
                                   <>
-                                    <div className="font-semibold text-gray-700">Drag & drop documents here</div>
-                                    <div className="text-xs text-mario-brown opacity-75">or click to browse</div>
-                                    <div className="text-xs bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-bold mt-2">
-                                      📊 PDF • 📝 TXT • 📈 CSV • 🔗 JSON • 📄 XML
+                                    <div className="font-bold text-gray-800 text-base">
+                                      Drag & drop documents here
+                                    </div>
+                                    <div className="text-sm text-gray-600 font-medium">
+                                      or click to browse files
+                                    </div>
+                                    <div className="flex flex-wrap justify-center gap-2 mt-3">
+                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        📄 PDF
+                                      </span>
+                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        📝 TXT
+                                      </span>
+                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        📊 CSV
+                                      </span>
+                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                        🔗 JSON
+                                      </span>
+                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        📄 XML
+                                      </span>
                                     </div>
                                   </>
                                 )}
@@ -878,17 +904,19 @@ QUICK RESPONSE MODE ⚡:
                     <span className="text-red-500 font-bold mario-text text-3xl animate-pulse">{'>'}</span>
                     <span className="text-sm text-mario-brown font-semibold">LUIGI</span>
                   </div>
-                  <input
-                    type="text"
+                  <textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
                     disabled={isLoading}
-                    className={`flex-1 mario-input p-4 text-mario-dark placeholder-mario-brown/60 font-normal text-lg transition-all duration-300 ${
+                    rows={input.split('\n').length || 1}
+                    className={`flex-1 mario-input p-4 text-mario-dark placeholder-mario-brown/60 font-normal text-lg transition-all duration-300 resize-none ${
                       powerUpMode ? 'border-2 bg-yellow-50 shadow-lg' : ''
                     } ${isLoading ? 'animate-pulse' : ''}`}
                     style={{ 
                       fontFamily: 'Fira Code, Arial, sans-serif',
+                      minHeight: '60px',
+                      maxHeight: '200px',
                       ...(powerUpMode && {
                         borderColor: '#FFD700',
                         boxShadow: '0 0 25px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 215, 0, 0.4)',
@@ -901,8 +929,8 @@ QUICK RESPONSE MODE ⚡:
                         : powerUpMode 
                           ? "⭐ Power-up mode! Ask complex questions for deep analysis..."
                           : useRAG 
-                            ? "🔍 Ask about your documents..." 
-                            : "💬 Type your message or command..."
+                            ? "🔍 Ask about your documents... (Shift+Enter for new line)"
+                            : "💬 Type your message or command... (Shift+Enter for new line)"
                     }
                   />
                   
@@ -987,7 +1015,7 @@ QUICK RESPONSE MODE ⚡:
                   </button>
                 </div>
                 <div className="text-xs mt-2 text-mario-brown font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
-                  Press ENTER to send, /help for commands 
+                  Press ENTER to send, SHIFT+ENTER for new line, /help for commands 
                   {useRAG && ' | 🔍 RAG Active'}
                   {powerUpMode && (
                     <span style={{ color: '#FFD700', textShadow: '0 0 2px rgba(255, 215, 0, 0.6)' }}>
