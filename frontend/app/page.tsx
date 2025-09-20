@@ -26,9 +26,9 @@ export default function Home() {
   const [dragActive, setDragActive] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // New state for collapsible sections
-  const [showSettings, setShowSettings] = useState(true)
-  const [showPDFManager, setShowPDFManager] = useState(true)
+  // New state for collapsible sections - expanded when no API key, collapsed when set
+  const [showSettings, setShowSettings] = useState(!apiKey)
+  const [showDocumentManager, setShowDocumentManager] = useState(!apiKey)
   
   // New state for file selection
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set())
@@ -104,6 +104,13 @@ export default function Home() {
     if (apiKey) {
       fetchUploadedFiles()
     }
+  }, [apiKey])
+
+  // Auto-collapse sections when API key is set, expand when not set
+  useEffect(() => {
+    const shouldExpand = !apiKey
+    setShowSettings(shouldExpand)
+    setShowDocumentManager(shouldExpand)
   }, [apiKey])
 
   const fetchUploadedFiles = async () => {
@@ -280,7 +287,7 @@ export default function Home() {
 
   const toggleSections = (expanded: boolean) => {
     setShowSettings(expanded)
-    setShowPDFManager(expanded)
+    setShowDocumentManager(expanded)
   }
 
   // Generate enhanced developer message based on power-up mode
@@ -647,17 +654,17 @@ QUICK RESPONSE MODE ⚡:
                 <div className="mario-border lg:col-span-3">
                   <div 
                     className="mario-header p-3 rounded-t-lg cursor-pointer hover:bg-mario-red/80 transition-colors"
-                    onClick={() => toggleSections(!showPDFManager)}
+                    onClick={() => toggleSections(!showDocumentManager)}
                   >
                     <div className="flex items-center justify-between">
                       <h2 className="text-lg font-bold mario-text text-white">📚 DOCUMENT MANAGER</h2>
                       <span className="text-white text-xl">
-                        {showPDFManager ? '🔽' : '▶️'}
+                        {showDocumentManager ? '🔽' : '▶️'}
                       </span>
                     </div>
                   </div>
                   
-                  {showPDFManager && (
+                  {showDocumentManager && (
                     <div className="p-4">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         
