@@ -93,7 +93,7 @@ export default function Home() {
     setMessages([
       {
         role: 'system',
-        content: 'SUPER MARIO WORLD RAG TERMINAL v2.2.0\n\n🍄 Welcome to the enhanced Mushroom Kingdom console!\n\n✨ FEATURES:\n🎯 **RAG Mode**: Upload PDFs and chat with your documents\n🔍 Smart document search with vector embeddings\n📚 Analyze files to get suggested questions and summaries\n🍄💪 **Power-Up Mode**: Toggle between critical thinking and quick answers\n⚡ Use the toggles in the header to control modes!\n\nQuick commands:\n- **/help**: Show all available commands\n- **/files**: Show uploaded files\n- **/files filename.pdf**: Analyze specific file\n- **/files #**: Analyze file by number\n\nLet\'s-a go! 🍄⭐',
+        content: 'SUPER MARIO WORLD RAG TERMINAL v2.2.0\n\n🍄 Welcome to the enhanced Mushroom Kingdom console!\n\n✨ FEATURES:\n🎯 **RAG Mode**: Upload PDFs and chat with your documents\n🔍 Smart document search with vector embeddings\n📚 Analyze files to get suggested questions and summaries\n🍄💪 **Power-Up Mode**: Toggle between critical thinking and quick answers\n🧠 **Conversation Memory**: Full context awareness across the session\n⚡ Use the toggles in the header to control modes!\n\nQuick commands:\n- **/help**: Show all available commands\n- **/clear**: Reset screen & conversation memory for fresh start\n- **/files**: Show uploaded files\n- **/files filename.pdf**: Analyze specific file\n- **/files #**: Analyze file by number\n\n💡 **Memory Feature**: I remember our entire conversation until you use `/clear`!\n\nLet\'s-a go! 🍄⭐',
         timestamp: new Date()
       }
     ])
@@ -487,16 +487,21 @@ QUICK RESPONSE MODE ⚡:
                           case '/help':
                 setMessages(prev => [...prev, {
                   role: 'system',
-                  content: '🎯 Available commands:\n- **/help**: Show this help\n- **/clear**: Clear terminal\n- **/status**: Show connection status\n- **/files**: Show uploaded files\n- **/files filename.pdf**: Analyze specific file\n- **/files #**: Analyze file by number\n\n📚 Features:\n- **RAG Mode**: Upload PDFs and chat with documents (toggle in header)\n- **Power-Up Mode**: Critical thinking vs quick answers (toggle in header)\n- **File Analysis**: Get suggested questions and summaries\n- Use toggles in header to switch between modes',
+                  content: '🎯 Available commands:\n- **/help**: Show this help\n- **/clear**: Clear screen & reset conversation memory\n- **/status**: Show connection status\n- **/files**: Show uploaded files\n- **/files filename.pdf**: Analyze specific file\n- **/files #**: Analyze file by number\n\n📚 Features:\n- **RAG Mode**: Upload PDFs and chat with documents (toggle in header)\n- **Power-Up Mode**: Critical thinking vs quick answers (toggle in header)\n- **File Analysis**: Get suggested questions and summaries\n- **Memory Reset**: Use `/clear` for fresh conversations\n- Use toggles in header to switch between modes',
                   timestamp: new Date()
                 }])
                 break
             case '/clear':
+              // Reset conversation completely - both visual and memory
               setMessages([{
                 role: 'system',
-                content: '🧹 Terminal cleared! Ready for new adventures! 🎮\n',
+                content: '🧹 **COMPLETE RESET PERFORMED**\n\n✅ **Screen cleared**\n✅ **Conversation memory wiped**\n✅ **Context history reset**\n\n🚀 Starting fresh! The AI will not remember any previous conversations.\n\n💡 **Welcome back to LUIGI RAG System!**\nYour files are still available if you had any uploaded.\nType **/help** for available commands. 🎮',
                 timestamp: new Date()
               }])
+              // Additional state resets for a truly fresh start
+              // Note: We keep API key, uploaded files, and UI settings
+              // but reset conversational context completely
+              console.log('🧠 Conversation memory completely cleared!')
               break
                           case '/files':
                 await handleFilesCommand(command.trim())
