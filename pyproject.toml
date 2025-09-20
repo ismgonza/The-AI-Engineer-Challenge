@@ -7,7 +7,10 @@ requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.115.12",
     "jupyter>=1.1.1",
+    "numpy>=2.3.3",
     "openai",
     "pydantic>=2.11.4",
+    "pypdf2>=3.0.1",
+    "python-dotenv>=1.1.1",
     "uvicorn>=0.34.2",
 ]

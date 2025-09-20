@@ -6,6 +6,8 @@ interface Message {
   role: 'user' | 'assistant' | 'system'
   content: string
   timestamp: Date
+  usedRAG?: boolean  // Track if this message was generated using RAG
+  usedPowerUp?: boolean  // Track if this message was generated with power-up mode
 }
 
 export default function Home() {
@@ -15,7 +17,6 @@ export default function Home() {
   const [apiKey, setApiKey] = useState('')
   const [model, setModel] = useState('gpt-4.1-mini')
   const [isLoading, setIsLoading] = useState(false)
-  const [showSettings, setShowSettings] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // New state for PDF RAG functionality
@@ -25,8 +26,63 @@ export default function Home() {
   const [dragActive, setDragActive] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // New state for collapsible sections
+  const [showSettings, setShowSettings] = useState(true)
+  const [showPDFManager, setShowPDFManager] = useState(true)
+  
+  // New state for file selection
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set())
+  
+  // New state for power-up mode (critical thinking vs quick answers)
+  const [powerUpMode, setPowerUpMode] = useState(false)
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  // Simple markdown renderer for better text formatting
+  const renderMarkdown = (text: string) => {
+    let html = text
+      // Headers (process from most specific to least specific)
+      .replace(/^### (.+)$/gm, '<h4 style="font-weight: bold; font-size: 1.05em; margin: 12px 0 6px 0; color: #8B4513;">$1</h4>')
+      .replace(/^## (.+)$/gm, '<h3 style="font-weight: bold; font-size: 1.1em; margin: 16px 0 8px 0; color: #8B4513;">$1</h3>')
+      .replace(/^# (.+)$/gm, '<h2 style="font-weight: bold; font-size: 1.2em; margin: 20px 0 10px 0; color: #8B4513;">$1</h2>')
+      // Bold text
+      .replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: bold;">$1</strong>')
+      // Italic text
+      .replace(/\*(.*?)\*/g, '<em style="font-style: italic;">$1</em>')
+
+    // Handle lists - replace the entire list block at once to avoid extra newlines
+    html = html.replace(/((?:^[-•]\s.+(?:\n|$))+)/gm, (match) => {
+      const listItems = match.trim().split('\n').map(line => {
+        const itemMatch = line.match(/^[-•]\s(.+)$/)
+        if (itemMatch) {
+          return `<div style="margin: 2px 0; padding-left: 16px;">• ${itemMatch[1]}</div>`
+        }
+        return line
+      }).join('')
+      return listItems
+    })
+
+    // Handle numbered lists similarly
+    html = html.replace(/((?:^\d+\.\s.+(?:\n|$))+)/gm, (match) => {
+      const listItems = match.trim().split('\n').map(line => {
+        const itemMatch = line.match(/^(\d+)\.\s(.+)$/)
+        if (itemMatch) {
+          return `<div style="margin: 2px 0; padding-left: 16px;">${itemMatch[1]}. ${itemMatch[2]}</div>`
+        }
+        return line
+      }).join('')
+      return listItems
+    })
+
+    // Handle paragraph breaks (double newlines)
+    html = html.replace(/\n\n+/g, '<br><br>')
+    
+    // Convert remaining single newlines
+    html = html.replace(/\n/g, '<br>')
+
+    return { __html: html }
   }
 
   useEffect(() => {
@@ -37,7 +93,7 @@ export default function Home() {
     setMessages([
       {
         role: 'system',
-        content: 'SUPER MARIO WORLD RAG TERMINAL v2.0.0\n\n🍄 Welcome to the enhanced Mushroom Kingdom console!\n\n✨ NEW FEATURES:\n🎯 Upload PDFs and chat with your documents using RAG!\n🔍 Smart document search with vector embeddings\n📚 Ask questions about your uploaded content\n\nAvailable commands:\n- /help - Show available commands\n- /clear - Clear terminal\n- /settings - Toggle settings panel\n- /status - Show connection status\n- /rag - Toggle RAG mode\n- /files - Show uploaded files\n\nLet\'s-a go! 🍄⭐\n',
+        content: 'SUPER MARIO WORLD RAG TERMINAL v2.2.0\n\n🍄 Welcome to the enhanced Mushroom Kingdom console!\n\n✨ FEATURES:\n🎯 **RAG Mode**: Upload PDFs and chat with your documents\n🔍 Smart document search with vector embeddings\n📚 Analyze files to get suggested questions and summaries\n🍄💪 **Power-Up Mode**: Toggle between critical thinking and quick answers\n⚡ Use the toggles in the header to control modes!\n\nQuick commands:\n- **/help**: Show all available commands\n- **/files**: Show uploaded files\n- **/files filename.pdf**: Analyze specific file\n- **/files #**: Analyze file by number\n\nLet\'s-a go! 🍄⭐',
         timestamp: new Date()
       }
     ])
@@ -57,7 +113,10 @@ export default function Home() {
       const response = await fetch(`/api/files?api_key=${encodeURIComponent(apiKey)}`)
       if (response.ok) {
         const data = await response.json()
-        setUploadedFiles(data.files || [])
+        const newFiles = data.files || []
+        setUploadedFiles(newFiles)
+        // Clear selections if file list changed
+        setSelectedFiles(prev => new Set(Array.from(prev).filter(file => newFiles.includes(file))))
       }
     } catch (error) {
       console.error('Error fetching files:', error)
@@ -68,7 +127,7 @@ export default function Home() {
     if (!apiKey) {
       setMessages(prev => [...prev, {
         role: 'system',
-        content: '🔑 Please set your OpenAI API key in settings first!',
+        content: '🔑 Please set your OpenAI API key first!',
         timestamp: new Date()
       }])
       return
@@ -104,8 +163,9 @@ export default function Home() {
         timestamp: new Date()
       }])
 
-      // Refresh uploaded files list
+      // Refresh uploaded files list and clear selection
       await fetchUploadedFiles()
+      setSelectedFiles(new Set())
       
     } catch (error) {
       console.error('Error uploading files:', error)
@@ -153,6 +213,7 @@ export default function Home() {
 
       if (response.ok) {
         setUploadedFiles([])
+        setSelectedFiles(new Set())
         setUseRAG(false)
         setMessages(prev => [...prev, {
           role: 'system',
@@ -163,6 +224,172 @@ export default function Home() {
     } catch (error) {
       console.error('Error clearing files:', error)
     }
+  }
+
+  const handleFileSelection = (filename: string, checked: boolean) => {
+    const newSelected = new Set(selectedFiles)
+    if (checked) {
+      newSelected.add(filename)
+    } else {
+      newSelected.delete(filename)
+    }
+    setSelectedFiles(newSelected)
+  }
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedFiles(new Set(uploadedFiles))
+    } else {
+      setSelectedFiles(new Set())
+    }
+  }
+
+  const deleteSelectedFiles = async () => {
+    if (selectedFiles.size === 0) return
+    
+    if (selectedFiles.size === uploadedFiles.length) {
+      // If all files selected, use clear all endpoint
+      await clearFiles()
+    } else {
+      // For now, we'll show a message that individual file deletion needs backend support
+      setMessages(prev => [...prev, {
+        role: 'system',
+        content: `🚧 Individual file deletion not yet implemented. Select all files to delete everything, or we need to add backend support for individual file deletion.`,
+        timestamp: new Date()
+      }])
+    }
+  }
+
+  const toggleSections = (expanded: boolean) => {
+    setShowSettings(expanded)
+    setShowPDFManager(expanded)
+  }
+
+  // Generate enhanced developer message based on power-up mode
+  const getEnhancedDeveloperMessage = () => {
+    const baseMessage = developerMessage
+    
+    if (powerUpMode) {
+      return `${baseMessage}
+
+CRITICAL THINKING MODE ACTIVATED 🍄💪:
+- Think deeply and analytically about each question
+- Provide comprehensive, well-reasoned responses
+- Consider multiple perspectives and potential implications
+- Include step-by-step reasoning when appropriate
+- Be thorough and educational in your explanations
+- Take time to explore nuances and complexities
+- Use detailed analysis and comprehensive coverage`
+    } else {
+      return `${baseMessage}
+
+QUICK RESPONSE MODE ⚡:
+- Provide concise, direct answers
+- Focus on the most essential information only
+- Be clear and to-the-point
+- Minimize unnecessary elaboration
+- Prioritize brevity and efficiency`
+    }
+  }
+
+  const handleRAGToggle = () => {
+    if (uploadedFiles.length === 0) {
+      setMessages(prev => [...prev, {
+        role: 'system',
+        content: '📁 No PDFs uploaded! Upload PDFs first to use RAG mode. 🔍',
+        timestamp: new Date()
+      }])
+      return
+    }
+    
+    setUseRAG(!useRAG)
+    // Silent toggle - no chat messages
+  }
+
+  const handleFilesCommand = async (command: string) => {
+    const parts = command.trim().split(' ')
+    
+    if (uploadedFiles.length === 0) {
+      setMessages(prev => [...prev, {
+        role: 'system',
+        content: '📁 No files uploaded yet. Upload some PDFs to get started! 🚀',
+        timestamp: new Date()
+      }])
+      return
+    }
+
+    // If just "/files" without parameters, show list
+    if (parts.length === 1) {
+      setMessages(prev => [...prev, {
+        role: 'system',
+        content: `📚 Uploaded files (${uploadedFiles.length}):\n${uploadedFiles.map((file, index) => `${index + 1}. 📄 ${file}`).join('\n')}\n\n🔍 RAG mode: ${useRAG ? '✅ Active' : '❌ Inactive'}\n\n💡 Tip: Type "**/files filename.pdf**" or "**/files #**" to analyze a specific file!`,
+        timestamp: new Date()
+      }])
+      return
+    }
+
+    // If "/files [filename/index]", analyze specific file
+    if (parts.length === 2) {
+      const target = parts[1]
+      
+      if (!apiKey) {
+        setMessages(prev => [...prev, {
+          role: 'system',
+          content: '🔑 Please set your OpenAI API key to analyze files!',
+          timestamp: new Date()
+        }])
+        return
+      }
+
+      setMessages(prev => [...prev, {
+        role: 'system',
+        content: `🔍 Analyzing file: ${target}... Please wait!`,
+        timestamp: new Date()
+      }])
+
+      try {
+        const response = await fetch('/api/analyze-file', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            api_key: apiKey,
+            filename_or_index: target,
+            model: model
+          }),
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.detail || `HTTP error! status: ${response.status}`)
+        }
+
+        const result = await response.json()
+        
+        setMessages(prev => [...prev, {
+          role: 'system',
+          content: `📄 **Analysis for:** ${result.filename}\n📊 **Content length:** ${result.content_length} characters\n\n${result.analysis}`,
+          timestamp: new Date()
+        }])
+
+      } catch (error) {
+        console.error('Error analyzing file:', error)
+        setMessages(prev => [...prev, {
+          role: 'system',
+          content: `❌ Error analyzing file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          timestamp: new Date()
+        }])
+      }
+      return
+    }
+
+    // Invalid syntax
+    setMessages(prev => [...prev, {
+      role: 'system',
+      content: '❓ Invalid syntax! Use:\n- **/files**: Show all files\n- **/files filename.pdf**: Analyze specific file\n- **/files #**: Analyze file by number',
+      timestamp: new Date()
+    }])
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -190,7 +417,7 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          developer_message: developerMessage,
+          developer_message: getEnhancedDeveloperMessage(),
           user_message: userMessage,
           model: model,
           api_key: apiKey,
@@ -209,7 +436,9 @@ export default function Home() {
       const newAssistantMessage: Message = {
         role: 'assistant',
         content: '',
-        timestamp: new Date()
+        timestamp: new Date(),
+        usedRAG: useRAG,  // Track whether RAG was used for this message
+        usedPowerUp: powerUpMode  // Track whether power-up was active for this message
       }
       setMessages(prev => [...prev, newAssistantMessage])
 
@@ -234,6 +463,7 @@ export default function Home() {
         role: 'system',
         content: `ERROR: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
         timestamp: new Date()
+        // Note: system messages don't need usedRAG property
       }
       setMessages(prev => [...prev, errorMessage])
     } finally {
@@ -241,15 +471,18 @@ export default function Home() {
     }
   }
 
-          const handleCommand = (command: string) => {
-          switch (command.toLowerCase()) {
-            case '/help':
-              setMessages(prev => [...prev, {
-                role: 'system',
-                content: '🎯 Available commands:\n- /help - Show this help\n- /clear - Clear terminal\n- /settings - Toggle settings panel\n- /status - Show connection status\n- /rag - Toggle RAG mode\n- /files - Show uploaded files\n- /powerup - Get a power-up! 🍄\n\n📚 RAG Features:\n- Upload PDFs to chat with documents\n- RAG mode searches your uploaded content\n- Regular mode uses standard AI chat',
-                timestamp: new Date()
-              }])
-              break
+          const handleCommand = async (command: string) => {
+          const commandParts = command.trim().toLowerCase().split(' ')
+          const mainCommand = commandParts[0]
+          
+          switch (mainCommand) {
+                          case '/help':
+                setMessages(prev => [...prev, {
+                  role: 'system',
+                  content: '🎯 Available commands:\n- **/help**: Show this help\n- **/clear**: Clear terminal\n- **/status**: Show connection status\n- **/files**: Show uploaded files\n- **/files filename.pdf**: Analyze specific file\n- **/files #**: Analyze file by number\n\n📚 Features:\n- **RAG Mode**: Upload PDFs and chat with documents (toggle in header)\n- **Power-Up Mode**: Critical thinking vs quick answers (toggle in header)\n- **File Analysis**: Get suggested questions and summaries\n- Use toggles in header to switch between modes',
+                  timestamp: new Date()
+                }])
+                break
             case '/clear':
               setMessages([{
                 role: 'system',
@@ -257,58 +490,21 @@ export default function Home() {
                 timestamp: new Date()
               }])
               break
-            case '/settings':
-              setShowSettings(!showSettings)
-              break
-            case '/rag':
-              if (uploadedFiles.length === 0) {
-                setMessages(prev => [...prev, {
-                  role: 'system',
-                  content: '📁 No PDFs uploaded! Upload PDFs first to use RAG mode. 🔍',
-                  timestamp: new Date()
-                }])
-              } else {
-                setUseRAG(!useRAG)
-                setMessages(prev => [...prev, {
-                  role: 'system',
-                  content: `🔍 RAG mode ${!useRAG ? 'ACTIVATED' : 'DEACTIVATED'}! ${!useRAG ? 'Now chatting with your PDFs 📚' : 'Now using regular chat 💬'}`,
-                  timestamp: new Date()
-                }])
-              }
-              break
-            case '/files':
-              if (uploadedFiles.length === 0) {
-                setMessages(prev => [...prev, {
-                  role: 'system',
-                  content: '📁 No files uploaded yet. Upload some PDFs to get started! 🚀',
-                  timestamp: new Date()
-                }])
-              } else {
-                setMessages(prev => [...prev, {
-                  role: 'system',
-                  content: `📚 Uploaded files (${uploadedFiles.length}):\n${uploadedFiles.map(file => `📄 ${file}`).join('\n')}\n\n🔍 RAG mode: ${useRAG ? '✅ Active' : '❌ Inactive'}`,
-                  timestamp: new Date()
-                }])
-              }
-              break
+                          case '/files':
+                await handleFilesCommand(command.trim())
+                break
             case '/status':
               setMessages(prev => [...prev, {
                 role: 'system',
-                content: `📊 Status:\n- API Key: ${apiKey ? '✅ Set' : '❌ Not set'}\n- Model: ${model}\n- RAG Mode: ${useRAG ? '🔍 Active' : '💬 Inactive'}\n- Uploaded Files: ${uploadedFiles.length}\n- Developer Message: ${developerMessage.substring(0, 50)}...\n- Power Level: ${apiKey ? '🔥 Super!' : '🍄 Normal'}`,
+                content: `📊 Status:\n- API Key: ${apiKey ? '✅ Set' : '❌ Not set'}\n- Model: ${model}\n- RAG Mode: ${useRAG ? '🔍 Active' : '💬 Inactive'}\n- Uploaded Files: ${uploadedFiles.length}\n- Thinking Mode: ${powerUpMode ? '🍄💪 Critical Thinking' : '⚡ Quick Answers'}\n- Developer Message: ${developerMessage.substring(0, 50)}...`,
                 timestamp: new Date()
               }])
               break
-            case '/powerup':
-              setMessages(prev => [...prev, {
-                role: 'system',
-                content: '🍄 Power-up activated! You\'re now Super Mario! 💪\n⭐ Extra strength and wisdom unlocked! ⭐\n🔍 RAG powers enhanced for document understanding! 📚',
-                timestamp: new Date()
-              }])
-              break
+
             default:
               setMessages(prev => [...prev, {
                 role: 'system',
-                content: `❓ Unknown command: ${command}. Type /help for available commands. 🎮`,
+                content: `❓ Unknown command: ${mainCommand}. Type /help for available commands. 🎮`,
                 timestamp: new Date()
               }])
           }
@@ -327,17 +523,23 @@ export default function Home() {
   }
 
           return (
-          <div className="min-h-screen mario-bg text-mario-dark font-mario-text p-4">
+          <div className="h-screen flex flex-col mario-bg text-mario-dark" style={{ fontFamily: 'Arial, sans-serif' }}>
             {/* Header */}
-            <div className="mario-border p-4 mb-4">
+            <div className="flex-shrink-0 mario-border m-4 mb-2">
               <div className="mario-header p-4 rounded-t-lg">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="mario-star text-mario-gold text-2xl">⭐</span>
-                    <h1 className="text-xl font-bold mario-text text-white">SUPER MARIO WORLD RAG TERMINAL</h1>
+                    <span className={`mario-star text-mario-gold text-2xl ${powerUpMode ? 'animate-spin' : ''}`}>⭐</span>
+                    <h1 className={`text-xl font-bold mario-text text-white ${powerUpMode ? 'animate-pulse' : ''}`}>
+                      SUPER MARIO WORLD RAG TERMINAL
+                    </h1>
                     <span className="mario-coin text-mario-gold text-2xl">🪙</span>
-                    {useRAG && (
-                      <span className="text-mario-yellow text-lg animate-pulse">🔍</span>
+                    {powerUpMode && (
+                      <>
+                        <span className="text-yellow-400 text-xl animate-bounce">⭐</span>
+                        <span className="text-yellow-300 text-lg animate-pulse">✨</span>
+                        <span className="text-yellow-400 text-xl animate-bounce" style={{animationDelay: '0.5s'}}>⭐</span>
+                      </>
                     )}
                   </div>
                   <div className="flex items-center space-x-2">
@@ -347,221 +549,377 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="text-sm mt-2 text-white mario-text-small">
-                  🎮 Connected to Mushroom Kingdom RAG AI v2.0.0 | 
-                  {useRAG ? ' 🔍 RAG Mode Active' : ' 💬 Chat Mode Active'} | 
-                  📁 {uploadedFiles.length} files loaded
+                  🎮 Connected to Mushroom Kingdom RAG AI v2.2.0 | 📁 {uploadedFiles.length} files loaded
                 </div>
               </div>
             </div>
 
-            {/* PDF Upload Section */}
-            <div className="mario-border p-4 mb-4">
-              <div className="mario-header p-4 rounded-t-lg mb-4">
-                <h2 className="text-lg font-bold mario-text text-white">📚 PDF DOCUMENT MANAGER 📚</h2>
-              </div>
-              
-              <div className="p-4 space-y-4">
-                {/* File Upload Area */}
-                <div
-                  className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                    dragActive 
-                      ? 'border-mario-yellow bg-mario-yellow/20' 
-                      : 'border-mario-brown hover:border-mario-red'
-                  }`}
-                  onDragEnter={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDragOver={handleDrag}
-                  onDrop={handleDrop}
-                >
-                  <div className="space-y-2">
-                    <div className="text-4xl">📄</div>
-                    <div className="mario-text-small font-bold">
-                      {isUploading ? (
-                        <div className="text-mario-red">🔄 Processing PDFs...</div>
-                      ) : (
-                        <>
-                          <div>Drag & drop PDF files here</div>
-                          <div className="text-sm text-mario-brown">or click to browse</div>
-                        </>
-                      )}
+            {/* Settings and PDF Upload - Side by Side with Collapsible Headers */}
+            <div className="flex-shrink-0 mx-4 mb-2">
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+                
+                {/* Settings Panel - Takes 2 columns */}
+                <div className="mario-border lg:col-span-2">
+                  <div 
+                    className="mario-header p-3 rounded-t-lg cursor-pointer hover:bg-mario-red/80 transition-colors"
+                    onClick={() => toggleSections(!showSettings)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-lg font-bold mario-text text-white">🍄 POWER-UP CONFIGURATION</h2>
+                      <span className="text-white text-xl">
+                        {showSettings ? '🔽' : '▶️'}
+                      </span>
                     </div>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      multiple
-                      accept=".pdf"
-                      onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
-                      className="hidden"
-                    />
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isUploading}
-                      className="mario-button p-2 text-white font-bold mario-text-small disabled:opacity-50"
-                    >
-                      📁 BROWSE FILES
-                    </button>
-                  </div>
-                </div>
-
-                {/* File Management */}
-                <div className="flex items-center justify-between">
-                  <div className="mario-text-small">
-                    📁 <strong>{uploadedFiles.length}</strong> files uploaded
                   </div>
                   
-                  <div className="flex space-x-2">
-                    {uploadedFiles.length > 0 && (
-                      <>
+                  {showSettings && (
+                    <div className="p-4 space-y-3">
+                      <div>
+                        <label className="block text-sm mb-1 mario-text-small font-normal">🔑 OpenAI API Key:</label>
+                        <input
+                          type="password"
+                          value={apiKey}
+                          onChange={(e) => setApiKey(e.target.value)}
+                          className="w-full mario-input p-2 text-mario-dark focus:outline-none text-sm"
+                          placeholder="sk-..."
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm mb-1 mario-text-small font-normal">🤖 AI Model:</label>
+                        <select
+                          value={model}
+                          onChange={(e) => setModel(e.target.value)}
+                          className="w-full mario-input p-2 text-mario-dark focus:outline-none text-sm"
+                        >
+                          <option value="gpt-4.1-mini">GPT-4.1 Mini</option>
+                          <option value="gpt-4">GPT-4</option>
+                          <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm mb-1 mario-text-small font-normal">💬 Developer Message:</label>
+                        <textarea
+                          value={developerMessage}
+                          onChange={(e) => setDeveloperMessage(e.target.value)}
+                          rows={2}
+                          className="w-full mario-input p-2 text-mario-dark focus:outline-none resize-none text-sm"
+                          placeholder="Enter system prompt..."
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* PDF Upload Section - Takes 3 columns */}
+                <div className="mario-border lg:col-span-3">
+                  <div 
+                    className="mario-header p-3 rounded-t-lg cursor-pointer hover:bg-mario-red/80 transition-colors"
+                    onClick={() => toggleSections(!showPDFManager)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-lg font-bold mario-text text-white">📚 PDF DOCUMENT MANAGER</h2>
+                      <span className="text-white text-xl">
+                        {showPDFManager ? '🔽' : '▶️'}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {showPDFManager && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        
+                        {/* Left: File Upload Area - Takes 1 column */}
+                        <div className="space-y-3 md:col-span-1">
+                          <div className="mario-text-small font-normal text-sm font-bold">📤 Upload PDFs</div>
+                          <div
+                            className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
+                              dragActive 
+                                ? 'border-mario-yellow bg-mario-yellow/20' 
+                                : 'border-mario-brown hover:border-mario-red'
+                            }`}
+                            onDragEnter={handleDrag}
+                            onDragLeave={handleDrag}
+                            onDragOver={handleDrag}
+                            onDrop={handleDrop}
+                          >
+                            <div className="space-y-2">
+                              <div className="text-2xl">📄</div>
+                              <div className="mario-text-small font-normal text-sm">
+                                {isUploading ? (
+                                  <div className="text-mario-red">🔄 Processing PDFs...</div>
+                                ) : (
+                                  <>
+                                    <div>Drag & drop PDF files here</div>
+                                    <div className="text-xs text-mario-brown">or click to browse</div>
+                                  </>
+                                )}
+                              </div>
+                              <input
+                                ref={fileInputRef}
+                                type="file"
+                                multiple
+                                accept=".pdf"
+                                onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
+                                className="hidden"
+                              />
+                              <button
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={isUploading}
+                                className="mario-button p-2 text-white font-normal mario-text-small disabled:opacity-50 text-sm"
+                              >
+                                📁 BROWSE FILES
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Right: Uploaded Files List - Takes 2 columns */}
+                        <div className="space-y-3 md:col-span-2">
+                          <div className="flex items-center justify-between">
+                            <div className="mario-text-small text-sm font-normal font-bold">
+                              📚 Uploaded Documents ({uploadedFiles.length})
+                            </div>
+                            {uploadedFiles.length > 0 && (
+                              <div className="flex space-x-2">
+                                <button
+                                  onClick={deleteSelectedFiles}
+                                  disabled={selectedFiles.size === 0}
+                                  className="mario-button p-2 text-white font-normal mario-text-small bg-mario-red text-xs disabled:opacity-50"
+                                >
+                                  🗑️ DELETE
+                                </button>
+                              </div>
+                            )}
+                          </div>
+
+                          {uploadedFiles.length > 0 ? (
+                            <div className="mario-message p-3 max-h-32 overflow-y-auto">
+                              {/* Select All Checkbox */}
+                              <div className="flex items-center space-x-2 mb-2 pb-2 border-b border-mario-brown/30">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedFiles.size === uploadedFiles.length && uploadedFiles.length > 0}
+                                  onChange={(e) => handleSelectAll(e.target.checked)}
+                                  className="w-4 h-4"
+                                />
+                                <span className="text-xs font-bold">Select All</span>
+                              </div>
+                              
+                              {/* File List */}
+                              <div className="space-y-1">
+                                {uploadedFiles.map((file, index) => (
+                                  <div key={index} className="flex items-center space-x-2 text-xs">
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedFiles.has(file)}
+                                      onChange={(e) => handleFileSelection(file, e.target.checked)}
+                                      className="w-4 h-4"
+                                    />
+                                    <span className="text-mario-brown">{index + 1}.</span>
+                                    <span>📄</span>
+                                    <span className="truncate flex-1" title={file}>{file}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="mario-message p-3 text-center text-mario-brown text-sm">
+                              No files uploaded yet
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Messages Display - Flexible Height */}
+            <div className="flex-1 mx-4 mb-2 mario-border overflow-hidden flex flex-col">
+              <div className="flex-1 p-4 overflow-y-auto">
+                <div className="space-y-3">
+                  {messages.map((message, index) => (
+                                          <div key={index} className="mario-message p-3">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-start space-x-2">
+                            <span className="text-mario-red font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
+                              {message.role === 'user' ? '🎮 MARIO' : message.role === 'assistant' ? '🤖 LUIGI' : '🍄 SYSTEM'}
+                            </span>
+                            <span className="text-mario-brown text-xs font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
+                              [{message.timestamp.toLocaleTimeString()}]
+                            </span>
+                          </div>
+                          
+                          {/* Indicators on the right side */}
+                          <div className="flex items-center space-x-2">
+                            {message.role === 'assistant' && message.usedRAG && (
+                              <span className="text-red-500 text-xs font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                🔍 RAG
+                              </span>
+                            )}
+                                                    {message.role === 'assistant' && message.usedPowerUp && (
+                          <span className="text-xs font-normal animate-pulse" style={{ 
+                            fontFamily: 'Arial, sans-serif',
+                            color: '#FFD700',
+                            textShadow: '0 0 4px rgba(255, 215, 0, 0.6)'
+                          }}>
+                            ⭐ POWER-UP
+                          </span>
+                        )}
+                          </div>
+                        </div>
+                        
+                        <div className="ml-4">
+                          <div 
+                            className="text-sm font-normal" 
+                            style={{ fontFamily: 'Arial, sans-serif' }}
+                            dangerouslySetInnerHTML={renderMarkdown(message.content)}
+                          />
+                          
+                          {message.role === 'assistant' && index === messages.length - 1 && isLoading && (
+                            <span className="animate-pulse text-mario-red">▋</span>
+                          )}
+                        </div>
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
+              </div>
+            </div>
+
+            {/* Input Area - Stick to Bottom */}
+            <div className="flex-shrink-0 mx-4 mb-4 mario-border">
+              <form onSubmit={handleSubmit} className="p-4">
+                <div className="flex items-center space-x-3">
+                  <span className="text-mario-red font-normal mario-text text-2xl">{'>'}</span>
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    disabled={isLoading}
+                    className={`flex-1 mario-input p-3 text-mario-dark placeholder-mario-brown/50 font-normal ${
+                      powerUpMode ? 'border-2 bg-yellow-50' : ''
+                    }`}
+                    style={{ 
+                      fontFamily: 'Arial, sans-serif',
+                      ...(powerUpMode && {
+                        borderColor: '#FFD700',
+                        boxShadow: '0 0 20px rgba(255, 215, 0, 0.6), 0 0 30px rgba(255, 215, 0, 0.3)',
+                        animation: 'pulse 2s infinite'
+                      })
+                    }}
+                    placeholder={
+                      isLoading 
+                        ? "🔄 Processing..." 
+                        : powerUpMode 
+                          ? "⭐ Power-up mode! Ask complex questions for deep analysis..."
+                          : useRAG 
+                            ? "🔍 Ask about your PDFs..." 
+                            : "💬 Type your message or command..."
+                    }
+                  />
+                  
+                  {/* Mode Toggles */}
+                  <div className="flex items-center space-x-4">
+                    {/* RAG Toggle */}
+                    <div className="flex flex-col items-center space-y-1">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-mario-brown text-xs font-normal">🔍</span>
                         <button
-                          onClick={() => setUseRAG(!useRAG)}
-                          className={`mario-button p-2 text-white font-bold mario-text-small ${
+                          onClick={handleRAGToggle}
+                          disabled={uploadedFiles.length === 0}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
                             useRAG ? 'bg-mario-green' : 'bg-mario-red'
                           }`}
                         >
-                          {useRAG ? '🔍 RAG ON' : '💬 RAG OFF'}
+                          <span
+                            className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                              useRAG ? 'translate-x-5' : 'translate-x-1'
+                            }`}
+                          />
                         </button>
+                      </div>
+                      <span className={`text-xs font-normal ${useRAG ? 'text-mario-green' : 'text-mario-red'}`}>
+                        RAG
+                      </span>
+                    </div>
+
+                    {/* Power-Up Toggle */}
+                    <div className="flex flex-col items-center space-y-1">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-mario-brown text-xs font-normal">⭐</span>
                         <button
-                          onClick={clearFiles}
-                          className="mario-button p-2 text-white font-bold mario-text-small bg-mario-red"
+                          onClick={() => setPowerUpMode(!powerUpMode)}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${
+                            powerUpMode ? 'bg-yellow-400' : 'bg-mario-red'
+                          }`}
+                          style={powerUpMode ? {
+                            backgroundColor: '#FFD700',
+                            boxShadow: '0 0 12px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.4)'
+                          } : {}}
                         >
-                          🧹 CLEAR ALL
+                          <span
+                            className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                              powerUpMode ? 'translate-x-5' : 'translate-x-1'
+                            }`}
+                          />
                         </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Uploaded Files List */}
-                {uploadedFiles.length > 0 && (
-                  <div className="mario-message p-3">
-                    <div className="mario-text-small font-bold mb-2">📚 Uploaded Documents:</div>
-                    <div className="space-y-1">
-                      {uploadedFiles.map((file, index) => (
-                        <div key={index} className="flex items-center space-x-2 text-sm">
-                          <span>📄</span>
-                          <span>{file}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-                  {/* Settings Panel */}
-            {showSettings && (
-              <div className="mario-border p-4 mb-4">
-                <div className="mario-header p-4 rounded-t-lg mb-4">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-bold mario-text text-white">🍄 POWER-UP CONFIGURATION 🍄</h2>
-                    <button
-                      onClick={() => setShowSettings(false)}
-                      className="text-white hover:text-mario-yellow text-xl"
-                    >
-                      ❌
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-4 p-4">
-                  <div>
-                    <label className="block text-sm mb-2 mario-text-small font-bold">🔑 OpenAI API Key:</label>
-                    <input
-                      type="password"
-                      value={apiKey}
-                      onChange={(e) => setApiKey(e.target.value)}
-                      className="w-full mario-input p-3 text-mario-dark focus:outline-none"
-                      placeholder="sk-..."
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm mb-2 mario-text-small font-bold">🤖 AI Model:</label>
-                    <select
-                      value={model}
-                      onChange={(e) => setModel(e.target.value)}
-                      className="w-full mario-input p-3 text-mario-dark focus:outline-none"
-                    >
-                      <option value="gpt-4.1-mini">GPT-4.1 Mini</option>
-                      <option value="gpt-4">GPT-4</option>
-                      <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm mb-2 mario-text-small font-bold">💬 Developer Message:</label>
-                    <textarea
-                      value={developerMessage}
-                      onChange={(e) => setDeveloperMessage(e.target.value)}
-                      rows={3}
-                      className="w-full mario-input p-3 text-mario-dark focus:outline-none resize-none"
-                      placeholder="Enter system prompt..."
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-                  {/* Messages Display */}
-            <div className="mario-border p-4 mb-4 h-96 overflow-y-auto">
-              <div className="space-y-3">
-                {messages.map((message, index) => (
-                  <div key={index} className="mario-message p-3">
-                    <div className="flex items-start space-x-2 mb-2">
-                      <span className="text-mario-red font-bold mario-text-small">
-                        {message.role === 'user' ? '🎮 MARIO' : message.role === 'assistant' ? (useRAG ? '🔍 LUIGI-RAG' : '🤖 LUIGI') : '🍄 SYSTEM'}
-                      </span>
-                      <span className="text-mario-brown text-xs mario-text-small">
-                        [{message.timestamp.toLocaleTimeString()}]
+                      </div>
+                      <span className={`text-xs font-normal ${powerUpMode ? 'text-yellow-300' : 'text-mario-red'}`} style={powerUpMode ? {
+                        color: '#FFD700',
+                        textShadow: '0 0 4px rgba(255, 215, 0, 0.6)'
+                      } : {}}>
+                        POWER
                       </span>
                     </div>
-                    <div className="ml-4 whitespace-pre-wrap text-sm mario-text-small">
-                      {message.content}
-                      {message.role === 'assistant' && index === messages.length - 1 && isLoading && (
-                        <span className="animate-pulse text-mario-red">▋</span>
-                      )}
-                    </div>
                   </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading || !input.trim()}
+                    className={`mario-button p-3 text-white font-normal mario-text-small disabled:opacity-50 disabled:cursor-not-allowed ${
+                      powerUpMode ? 'hover:bg-yellow-600' : ''
+                    }`}
+                    style={powerUpMode ? {
+                      backgroundColor: '#FFD700',
+                      boxShadow: '0 0 15px rgba(255, 215, 0, 0.8), 0 0 25px rgba(255, 215, 0, 0.4)',
+                      animation: 'pulse 1.5s infinite'
+                    } : {}}
+                  >
+                    {powerUpMode 
+                      ? '⭐ POWER' 
+                      : useRAG 
+                        ? '🔍 RAG' 
+                        : '🚀 SEND'
+                    }
+                  </button>
+                </div>
+                <div className="text-xs mt-2 text-mario-brown font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
+                  Press ENTER to send, /help for commands 
+                  {useRAG && ' | 🔍 RAG Active'}
+                  {powerUpMode && (
+                    <span style={{ color: '#FFD700', textShadow: '0 0 2px rgba(255, 215, 0, 0.6)' }}>
+                      {' | ⭐ Power Active'}
+                    </span>
+                  )}
+                </div>
+              </form>
             </div>
 
-                  {/* Input Area */}
-            <form onSubmit={handleSubmit} className="mario-border p-4">
-              <div className="flex items-center space-x-3">
-                <span className="text-mario-red font-bold mario-text text-2xl">{'>'}</span>
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  disabled={isLoading}
-                  className="flex-1 mario-input p-3 text-mario-dark placeholder-mario-brown/50"
-                  placeholder={isLoading ? "🔄 Processing..." : useRAG ? "🔍 Ask about your PDFs..." : "💬 Type your message or command..."}
-                />
-                <button
-                  type="submit"
-                  disabled={isLoading || !input.trim()}
-                  className="mario-button p-3 text-white font-bold mario-text-small disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {useRAG ? '🔍 RAG' : '🚀 SEND'}
-                </button>
-              </div>
-              <div className="text-xs mt-2 text-mario-brown mario-text-small">
-                Press ENTER to send, /help for commands {useRAG && '| 🔍 RAG Mode Active'}
-              </div>
-            </form>
-
-                  {/* Footer */}
-            <div className="text-center mt-4 text-xs text-mario-brown mario-text-small">
-              <div className="flex items-center justify-center space-x-4">
-                <span>🍄 AI ENGINEER CHALLENGE</span>
-                <span className="mario-star">⭐</span>
-                <span>SUPER MARIO WORLD RAG v2.0.0</span>
-                <span className="mario-coin">🪙</span>
-                {useRAG && <span className="text-mario-yellow">🔍 RAG ACTIVE</span>}
-              </div>
+            {/* Footer */}
+            <div className="flex-shrink-0 text-center pb-4 text-xs text-mario-brown mario-text-small font-normal">
+                              <div className="flex items-center justify-center space-x-4">
+                  <span>🍄 AI ENGINEER CHALLENGE</span>
+                  <span className="mario-star">⭐</span>
+                  <span>SUPER MARIO WORLD RAG v2.2.0</span>
+                  <span className="mario-coin">🪙</span>
+                  {useRAG && <span className="text-mario-yellow">🔍 RAG ACTIVE</span>}
+                  {powerUpMode && <span className="text-yellow-400 animate-pulse">⭐ POWER-UP ACTIVE ⭐</span>}
+                </div>
             </div>
    </div>
   )
