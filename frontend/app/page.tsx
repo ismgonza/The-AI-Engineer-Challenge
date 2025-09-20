@@ -35,6 +35,9 @@ export default function Home() {
   
   // New state for power-up mode (critical thinking vs quick answers)
   const [powerUpMode, setPowerUpMode] = useState(false)
+  
+  // New state for sidebar
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -566,285 +569,289 @@ QUICK RESPONSE MODE ⚡:
     }
   }
 
-          return (
-          <div className="h-screen flex flex-col mario-bg text-mario-dark" style={{ fontFamily: 'Arial, sans-serif' }}>
-            {/* Enhanced Header */}
-            <div className="flex-shrink-0 mario-border m-4 mb-2 slide-in">
-              <div className="mario-header p-6 rounded-t-lg">
-                <div className="flex items-center justify-between flex-wrap gap-4">
-                  <div className="flex items-center space-x-3">
-                    <span className={`mario-star text-yellow-300 text-3xl ${powerUpMode ? 'animate-spin' : 'floating-animation'}`}>⭐</span>
-                    <h1 className={`text-xl md:text-2xl font-bold mario-text text-white ${powerUpMode ? 'animate-pulse glow-text' : ''}`}>
-                      SUPER MARIO WORLD RAG TERMINAL
-                    </h1>
-                    <span className="mario-coin text-yellow-300 text-3xl">🪙</span>
-                    {powerUpMode && (
-                      <>
-                        <span className="text-yellow-400 text-xl animate-bounce">⭐</span>
-                        <span className="text-yellow-300 text-lg animate-pulse">✨</span>
-                        <span className="text-yellow-400 text-xl animate-bounce" style={{animationDelay: '0.5s'}}>⭐</span>
-                      </>
+  return (
+    <div className="h-screen flex mario-bg text-mario-dark" style={{ fontFamily: 'Arial, sans-serif' }}>
+      {/* Sidebar */}
+      <div className={`flex-shrink-0 transition-all duration-300 ${sidebarOpen ? 'w-80' : 'w-0'} overflow-hidden`}>
+        <div className="h-full flex flex-col bg-gradient-to-b from-gray-900 to-gray-800 border-r border-gray-700">
+          {/* Sidebar Header */}
+          <div className="p-4 border-b border-gray-700">
+            <div className="flex items-center justify-between">
+              <h2 className="text-white font-bold mario-text">⚙️ CONTROLS</h2>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="text-gray-400 hover:text-white transition-colors p-1 rounded"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+          
+          {/* Sidebar Content */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* PowerUp Configuration Section */}
+            <div className="bg-gray-800 rounded-lg border border-gray-600">
+              <div 
+                className="p-3 cursor-pointer hover:bg-gray-700 transition-all duration-300 rounded-t-lg group"
+                onClick={() => toggleSections(!showSettings)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xl group-hover:animate-spin transition-transform">🍄</span>
+                    <h3 className="text-sm font-bold text-white">POWER-UP CONFIG</h3>
+                  </div>
+                  <span className={`text-white text-sm transition-transform duration-300 ${showSettings ? 'rotate-180' : ''}`}>
+                    🔽
+                  </span>
+                </div>
+              </div>
+              
+              {showSettings && (
+                <div className="p-3 space-y-3 border-t border-gray-600">
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold text-gray-300">🔑 OpenAI API Key</label>
+                    <input
+                      type="password"
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                      placeholder="sk-..."
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold text-gray-300">🤖 Model</label>
+                    <select
+                      value={model}
+                      onChange={(e) => setModel(e.target.value)}
+                      className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                    >
+                      <option value="gpt-4.1-mini">GPT-4.1-mini</option>
+                      <option value="gpt-4">GPT-4</option>
+                      <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold text-gray-300">🎯 Developer Message</label>
+                    <textarea
+                      value={developerMessage}
+                      onChange={(e) => setDeveloperMessage(e.target.value)}
+                      rows={2}
+                      className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500 resize-none"
+                      placeholder="Enter system prompt..."
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Document Manager Section */}
+            <div className="bg-gray-800 rounded-lg border border-gray-600">
+              <div 
+                className="p-3 cursor-pointer hover:bg-gray-700 transition-all duration-300 rounded-t-lg group"
+                onClick={() => toggleSections(!showDocumentManager)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xl group-hover:animate-bounce transition-transform">📚</span>
+                    <h3 className="text-sm font-bold text-white">DOCUMENT MANAGER</h3>
+                    {uploadedFiles.length > 0 && (
+                      <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                        {uploadedFiles.length}
+                      </span>
                     )}
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-5 h-5 bg-red-500 rounded-full shadow-lg animate-pulse" style={{animationDelay: '0s'}}></div>
-                    <div className="w-5 h-5 bg-yellow-400 rounded-full shadow-lg animate-pulse" style={{animationDelay: '0.5s'}}></div>
-                    <div className="w-5 h-5 bg-green-500 rounded-full shadow-lg animate-pulse" style={{animationDelay: '1s'}}></div>
-                  </div>
-                </div>
-                <div className="mt-4 flex flex-wrap gap-3 items-center justify-center lg:justify-start">
-                  <div className="glass-effect px-4 py-2 rounded-lg">
-                    <span className="text-sm text-white mario-text-small glow-text">
-                      🎮 Connected to Mushroom Kingdom RAG AI v2.2.0
-                    </span>
-                  </div>
-                  <div className="glass-effect px-4 py-2 rounded-lg">
-                    <span className="text-sm text-white mario-text-small glow-text">
-                      📁 {uploadedFiles.length} files loaded
-                    </span>
-                  </div>
-                  {useRAG && (
-                    <div className="glass-effect px-4 py-2 rounded-lg border border-green-400/30">
-                      <span className="text-sm text-green-300 mario-text-small glow-text">
-                        🔍 RAG Active
-                      </span>
-                    </div>
-                  )}
-                  {powerUpMode && (
-                    <div className="glass-effect px-4 py-2 rounded-lg border border-yellow-400/30">
-                      <span className="text-sm text-yellow-300 mario-text-small glow-text animate-pulse">
-                        ⭐ Power Mode
-                      </span>
-                    </div>
-                  )}
+                  <span className={`text-white text-sm transition-transform duration-300 ${showDocumentManager ? 'rotate-180' : ''}`}>
+                    🔽
+                  </span>
                 </div>
               </div>
-            </div>
-
-            {/* Enhanced Settings and Document Manager - Side by Side */}
-            <div className="flex-shrink-0 mx-4 mb-2">
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                
-                {/* Enhanced Settings Panel - Takes 2 columns */}
-                <div className="mario-border lg:col-span-2 slide-in">
-                  <div 
-                    className="mario-header p-4 rounded-t-lg cursor-pointer hover:bg-gradient-to-r hover:from-red-600 hover:to-orange-500 transition-all duration-300 transform hover:scale-[1.02] group"
-                    onClick={() => toggleSections(!showSettings)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <span className="text-2xl group-hover:animate-spin transition-transform">🍄</span>
-                        <h2 className="text-lg font-bold mario-text text-white glow-text">POWER-UP CONFIGURATION</h2>
-                      </div>
-                      <span className={`text-white text-xl transition-transform duration-300 ${showSettings ? 'rotate-180' : ''}`}>
-                        🔽
-                      </span>
+              
+              {showDocumentManager && (
+                <div className="p-3 space-y-3 border-t border-gray-600">
+                  {/* File Upload Area */}
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm">📤</span>
+                      <div className="text-xs font-bold text-gray-300">Upload Documents</div>
                     </div>
-                  </div>
-                  
-                  {showSettings && (
-                    <div className="p-4 space-y-3">
-                      <div>
-                        <label className="block text-sm mb-1 mario-text-small font-normal">🔑 OpenAI API Key:</label>
-                        <input
-                          type="password"
-                          value={apiKey}
-                          onChange={(e) => setApiKey(e.target.value)}
-                          className="w-full mario-input p-2 text-mario-dark focus:outline-none text-sm"
-                          placeholder="sk-..."
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm mb-1 mario-text-small font-normal">🤖 AI Model:</label>
-                        <select
-                          value={model}
-                          onChange={(e) => setModel(e.target.value)}
-                          className="w-full mario-input p-2 text-mario-dark focus:outline-none text-sm"
-                        >
-                          <option value="gpt-4.1-mini">GPT-4.1 Mini</option>
-                          <option value="gpt-4">GPT-4</option>
-                          <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm mb-1 mario-text-small font-normal">💬 Developer Message:</label>
-                        <textarea
-                          value={developerMessage}
-                          onChange={(e) => setDeveloperMessage(e.target.value)}
-                          rows={2}
-                          className="w-full mario-input p-2 text-mario-dark focus:outline-none resize-none text-sm"
-                          placeholder="Enter system prompt..."
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Enhanced Document Manager Section - Takes 3 columns */}
-                <div className="mario-border lg:col-span-3 slide-in" style={{animationDelay: '0.1s'}}>
-                  <div 
-                    className="mario-header p-4 rounded-t-lg cursor-pointer hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-500 transition-all duration-300 transform hover:scale-[1.02] group"
-                    onClick={() => toggleSections(!showDocumentManager)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <span className="text-2xl group-hover:animate-bounce transition-transform">📚</span>
-                        <h2 className="text-lg font-bold mario-text text-white glow-text">DOCUMENT MANAGER</h2>
-                        {uploadedFiles.length > 0 && (
-                          <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
-                            {uploadedFiles.length}
-                          </span>
-                        )}
-                      </div>
-                      <span className={`text-white text-xl transition-transform duration-300 ${showDocumentManager ? 'rotate-180' : ''}`}>
-                        🔽
-                      </span>
-                    </div>
-                  </div>
-                  
-                  {showDocumentManager && (
-                    <div className="p-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        
-                        {/* Enhanced File Upload Area - Takes 1 column */}
-                        <div className="space-y-4 md:col-span-1">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-xl">📤</span>
-                            <div className="mario-text-small font-normal text-sm font-bold text-mario-brown glow-text">Upload Documents</div>
-                          </div>
-                          <div
-                            className={`border-3 border-dashed rounded-xl p-6 text-center transition-all duration-300 transform ${
-                              dragActive 
-                                ? 'border-yellow-400 bg-gradient-to-br from-yellow-50 to-yellow-100 scale-105 shadow-lg shadow-yellow-200/50' 
-                                : 'border-mario-brown hover:border-blue-500 hover:bg-gradient-to-br hover:from-blue-50 hover:to-blue-100 hover:scale-102 hover:shadow-md'
-                            }`}
-                            onDragEnter={handleDrag}
-                            onDragLeave={handleDrag}
-                            onDragOver={handleDrag}
-                            onDrop={handleDrop}
-                          >
-                            <div className="space-y-4">
-                              <div className={`text-5xl transition-transform duration-300 ${dragActive ? 'animate-bounce' : 'hover:scale-110'}`}>
-                                {isUploading ? '🔄' : dragActive ? '📥' : '📄'}
-                              </div>
-                              <div className="space-y-2">
-                                {isUploading ? (
-                                  <div className="text-blue-600 font-bold animate-pulse text-base">
-                                    🔄 Processing files...
-                                  </div>
-                                ) : (
-                                  <>
-                                    <div className="font-bold text-gray-800 text-base">
-                                      Drag & drop documents here
-                                    </div>
-                                    <div className="text-sm text-gray-600 font-medium">
-                                      or click to browse files
-                                    </div>
-                                    <div className="flex flex-wrap justify-center gap-2 mt-3">
-                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                        📄 PDF
-                                      </span>
-                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        📝 TXT
-                                      </span>
-                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        📊 CSV
-                                      </span>
-                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                        🔗 JSON
-                                      </span>
-                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                        📄 XML
-                                      </span>
-                                    </div>
-                                  </>
-                                )}
-                              </div>
-                              <input
-                                ref={fileInputRef}
-                                type="file"
-                                multiple
-                                accept=".pdf,.txt,.csv,.json,.xml"
-                                onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
-                                className="hidden"
-                              />
-                              <button
-                                onClick={() => fileInputRef.current?.click()}
-                                disabled={isUploading}
-                                className="mario-button p-2 text-white font-normal mario-text-small disabled:opacity-50 text-sm"
-                              >
-                                📁 BROWSE FILES
-                              </button>
-                            </div>
-                          </div>
+                    <div
+                      className={`border-2 border-dashed rounded-lg p-3 text-center transition-all duration-300 ${
+                        dragActive 
+                          ? 'border-yellow-400 bg-yellow-900/20' 
+                          : 'border-gray-600 hover:border-blue-500 hover:bg-blue-900/20'
+                      }`}
+                      onDragEnter={handleDrag}
+                      onDragLeave={handleDrag}
+                      onDragOver={handleDrag}
+                      onDrop={handleDrop}
+                    >
+                      <div className="space-y-2">
+                        <div className={`text-2xl transition-transform duration-300 ${dragActive ? 'animate-bounce' : ''}`}>
+                          {isUploading ? '🔄' : dragActive ? '📥' : '📄'}
                         </div>
-
-                        {/* Right: Uploaded Files List - Takes 2 columns */}
-                        <div className="space-y-3 md:col-span-2">
-                          <div className="flex items-center justify-between">
-                            <div className="mario-text-small text-sm font-normal font-bold">
-                              📚 Uploaded Documents ({uploadedFiles.length})
-                            </div>
-                            {uploadedFiles.length > 0 && (
-                              <div className="flex space-x-2">
-                                <button
-                                  onClick={deleteSelectedFiles}
-                                  disabled={selectedFiles.size === 0}
-                                  className="mario-button p-2 text-white font-normal mario-text-small bg-mario-red text-xs disabled:opacity-50"
-                                >
-                                  🗑️ DELETE
-                                </button>
-                              </div>
-                            )}
-                          </div>
-
-                          {uploadedFiles.length > 0 ? (
-                            <div className="mario-message p-3 max-h-32 overflow-y-auto">
-                              {/* Select All Checkbox */}
-                              <div className="flex items-center space-x-2 mb-2 pb-2 border-b border-mario-brown/30">
-                                <input
-                                  type="checkbox"
-                                  checked={selectedFiles.size === uploadedFiles.length && uploadedFiles.length > 0}
-                                  onChange={(e) => handleSelectAll(e.target.checked)}
-                                  className="w-4 h-4"
-                                />
-                                <span className="text-xs font-bold">Select All</span>
-                              </div>
-                              
-                              {/* File List */}
-                              <div className="space-y-1">
-                                {uploadedFiles.map((file, index) => (
-                                  <div key={index} className="flex items-center space-x-2 text-xs">
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedFiles.has(file)}
-                                      onChange={(e) => handleFileSelection(file, e.target.checked)}
-                                      className="w-4 h-4"
-                                    />
-                                    <span className="text-mario-brown">{index + 1}.</span>
-                                    <span>📄</span>
-                                    <span className="truncate flex-1" title={file}>{file}</span>
-                                  </div>
-                                ))}
-                              </div>
+                        <div className="space-y-1">
+                          {isUploading ? (
+                            <div className="text-blue-400 text-xs font-bold animate-pulse">
+                              🔄 Processing...
                             </div>
                           ) : (
-                            <div className="mario-message p-3 text-center text-mario-brown text-sm">
-                              No files uploaded yet
-                            </div>
+                            <>
+                              <div className="font-bold text-gray-300 text-xs">
+                                Drag & drop here
+                              </div>
+                              <div className="text-xs text-gray-400">
+                                or click to browse
+                              </div>
+                              <div className="flex flex-wrap justify-center gap-1 mt-2">
+                                <span className="inline-flex items-center px-1 py-0.5 rounded text-xs bg-red-100 text-red-800">PDF</span>
+                                <span className="inline-flex items-center px-1 py-0.5 rounded text-xs bg-blue-100 text-blue-800">TXT</span>
+                                <span className="inline-flex items-center px-1 py-0.5 rounded text-xs bg-green-100 text-green-800">CSV</span>
+                                <span className="inline-flex items-center px-1 py-0.5 rounded text-xs bg-purple-100 text-purple-800">JSON</span>
+                                <span className="inline-flex items-center px-1 py-0.5 rounded text-xs bg-yellow-100 text-yellow-800">XML</span>
+                              </div>
+                            </>
                           )}
                         </div>
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          multiple
+                          accept=".pdf,.txt,.csv,.json,.xml"
+                          onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
+                          className="hidden"
+                        />
                       </div>
                     </div>
-                  )}
+                  </div>
+
+                  {/* Uploaded Files List */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs font-bold text-gray-300">📁 Uploaded Files</div>
+                      {uploadedFiles.length > 0 && (
+                        <button
+                          onClick={deleteSelectedFiles}
+                          disabled={selectedFiles.size === 0}
+                          className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          DELETE
+                        </button>
+                      )}
+                    </div>
+                    
+                    {uploadedFiles.length === 0 ? (
+                      <div className="text-center py-4 text-gray-500">
+                        <div className="text-lg mb-1">📁</div>
+                        <div className="text-xs">No files uploaded</div>
+                      </div>
+                    ) : (
+                      <div className="border rounded border-gray-600 bg-gray-900/50 max-h-40 overflow-y-auto">
+                        <div className="p-2 border-b border-gray-600 bg-gray-800/50 flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedFiles.size === uploadedFiles.length}
+                            onChange={(e) => handleSelectAll(e.target.checked)}
+                            className="rounded"
+                          />
+                          <span className="text-xs font-semibold text-gray-300">
+                            Select All ({uploadedFiles.length})
+                          </span>
+                        </div>
+                        <div className="divide-y divide-gray-600">
+                          {uploadedFiles.map((file, index) => (
+                            <div key={index} className="p-2 hover:bg-gray-700/50 transition-colors">
+                              <div className="flex items-center space-x-2">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedFiles.has(file)}
+                                  onChange={(e) => handleFileSelection(file, e.target.checked)}
+                                  className="rounded"
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-xs font-medium text-gray-300 truncate">
+                                    📄 {file}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Enhanced Header */}
+        <div className="flex-shrink-0 mario-border m-4 mb-2 slide-in">
+          <div className="mario-header p-6 rounded-t-lg">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center space-x-3">
+                {!sidebarOpen && (
+                  <button
+                    onClick={() => setSidebarOpen(true)}
+                    className="text-white hover:text-yellow-300 transition-colors p-2 rounded mario-button"
+                    title="Open sidebar"
+                  >
+                    <span className="text-lg">☰</span>
+                  </button>
+                )}
+                <span className={`mario-star text-yellow-300 text-3xl ${powerUpMode ? 'animate-spin' : 'floating-animation'}`}>⭐</span>
+                <h1 className={`text-xl md:text-2xl font-bold mario-text text-white ${powerUpMode ? 'animate-pulse glow-text' : ''}`}>
+                  LUIGI
+                </h1>
+                <span className="mario-coin text-yellow-300 text-3xl">🪙</span>
+                {powerUpMode && (
+                  <>
+                    <span className="text-yellow-400 text-xl animate-bounce">⭐</span>
+                    <span className="text-yellow-300 text-lg animate-pulse">✨</span>
+                    <span className="text-yellow-400 text-xl animate-bounce" style={{animationDelay: '0.5s'}}>⭐</span>
+                  </>
+                )}
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-5 h-5 bg-red-500 rounded-full shadow-lg animate-pulse" style={{animationDelay: '0s'}}></div>
+                <div className="w-5 h-5 bg-yellow-400 rounded-full shadow-lg animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                <div className="w-5 h-5 bg-green-500 rounded-full shadow-lg animate-pulse" style={{animationDelay: '1s'}}></div>
               </div>
             </div>
+            <div className="mt-4 flex flex-wrap gap-3 items-center justify-center lg:justify-start">
+              <div className="glass-effect px-4 py-2 rounded-lg">
+                <span className="text-sm text-white mario-text-small glow-text">
+                  🎮 Connected to Mushroom Kingdom RAG AI v2.2.0
+                </span>
+              </div>
+              <div className="glass-effect px-4 py-2 rounded-lg">
+                <span className="text-sm text-white mario-text-small glow-text">
+                  📁 {uploadedFiles.length} files loaded
+                </span>
+              </div>
+              {useRAG && (
+                <div className="glass-effect px-4 py-2 rounded-lg border border-green-400/30">
+                  <span className="text-sm text-green-300 mario-text-small glow-text">
+                    🔍 RAG Active
+                  </span>
+                </div>
+              )}
+              {powerUpMode && (
+                <div className="glass-effect px-4 py-2 rounded-lg border border-yellow-400/30">
+                  <span className="text-sm text-yellow-300 mario-text-small glow-text animate-pulse">
+                    ⭐ Power Mode
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+                </div>
 
-            {/* Messages Display - Flexible Height */}
-            <div className="flex-1 mx-4 mb-2 mario-border overflow-hidden flex flex-col">
+        {/* Messages Display - Flexible Height */}
+        <div className="flex-1 mx-4 mb-2 mario-border overflow-hidden flex flex-col">
               <div className="flex-1 p-4 overflow-y-auto">
                 <div className="space-y-3">
                   {messages.map((message, index) => (
@@ -1037,6 +1044,8 @@ QUICK RESPONSE MODE ⚡:
                   {powerUpMode && <span className="text-yellow-400 animate-pulse">⭐ POWER-UP ACTIVE ⭐</span>}
                 </div>
             </div>
-   </div>
+        </div>
+      </div>
+    </div>
   )
 }
