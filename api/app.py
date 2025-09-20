@@ -14,7 +14,10 @@ from pathlib import Path
 
 # Import aimakerspace components for RAG functionality
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from pathlib import Path
+# Add the project root directory to Python path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 
 from aimakerspace.openai_utils.embedding import EmbeddingModel
 from aimakerspace.openai_utils.chatmodel import ChatOpenAI
@@ -38,21 +41,34 @@ app.add_middleware(
 # Each API key gets its own vector database to keep user data separate
 vector_databases: Dict[str, VectorDatabase] = {}
 uploaded_files: Dict[str, List[str]] = {}  # Track uploaded files per API key
+file_contents: Dict[str, Dict[str, str]] = {}  # Store full file contents per API key
+
+# Define the data model for individual messages
+class ChatMessage(BaseModel):
+    role: str      # "system", "user", or "assistant"
+    content: str   # The message content
 
 # Define the data model for chat requests using Pydantic
 # This ensures incoming request data is properly validated
 class ChatRequest(BaseModel):
-    developer_message: str  # Message from the developer/system
-    user_message: str      # Message from the user
+    messages: List[ChatMessage]  # Full conversation history
+    developer_message: str       # System message for context
+    user_message: str           # Current user message (for backward compatibility)
     model: Optional[str] = "gpt-4.1-mini"  # Optional model selection with default
-    api_key: str          # OpenAI API key for authentication
-    use_rag: bool = False  # Whether to use RAG (context from uploaded PDFs)
+    api_key: str                # OpenAI API key for authentication
+    use_rag: bool = False       # Whether to use RAG (context from uploaded PDFs)
 
 # Define data model for RAG responses
 class RAGResponse(BaseModel):
     answer: str
     context_used: List[str]
     confidence: float
+
+# Define data model for file analysis requests
+class FileAnalysisRequest(BaseModel):
+    api_key: str
+    filename_or_index: str  # Can be filename like "doc.pdf" or index like "1"
+    model: Optional[str] = "gpt-4.1-mini"
 
 @app.post("/api/upload-pdf")
 async def upload_pdf(
@@ -75,16 +91,17 @@ async def upload_pdf(
             client = OpenAI(api_key=api_key)
             # Test the API key with a minimal request
             client.models.list()
-        except Exception:
+        except Exception as e:
             raise HTTPException(status_code=401, detail="Invalid OpenAI API key")
         
         # Initialize or get existing vector database for this API key
         if api_key not in vector_databases:
             # Create new embedding model and vector database
             # EmbeddingModel handles OpenAI text-embedding-3-small API calls
-            embedding_model = EmbeddingModel()
+            embedding_model = EmbeddingModel(api_key=api_key)
             vector_databases[api_key] = VectorDatabase(embedding_model=embedding_model)
             uploaded_files[api_key] = []
+            file_contents[api_key] = {}
         
         vector_db = vector_databases[api_key]
         processed_files = []
@@ -108,6 +125,10 @@ async def upload_pdf(
                 
                 if not pdf_loader.documents:
                     continue
+                
+                # Store the full document content for analysis
+                full_text = "\n".join(pdf_loader.documents)
+                file_contents[api_key][file.filename] = full_text
                 
                 # Split the extracted text into chunks
                 # CharacterTextSplitter creates overlapping chunks for better context
@@ -144,7 +165,114 @@ async def upload_pdf(
         }
         
     except Exception as e:
+        print(f"Error in upload_pdf: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error processing PDF: {str(e)}")
+
+@app.post("/api/analyze-file")
+async def analyze_file(request: FileAnalysisRequest):
+    """
+    Analyze a specific file and generate suggested questions and summary.
+    
+    This endpoint:
+    1. Identifies the requested file by name or index
+    2. Uses the full document content to generate analysis
+    3. Creates 5 suggested questions about the content
+    4. Provides a 2-paragraph summary/abstract
+    """
+    try:
+        # Check if user has uploaded files
+        if request.api_key not in file_contents or not file_contents[request.api_key]:
+            raise HTTPException(
+                status_code=400,
+                detail="No files uploaded. Please upload PDFs first."
+            )
+        
+        files_list = list(file_contents[request.api_key].keys())
+        filename = None
+        
+        # Determine if input is filename or index
+        if request.filename_or_index.isdigit():
+            # It's an index
+            index = int(request.filename_or_index) - 1  # Convert to 0-based index
+            if 0 <= index < len(files_list):
+                filename = files_list[index]
+            else:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid file index. Available files: 1-{len(files_list)}"
+                )
+        else:
+            # It's a filename
+            if request.filename_or_index in file_contents[request.api_key]:
+                filename = request.filename_or_index
+            else:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"File '{request.filename_or_index}' not found. Available files: {', '.join(files_list)}"
+                )
+        
+        # Get the full content of the requested file
+        content = file_contents[request.api_key][filename]
+        
+        # Truncate content if too long (keep first 4000 chars for analysis)
+        if len(content) > 4000:
+            analysis_content = content[:4000] + "..."
+        else:
+            analysis_content = content
+        
+        # Create analysis prompt
+        analysis_prompt = f"""Analyze the following document content and provide:
+
+1. SUMMARY: Provide a concise 2-paragraph summary/abstract that gives an overview of what this document contains and its main topics.
+
+2. SUGGESTED QUESTIONS: Create 10 specific, insightful questions that someone could ask about this document. These should be questions that can be answered using the document's content. Make each question unique and cover different aspects of the document.
+
+Document: {filename}
+Content: {analysis_content}
+
+Format your response as:
+
+## SUMMARY
+
+[First paragraph of summary]
+
+[Second paragraph of summary]
+
+## SUGGESTED QUESTIONS
+
+1. [Question 1]
+2. [Question 2]
+3. [Question 3]
+4. [Question 4]
+5. [Question 5]
+6. [Question 6]
+7. [Question 7]
+8. [Question 8]
+9. [Question 9]
+10. [Question 10]"""
+        
+        # Use OpenAI to analyze the content
+        client = OpenAI(api_key=request.api_key)
+        response = client.chat.completions.create(
+            model=request.model,
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that analyzes documents and creates suggested questions and summaries."},
+                {"role": "user", "content": analysis_prompt}
+            ],
+            temperature=0.7
+        )
+        
+        analysis_result = response.choices[0].message.content
+        
+        return {
+            "filename": filename,
+            "analysis": analysis_result,
+            "content_length": len(content)
+        }
+        
+    except Exception as e:
+        print(f"Error in analyze_file: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error analyzing file: {str(e)}")
 
 @app.post("/api/rag-chat")
 async def rag_chat(request: ChatRequest):
@@ -191,36 +319,42 @@ async def rag_chat(request: ChatRequest):
             
             return StreamingResponse(generate(), media_type="text/plain")
         
-        # Construct RAG prompt with context
+        # Construct RAG system prompt with context
         # This is the key to RAG - we provide relevant document context to the LLM
         context_text = "\n\n".join(relevant_chunks)
         
-        rag_prompt = f"""You are a helpful assistant that answers questions based ONLY on the provided context from uploaded PDF documents.
+        rag_system_prompt = f"""You are a helpful assistant that answers questions based ONLY on the provided context from uploaded PDF documents.
 
 CONTEXT FROM DOCUMENTS:
 {context_text}
 
 INSTRUCTIONS:
-- Answer the user's question using ONLY the information provided in the context above
-- If the context doesn't contain information to answer the question, respond with "I don't have enough information in the uploaded documents to answer that question."
+- Answer questions using ONLY the information provided in the context above
+- If the context doesn't contain information to answer a question, respond with "I don't have enough information in the uploaded documents to answer that question."
 - Be specific and cite the relevant parts of the context when possible
 - Do not make up information that isn't in the context
-
-USER QUESTION: {request.user_message}
-
-ANSWER:"""
+- Maintain conversation context and refer to previous messages when relevant"""
         
         # Initialize OpenAI client with user's API key
         client = OpenAI(api_key=request.api_key)
         
-        # Create streaming response using RAG prompt
+        # Build conversation messages with RAG context
+        conversation_messages = []
+        
+        # Add the RAG system message
+        conversation_messages.append({"role": "system", "content": rag_system_prompt})
+        
+        # Add conversation history (skip any existing system messages to avoid conflicts)
+        for msg in request.messages:
+            if msg.role != "system":  # Skip system messages from conversation history
+                conversation_messages.append({"role": msg.role, "content": msg.content})
+        
+        # Create streaming response using full conversation with RAG context
         async def generate():
-            # Create a streaming chat completion request with RAG context
+            # Create a streaming chat completion request with full conversation + RAG context
             stream = client.chat.completions.create(
                 model=request.model,
-                messages=[
-                    {"role": "system", "content": rag_prompt},
-                ],
+                messages=conversation_messages,
                 stream=True  # Enable streaming response
             )
             
@@ -250,17 +384,25 @@ async def chat(request: ChatRequest):
         if request.use_rag and request.api_key in vector_databases:
             return await rag_chat(request)
         
-        # Otherwise, use regular chat (original functionality)
+        # Otherwise, use regular chat with full conversation history
         client = OpenAI(api_key=request.api_key)
         
+        # Build conversation messages for regular chat
+        conversation_messages = []
+        
+        # Add the developer system message
+        conversation_messages.append({"role": "system", "content": request.developer_message})
+        
+        # Add conversation history (skip any existing system messages to avoid conflicts)
+        for msg in request.messages:
+            if msg.role != "system":  # Skip system messages from conversation history
+                conversation_messages.append({"role": msg.role, "content": msg.content})
+        
         async def generate():
-            # Create a streaming chat completion request
+            # Create a streaming chat completion request with full conversation history
             stream = client.chat.completions.create(
                 model=request.model,
-                messages=[
-                    {"role": "system", "content": request.developer_message},
-                    {"role": "user", "content": request.user_message}
-                ],
+                messages=conversation_messages,
                 stream=True  # Enable streaming response
             )
             
@@ -299,13 +441,15 @@ async def clear_uploaded_files(api_key: str = Form(...)):
         del vector_databases[api_key]
     if api_key in uploaded_files:
         del uploaded_files[api_key]
+    if api_key in file_contents:
+        del file_contents[api_key]
     
     return {"message": "All files cleared successfully"}
 
 # Define a health check endpoint to verify API status
 @app.get("/api/health")
 async def health_check():
-    return {"status": "ok", "features": ["regular_chat", "pdf_upload", "rag_chat"]}
+    return {"status": "ok", "features": ["regular_chat", "pdf_upload", "rag_chat", "file_analysis"]}
 
 # Entry point for running the application directly
 if __name__ == "__main__":

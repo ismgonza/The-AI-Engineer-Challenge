@@ -411,14 +411,22 @@ QUICK RESPONSE MODE ⚡:
       // Choose endpoint based on RAG mode
       const endpoint = useRAG ? '/api/rag-chat' : '/api/chat'
       
+      // Prepare conversation history for the backend
+      // Include the current user message in the messages array
+      const conversationHistory = [...messages, newUserMessage].map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }))
+
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          messages: conversationHistory,  // Send full conversation history
           developer_message: getEnhancedDeveloperMessage(),
-          user_message: userMessage,
+          user_message: userMessage,      // Keep for backward compatibility
           model: model,
           api_key: apiKey,
           use_rag: useRAG
