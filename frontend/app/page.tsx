@@ -93,7 +93,7 @@ export default function Home() {
     setMessages([
       {
         role: 'system',
-        content: 'SUPER MARIO WORLD RAG TERMINAL v2.2.0\n\n🍄 Welcome to the enhanced Mushroom Kingdom console!\n\n✨ FEATURES:\n🎯 **RAG Mode**: Upload PDFs and chat with your documents\n🔍 Smart document search with vector embeddings\n📚 Analyze files to get suggested questions and summaries\n🍄💪 **Power-Up Mode**: Toggle between critical thinking and quick answers\n🧠 **Conversation Memory**: Full context awareness across the session\n⚡ Use the toggles in the header to control modes!\n\nQuick commands:\n- **/help**: Show all available commands\n- **/clear**: Reset screen & conversation memory for fresh start\n- **/files**: Show uploaded files\n- **/files filename.pdf**: Analyze specific file\n- **/files #**: Analyze file by number\n\n💡 **Memory Feature**: I remember our entire conversation until you use `/clear`!\n\nLet\'s-a go! 🍄⭐',
+        content: 'SUPER MARIO WORLD RAG TERMINAL v2.2.0\n\n🍄 Welcome to the enhanced Mushroom Kingdom console!\n\n✨ FEATURES:\n🎯 **RAG Mode**: Upload documents (PDF, TXT, CSV, JSON, XML) and chat with them\n🔍 Smart document search with vector embeddings\n📚 Analyze files to get suggested questions and summaries\n🍄💪 **Power-Up Mode**: Toggle between critical thinking and quick answers\n🧠 **Conversation Memory**: Full context awareness across the session\n⚡ Use the toggles in the header to control modes!\n\nSupported file types: PDF, TXT, CSV, JSON, XML\n\nQuick commands:\n- **/help**: Show all available commands\n- **/clear**: Reset screen & conversation memory for fresh start\n- **/files**: Show uploaded files\n- **/files filename**: Analyze specific file\n- **/files #**: Analyze file by number\n\n💡 **Memory Feature**: I remember our entire conversation until you use `/clear`!\n\nLet\'s-a go! 🍄⭐',
         timestamp: new Date()
       }
     ])
@@ -137,8 +137,26 @@ export default function Home() {
     const formData = new FormData()
     
     // Add all PDF files to formData
+    // Supported file types and their MIME types
+    const supportedTypes = {
+      'application/pdf': '.pdf',
+      'text/plain': '.txt',
+      'text/csv': '.csv',
+      'application/csv': '.csv',
+      'application/json': '.json',
+      'text/json': '.json',
+      'application/xml': '.xml',
+      'text/xml': '.xml'
+    } as const
+    
+    const supportedExtensions = ['.pdf', '.txt', '.csv', '.json', '.xml']
+    
     Array.from(files).forEach(file => {
-      if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+      // Check by MIME type or file extension
+      const isSupportedMimeType = file.type in supportedTypes
+      const isSupportedExtension = supportedExtensions.some(ext => file.name.toLowerCase().endsWith(ext))
+      
+      if (isSupportedMimeType || isSupportedExtension) {
         formData.append('files', file)
       }
     })
@@ -146,7 +164,7 @@ export default function Home() {
     formData.append('api_key', apiKey)
 
     try {
-      const response = await fetch('/api/upload-pdf', {
+      const response = await fetch('/api/upload-files', {
         method: 'POST',
         body: formData,
       })
@@ -159,7 +177,7 @@ export default function Home() {
       
       setMessages(prev => [...prev, {
         role: 'system',
-        content: `🎉 ${result.message}\n📁 Processed: ${result.processed_files.join(', ')}\n📊 Total files: ${result.total_files}\n\n🔍 You can now use RAG mode to chat with your PDFs!`,
+        content: `🎉 ${result.message}\n📁 Processed: ${result.processed_files.join(', ')}\n📊 Total files: ${result.total_files}\n\n🔍 You can now use RAG mode to chat with your documents!`,
         timestamp: new Date()
       }])
 
@@ -296,7 +314,7 @@ QUICK RESPONSE MODE ⚡:
     if (uploadedFiles.length === 0) {
       setMessages(prev => [...prev, {
         role: 'system',
-        content: '📁 No PDFs uploaded! Upload PDFs first to use RAG mode. 🔍',
+                        content: '📁 No documents uploaded! Upload files (PDF, TXT, CSV, JSON, XML) first to use RAG mode. 🔍',
         timestamp: new Date()
       }])
       return
@@ -312,7 +330,7 @@ QUICK RESPONSE MODE ⚡:
     if (uploadedFiles.length === 0) {
       setMessages(prev => [...prev, {
         role: 'system',
-        content: '📁 No files uploaded yet. Upload some PDFs to get started! 🚀',
+        content: '📁 No files uploaded yet. Upload documents (PDF, TXT, CSV, JSON, XML) to get started! 🚀',
         timestamp: new Date()
       }])
       return
@@ -487,7 +505,7 @@ QUICK RESPONSE MODE ⚡:
                           case '/help':
                 setMessages(prev => [...prev, {
                   role: 'system',
-                  content: '🎯 Available commands:\n- **/help**: Show this help\n- **/clear**: Clear screen & reset conversation memory\n- **/status**: Show connection status\n- **/files**: Show uploaded files\n- **/files filename.pdf**: Analyze specific file\n- **/files #**: Analyze file by number\n\n📚 Features:\n- **RAG Mode**: Upload PDFs and chat with documents (toggle in header)\n- **Power-Up Mode**: Critical thinking vs quick answers (toggle in header)\n- **File Analysis**: Get suggested questions and summaries\n- **Memory Reset**: Use `/clear` for fresh conversations\n- Use toggles in header to switch between modes',
+                  content: '🎯 Available commands:\n- **/help**: Show this help\n- **/clear**: Clear screen & reset conversation memory\n- **/status**: Show connection status\n- **/files**: Show uploaded files\n- **/files filename**: Analyze specific file\n- **/files #**: Analyze file by number\n\n📚 Features:\n- **RAG Mode**: Upload documents (PDF, TXT, CSV, JSON, XML) and chat with them (toggle in header)\n- **Power-Up Mode**: Critical thinking vs quick answers (toggle in header)\n- **File Analysis**: Get suggested questions and summaries\n- **Memory Reset**: Use `/clear` for fresh conversations\n- **Multi-Format Support**: PDF, TXT, CSV, JSON, XML files\n- Use toggles in header to switch between modes',
                   timestamp: new Date()
                 }])
                 break
@@ -645,7 +663,7 @@ QUICK RESPONSE MODE ⚡:
                         
                         {/* Left: File Upload Area - Takes 1 column */}
                         <div className="space-y-3 md:col-span-1">
-                          <div className="mario-text-small font-normal text-sm font-bold">📤 Upload PDFs</div>
+                          <div className="mario-text-small font-normal text-sm font-bold">📤 Upload Documents</div>
                           <div
                             className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
                               dragActive 
@@ -664,8 +682,9 @@ QUICK RESPONSE MODE ⚡:
                                   <div className="text-mario-red">🔄 Processing PDFs...</div>
                                 ) : (
                                   <>
-                                    <div>Drag & drop PDF files here</div>
-                                    <div className="text-xs text-mario-brown">or click to browse</div>
+                                    <div>Drag & drop documents here</div>
+                                                                          <div className="text-xs text-mario-brown">or click to browse</div>
+                                      <div className="text-xs text-mario-brown mt-1">Supports: PDF, TXT, CSV, JSON, XML</div>
                                   </>
                                 )}
                               </div>
@@ -673,7 +692,7 @@ QUICK RESPONSE MODE ⚡:
                                 ref={fileInputRef}
                                 type="file"
                                 multiple
-                                accept=".pdf"
+                                accept=".pdf,.txt,.csv,.json,.xml"
                                 onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
                                 className="hidden"
                               />

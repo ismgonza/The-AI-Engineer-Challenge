@@ -11,6 +11,9 @@ import tempfile
 import asyncio
 from typing import Optional, List, Dict, Any
 from pathlib import Path
+import json
+import csv
+import xml.etree.ElementTree as ET
 
 # Import aimakerspace components for RAG functionality
 import sys
@@ -20,9 +23,139 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from aimakerspace.openai_utils.embedding import EmbeddingModel
-from aimakerspace.openai_utils.chatmodel import ChatOpenAI
 from aimakerspace.vectordatabase import VectorDatabase
-from aimakerspace.text_utils import PDFLoader, CharacterTextSplitter
+from aimakerspace.text_utils import PDFLoader, CharacterTextSplitter, TextFileLoader
+
+
+# Custom loaders for different file types
+class CSVLoader:
+    """Extract text from CSV files by converting to structured text."""
+    
+    def __init__(self, path: str):
+        self.path = Path(path)
+        self.documents: List[str] = []
+    
+    def load_file(self) -> None:
+        """Load a single CSV file and convert to text format."""
+        with open(self.path, 'r', encoding='utf-8') as file:
+            # Try to detect delimiter
+            sample = file.read(1024)
+            file.seek(0)
+            sniffer = csv.Sniffer()
+            delimiter = sniffer.sniff(sample).delimiter
+            
+            reader = csv.DictReader(file, delimiter=delimiter)
+            
+            # Convert CSV to structured text
+            rows = []
+            for i, row in enumerate(reader):
+                row_text = f"Row {i+1}:\n"
+                for key, value in row.items():
+                    row_text += f"  {key}: {value}\n"
+                rows.append(row_text)
+            
+            self.documents = ["\n".join(rows)]
+
+
+class JSONLoader:
+    """Extract text from JSON files by flattening structure."""
+    
+    def __init__(self, path: str):
+        self.path = Path(path)
+        self.documents: List[str] = []
+    
+    def load_file(self) -> None:
+        """Load a single JSON file and convert to text format."""
+        with open(self.path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            
+        # Convert JSON to readable text
+        text_content = self._json_to_text(data)
+        self.documents = [text_content]
+    
+    def _json_to_text(self, obj, prefix="") -> str:
+        """Recursively convert JSON object to readable text."""
+        result = []
+        
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                new_prefix = f"{prefix}.{key}" if prefix else key
+                if isinstance(value, (dict, list)):
+                    result.append(f"{new_prefix}:")
+                    result.append(self._json_to_text(value, new_prefix))
+                else:
+                    result.append(f"{new_prefix}: {value}")
+        elif isinstance(obj, list):
+            for i, item in enumerate(obj):
+                new_prefix = f"{prefix}[{i}]" if prefix else f"Item {i+1}"
+                if isinstance(item, (dict, list)):
+                    result.append(f"{new_prefix}:")
+                    result.append(self._json_to_text(item, new_prefix))
+                else:
+                    result.append(f"{new_prefix}: {item}")
+        else:
+            return str(obj)
+        
+        return "\n".join(result)
+
+
+class XMLLoader:
+    """Extract text from XML files by parsing structure."""
+    
+    def __init__(self, path: str):
+        self.path = Path(path)
+        self.documents: List[str] = []
+    
+    def load_file(self) -> None:
+        """Load a single XML file and convert to text format."""
+        tree = ET.parse(self.path)
+        root = tree.getroot()
+        
+        # Convert XML to readable text
+        text_content = self._xml_to_text(root)
+        self.documents = [text_content]
+    
+    def _xml_to_text(self, element, prefix="") -> str:
+        """Recursively convert XML element to readable text."""
+        result = []
+        
+        # Add element name and attributes
+        element_info = element.tag
+        if element.attrib:
+            attrs = ", ".join([f"{k}={v}" for k, v in element.attrib.items()])
+            element_info += f" ({attrs})"
+        
+        current_prefix = f"{prefix}.{element_info}" if prefix else element_info
+        
+        # Add element text content if present
+        if element.text and element.text.strip():
+            result.append(f"{current_prefix}: {element.text.strip()}")
+        
+        # Process child elements
+        for child in element:
+            child_text = self._xml_to_text(child, current_prefix)
+            if child_text:
+                result.append(child_text)
+        
+        return "\n".join(result)
+
+
+def get_file_loader(file_path: str, file_extension: str):
+    """Factory function to get appropriate loader based on file extension."""
+    loaders = {
+        '.pdf': PDFLoader,
+        '.txt': TextFileLoader,
+        '.csv': CSVLoader,
+        '.json': JSONLoader,
+        '.xml': XMLLoader
+    }
+    
+    loader_class = loaders.get(file_extension.lower())
+    if not loader_class:
+        raise ValueError(f"Unsupported file type: {file_extension}")
+    
+    return loader_class(file_path)
+
 
 # Initialize FastAPI application with a title
 app = FastAPI(title="PDF RAG Chat API")
@@ -70,20 +203,27 @@ class FileAnalysisRequest(BaseModel):
     filename_or_index: str  # Can be filename like "doc.pdf" or index like "1"
     model: Optional[str] = "gpt-4.1-mini"
 
-@app.post("/api/upload-pdf")
-async def upload_pdf(
+@app.post("/api/upload-files")
+async def upload_files(
     files: List[UploadFile] = File(...),
     api_key: str = Form(...)
 ):
     """
-    Upload one or more PDF files and process them for RAG.
+    Upload one or more documents (PDF, TXT, CSV, JSON, XML) and process them for RAG.
     
     This endpoint:
-    1. Saves uploaded PDF files temporarily
-    2. Extracts text using PDFLoader from aimakerspace
+    1. Saves uploaded files temporarily
+    2. Extracts text using appropriate loader based on file type
     3. Splits text into chunks using CharacterTextSplitter
     4. Creates embeddings using EmbeddingModel
     5. Stores vectors in VectorDatabase for similarity search
+    
+    Supported file types:
+    - PDF: Uses PyPDF2 for text extraction
+    - TXT: Plain text files
+    - CSV: Converts tabular data to structured text
+    - JSON: Flattens structure to readable text
+    - XML: Parses elements and attributes to text
     """
     try:
         # Validate API key by testing OpenAI connection
@@ -107,27 +247,30 @@ async def upload_pdf(
         processed_files = []
         
         for file in files:
-            # Validate file type
-            if not file.filename.lower().endswith('.pdf'):
-                continue
+            # Get file extension to determine appropriate loader
+            file_extension = Path(file.filename).suffix.lower()
+            
+            # Validate file type - support multiple formats
+            supported_extensions = ['.pdf', '.txt', '.csv', '.json', '.xml']
+            if file_extension not in supported_extensions:
+                continue  # Skip unsupported files
                 
-            # Save uploaded file temporarily
-            with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as temp_file:
+            # Save uploaded file temporarily with correct extension
+            with tempfile.NamedTemporaryFile(delete=False, suffix=file_extension) as temp_file:
                 content = await file.read()
                 temp_file.write(content)
                 temp_file_path = temp_file.name
             
             try:
-                # Use PDFLoader to extract text from PDF
-                # PDFLoader uses PyPDF2 under the hood to read PDF content
-                pdf_loader = PDFLoader(temp_file_path)
-                pdf_loader.load_file()
+                # Use appropriate loader based on file type
+                file_loader = get_file_loader(temp_file_path, file_extension)
+                file_loader.load_file()
                 
-                if not pdf_loader.documents:
+                if not file_loader.documents:
                     continue
                 
                 # Store the full document content for analysis
-                full_text = "\n".join(pdf_loader.documents)
+                full_text = "\n".join(file_loader.documents)
                 file_contents[api_key][file.filename] = full_text
                 
                 # Split the extracted text into chunks
@@ -140,11 +283,12 @@ async def upload_pdf(
                 )
                 
                 chunks = []
-                for doc in pdf_loader.documents:
+                for doc in file_loader.documents:
                     doc_chunks = text_splitter.split(doc)
-                    # Add filename context to each chunk for better retrieval
+                    # Add filename and file type context to each chunk for better retrieval
+                    file_type = file_extension.upper().replace('.', '')
                     for i, chunk in enumerate(doc_chunks):
-                        chunk_with_metadata = f"[{file.filename} - Chunk {i+1}]\n{chunk}"
+                        chunk_with_metadata = f"[{file.filename} ({file_type}) - Chunk {i+1}]\n{chunk}"
                         chunks.append(chunk_with_metadata)
                 
                 # Build vector database asynchronously
