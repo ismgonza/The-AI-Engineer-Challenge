@@ -324,7 +324,7 @@ QUICK RESPONSE MODE ⚡:
     if (uploadedFiles.length === 0) {
       setMessages(prev => [...prev, {
         role: 'system',
-                        content: '📁 No documents uploaded! Upload files (PDF, TXT, CSV, JSON, XML) first to use RAG mode. 🔍',
+        content: '📁 No documents uploaded! Upload files (PDF, TXT, CSV, JSON, XML) first to use RAG mode. 🔍',
         timestamp: new Date()
       }])
       return
@@ -507,49 +507,49 @@ QUICK RESPONSE MODE ⚡:
     }
   }
 
-          const handleCommand = async (command: string) => {
-          const commandParts = command.trim().toLowerCase().split(' ')
-          const mainCommand = commandParts[0]
-          
-          switch (mainCommand) {
-                          case '/help':
-                setMessages(prev => [...prev, {
-                  role: 'system',
-                  content: '🎯 Available commands:\n- **/help**: Show this help\n- **/clear**: Clear screen & reset conversation memory\n- **/status**: Show connection status\n- **/files**: Show uploaded files\n- **/files filename**: Analyze specific file\n- **/files #**: Analyze file by number\n\n⌨️ Keyboard Shortcuts:\n- **ENTER**: Send message\n- **SHIFT+ENTER**: New line in message\n\n📚 Features:\n- **RAG Mode**: Upload documents (PDF, TXT, CSV, JSON, XML) and chat with them (toggle in input area)\n- **Power-Up Mode**: Critical thinking vs quick answers (toggle in input area)\n- **File Analysis**: Get suggested questions and summaries\n- **Memory Reset**: Use `/clear` for fresh conversations\n- **Multi-Format Support**: PDF, TXT, CSV, JSON, XML files\n- **Multi-line Input**: Use Shift+Enter for longer messages',
-                  timestamp: new Date()
-                }])
-                break
-            case '/clear':
-              // Reset conversation completely - both visual and memory
-              setMessages([{
-                role: 'system',
-                content: '🧹 **COMPLETE RESET PERFORMED**\n\n✅ **Screen cleared**\n✅ **Conversation memory wiped**\n✅ **Context history reset**\n\n🚀 Starting fresh! The AI will not remember any previous conversations.\n\n💡 **Welcome back to LUIGI RAG System!**\nYour files are still available if you had any uploaded.\nType **/help** for available commands. 🎮',
-                timestamp: new Date()
-              }])
-              // Additional state resets for a truly fresh start
-              // Note: We keep API key, uploaded files, and UI settings
-              // but reset conversational context completely
-              console.log('🧠 Conversation memory completely cleared!')
-              break
-                          case '/files':
-                await handleFilesCommand(command.trim())
-                break
-            case '/status':
-              setMessages(prev => [...prev, {
-                role: 'system',
-                content: `📊 Status:\n- API Key: ${apiKey ? '✅ Set' : '❌ Not set'}\n- Model: ${model}\n- RAG Mode: ${useRAG ? '🔍 Active' : '💬 Inactive'}\n- Uploaded Files: ${uploadedFiles.length}\n- Thinking Mode: ${powerUpMode ? '🍄💪 Critical Thinking' : '⚡ Quick Answers'}\n- Developer Message: ${developerMessage.substring(0, 50)}...`,
-                timestamp: new Date()
-              }])
-              break
+  const handleCommand = async (command: string) => {
+    const commandParts = command.trim().toLowerCase().split(' ')
+    const mainCommand = commandParts[0]
+    
+    switch (mainCommand) {
+      case '/help':
+        setMessages(prev => [...prev, {
+          role: 'system',
+          content: '🎯 Available commands:\n- **/help**: Show this help\n- **/clear**: Clear screen & reset conversation memory\n- **/status**: Show connection status\n- **/files**: Show uploaded files\n- **/files filename**: Analyze specific file\n- **/files #**: Analyze file by number\n\n⌨️ Keyboard Shortcuts:\n- **ENTER**: Send message\n- **SHIFT+ENTER**: New line in message\n\n📚 Features:\n- **RAG Mode**: Upload documents (PDF, TXT, CSV, JSON, XML) and chat with them (toggle in input area)\n- **Power-Up Mode**: Critical thinking vs quick answers (toggle in input area)\n- **File Analysis**: Get suggested questions and summaries\n- **Memory Reset**: Use `/clear` for fresh conversations\n- **Multi-Format Support**: PDF, TXT, CSV, JSON, XML files\n- **Multi-line Input**: Use Shift+Enter for longer messages',
+          timestamp: new Date()
+        }])
+        break
+      case '/clear':
+        // Reset conversation completely - both visual and memory
+        setMessages([{
+          role: 'system',
+          content: '🧹 **COMPLETE RESET PERFORMED**\n\n✅ **Screen cleared**\n✅ **Conversation memory wiped**\n✅ **Context history reset**\n\n🚀 Starting fresh! The AI will not remember any previous conversations.\n\n💡 **Welcome back to LUIGI RAG System!**\nYour files are still available if you had any uploaded.\nType **/help** for available commands. 🎮',
+          timestamp: new Date()
+        }])
+        // Additional state resets for a truly fresh start
+        // Note: We keep API key, uploaded files, and UI settings
+        // but reset conversational context completely
+        console.log('🧠 Conversation memory completely cleared!')
+        break
+      case '/files':
+        await handleFilesCommand(command.trim())
+        break
+      case '/status':
+        setMessages(prev => [...prev, {
+          role: 'system',
+          content: `📊 Status:\n- API Key: ${apiKey ? '✅ Set' : '❌ Not set'}\n- Model: ${model}\n- RAG Mode: ${useRAG ? '🔍 Active' : '💬 Inactive'}\n- Uploaded Files: ${uploadedFiles.length}\n- Thinking Mode: ${powerUpMode ? '🍄💪 Critical Thinking' : '⚡ Quick Answers'}\n- Developer Message: ${developerMessage.substring(0, 50)}...`,
+          timestamp: new Date()
+        }])
+        break
 
-            default:
-              setMessages(prev => [...prev, {
-                role: 'system',
-                content: `❓ Unknown command: ${mainCommand}. Type /help for available commands. 🎮`,
-                timestamp: new Date()
-              }])
-          }
-        }
+      default:
+        setMessages(prev => [...prev, {
+          role: 'system',
+          content: `❓ Unknown command: ${mainCommand}. Type /help for available commands. 🎮`,
+          timestamp: new Date()
+        }])
+    }
+  }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -582,7 +582,7 @@ QUICK RESPONSE MODE ⚡:
                 onClick={() => setSidebarOpen(false)}
                 className="text-gray-400 hover:text-white transition-colors p-1 rounded"
               >
-                ✕
+                &lt;
               </button>
             </div>
           </div>
@@ -591,200 +591,199 @@ QUICK RESPONSE MODE ⚡:
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {/* PowerUp Configuration Section */}
             <div className="bg-gray-800 rounded-lg border border-gray-600">
-              <div 
-                className="p-3 cursor-pointer hover:bg-gray-700 transition-all duration-300 rounded-t-lg group"
-                onClick={() => toggleSections(!showSettings)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xl group-hover:animate-spin transition-transform">🍄</span>
-                    <h3 className="text-sm font-bold text-white">POWER-UP CONFIG</h3>
-                  </div>
-                  <span className={`text-white text-sm transition-transform duration-300 ${showSettings ? 'rotate-180' : ''}`}>
-                    🔽
-                  </span>
+              <div className="p-3 border-b border-gray-600">
+                <div className="flex items-center space-x-2">
+                  <span className="text-xl">🍄</span>
+                  <h3 className="text-sm font-bold text-white">POWER-UP CONFIG</h3>
                 </div>
               </div>
               
-              {showSettings && (
-                <div className="p-3 space-y-3 border-t border-gray-600">
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold text-gray-300">🔑 OpenAI API Key</label>
-                    <input
-                      type="password"
-                      value={apiKey}
-                      onChange={(e) => setApiKey(e.target.value)}
-                      className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
-                      placeholder="sk-..."
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold text-gray-300">🤖 Model</label>
-                    <select
-                      value={model}
-                      onChange={(e) => setModel(e.target.value)}
-                      className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
-                    >
-                      <option value="gpt-4.1-mini">GPT-4.1-mini</option>
-                      <option value="gpt-4">GPT-4</option>
-                      <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold text-gray-300">🎯 Developer Message</label>
-                    <textarea
-                      value={developerMessage}
-                      onChange={(e) => setDeveloperMessage(e.target.value)}
-                      rows={2}
-                      className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500 resize-none"
-                      placeholder="Enter system prompt..."
-                    />
-                  </div>
+              <div className="p-3 space-y-3">
+                <div className="space-y-2">
+                  <label className="block text-xs font-semibold text-gray-300">🔑 OpenAI API Key</label>
+                  <input
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                    placeholder="sk-..."
+                  />
                 </div>
-              )}
+                <div className="space-y-2">
+                  <label className="block text-xs font-semibold text-gray-300">🤖 Model</label>
+                  <select
+                    value={model}
+                    onChange={(e) => setModel(e.target.value)}
+                    className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="gpt-4.1-mini">GPT-4.1-mini</option>
+                    <option value="gpt-4">GPT-4</option>
+                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-xs font-semibold text-gray-300">🎯 Developer Message</label>
+                  <textarea
+                    value={developerMessage}
+                    onChange={(e) => setDeveloperMessage(e.target.value)}
+                    rows={2}
+                    className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500 resize-none"
+                    placeholder="Enter system prompt..."
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Document Manager Section */}
             <div className="bg-gray-800 rounded-lg border border-gray-600">
-              <div 
-                className="p-3 cursor-pointer hover:bg-gray-700 transition-all duration-300 rounded-t-lg group"
-                onClick={() => toggleSections(!showDocumentManager)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xl group-hover:animate-bounce transition-transform">📚</span>
-                    <h3 className="text-sm font-bold text-white">DOCUMENT MANAGER</h3>
-                    {uploadedFiles.length > 0 && (
-                      <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                        {uploadedFiles.length}
-                      </span>
-                    )}
-                  </div>
-                  <span className={`text-white text-sm transition-transform duration-300 ${showDocumentManager ? 'rotate-180' : ''}`}>
-                    🔽
-                  </span>
+              <div className="p-3 border-b border-gray-600">
+                <div className="flex items-center space-x-2">
+                  <span className="text-xl">📚</span>
+                  <h3 className="text-sm font-bold text-white">DOCUMENT MANAGER</h3>
+                  {uploadedFiles.length > 0 && (
+                    <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                      {uploadedFiles.length}
+                    </span>
+                  )}
                 </div>
               </div>
               
-              {showDocumentManager && (
-                <div className="p-3 space-y-3 border-t border-gray-600">
-                  {/* File Upload Area */}
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm">📤</span>
-                      <div className="text-xs font-bold text-gray-300">Upload Documents</div>
-                    </div>
-                    <div
-                      className={`border-2 border-dashed rounded-lg p-3 text-center transition-all duration-300 ${
-                        dragActive 
-                          ? 'border-yellow-400 bg-yellow-900/20' 
-                          : 'border-gray-600 hover:border-blue-500 hover:bg-blue-900/20'
-                      }`}
-                      onDragEnter={handleDrag}
-                      onDragLeave={handleDrag}
-                      onDragOver={handleDrag}
-                      onDrop={handleDrop}
-                    >
-                      <div className="space-y-2">
-                        <div className={`text-2xl transition-transform duration-300 ${dragActive ? 'animate-bounce' : ''}`}>
-                          {isUploading ? '🔄' : dragActive ? '📥' : '📄'}
-                        </div>
-                        <div className="space-y-1">
-                          {isUploading ? (
-                            <div className="text-blue-400 text-xs font-bold animate-pulse">
-                              🔄 Processing...
-                            </div>
-                          ) : (
-                            <>
-                              <div className="font-bold text-gray-300 text-xs">
-                                Drag & drop here
-                              </div>
-                              <div className="text-xs text-gray-400">
-                                or click to browse
-                              </div>
-                              <div className="flex flex-wrap justify-center gap-1 mt-2">
-                                <span className="inline-flex items-center px-1 py-0.5 rounded text-xs bg-red-100 text-red-800">PDF</span>
-                                <span className="inline-flex items-center px-1 py-0.5 rounded text-xs bg-blue-100 text-blue-800">TXT</span>
-                                <span className="inline-flex items-center px-1 py-0.5 rounded text-xs bg-green-100 text-green-800">CSV</span>
-                                <span className="inline-flex items-center px-1 py-0.5 rounded text-xs bg-purple-100 text-purple-800">JSON</span>
-                                <span className="inline-flex items-center px-1 py-0.5 rounded text-xs bg-yellow-100 text-yellow-800">XML</span>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                        <input
-                          type="file"
-                          ref={fileInputRef}
-                          multiple
-                          accept=".pdf,.txt,.csv,.json,.xml"
-                          onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
-                          className="hidden"
-                        />
+              <div className="p-3 space-y-3">
+                {/* File Upload Area */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm">📤</span>
+                    <div className="text-xs font-bold text-gray-300">Upload Documents</div>
+                  </div>
+                  <div
+                    className={`border-2 border-dashed rounded-lg p-3 text-center transition-all duration-300 cursor-pointer ${
+                      dragActive 
+                        ? 'border-yellow-400 bg-yellow-900/20' 
+                        : 'border-gray-600 hover:border-blue-500 hover:bg-blue-900/20'
+                    }`}
+                    onDragEnter={handleDrag}
+                    onDragLeave={handleDrag}
+                    onDragOver={handleDrag}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <div className="space-y-2">
+                      <div className={`text-2xl transition-transform duration-300 ${dragActive ? 'animate-bounce' : ''}`}>
+                        {isUploading ? '🔄' : dragActive ? '📥' : '📄'}
                       </div>
+                      <div className="space-y-1">
+                        {isUploading ? (
+                          <div className="text-blue-400 text-xs font-bold animate-pulse">
+                            🔄 Processing...
+                          </div>
+                        ) : (
+                          <>
+                            <div className="font-bold text-gray-300 text-xs">
+                              Drag & drop here
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              or click to browse
+                            </div>
+                            <div className="flex flex-wrap justify-center gap-1 mt-2">
+                              <span className="inline-flex items-center px-1 py-0.5 rounded text-xs bg-red-100 text-red-800">PDF</span>
+                              <span className="inline-flex items-center px-1 py-0.5 rounded text-xs bg-blue-100 text-blue-800">TXT</span>
+                              <span className="inline-flex items-center px-1 py-0.5 rounded text-xs bg-green-100 text-green-800">CSV</span>
+                              <span className="inline-flex items-center px-1 py-0.5 rounded text-xs bg-purple-100 text-purple-800">JSON</span>
+                              <span className="inline-flex items-center px-1 py-0.5 rounded text-xs bg-yellow-100 text-yellow-800">XML</span>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        multiple
+                        accept=".pdf,.txt,.csv,.json,.xml"
+                        onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
+                        className="hidden"
+                      />
                     </div>
                   </div>
+                </div>
 
-                  {/* Uploaded Files List */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="text-xs font-bold text-gray-300">📁 Uploaded Files</div>
-                      {uploadedFiles.length > 0 && (
-                        <button
-                          onClick={deleteSelectedFiles}
-                          disabled={selectedFiles.size === 0}
-                          className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                          DELETE
-                        </button>
-                      )}
+                {/* Uploaded Files List */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs font-bold text-gray-300">📁 Uploaded Files</div>
+                    {uploadedFiles.length > 0 && (
+                      <button
+                        onClick={deleteSelectedFiles}
+                        disabled={selectedFiles.size === 0}
+                        className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        DELETE
+                      </button>
+                    )}
+                  </div>
+                  
+                  {uploadedFiles.length === 0 ? (
+                    <div className="text-center py-4 text-gray-500">
+                      <div className="text-lg mb-1">📁</div>
+                      <div className="text-xs">No files uploaded</div>
                     </div>
-                    
-                    {uploadedFiles.length === 0 ? (
-                      <div className="text-center py-4 text-gray-500">
-                        <div className="text-lg mb-1">📁</div>
-                        <div className="text-xs">No files uploaded</div>
+                  ) : (
+                    <div className="border rounded border-gray-600 bg-gray-900/50 max-h-40 overflow-y-auto">
+                      <div className="p-2 border-b border-gray-600 bg-gray-800/50 flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={selectedFiles.size === uploadedFiles.length}
+                          onChange={(e) => handleSelectAll(e.target.checked)}
+                          className="rounded"
+                        />
+                        <span className="text-xs font-semibold text-gray-300">
+                          Select All ({uploadedFiles.length})
+                        </span>
                       </div>
-                    ) : (
-                      <div className="border rounded border-gray-600 bg-gray-900/50 max-h-40 overflow-y-auto">
-                        <div className="p-2 border-b border-gray-600 bg-gray-800/50 flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={selectedFiles.size === uploadedFiles.length}
-                            onChange={(e) => handleSelectAll(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-xs font-semibold text-gray-300">
-                            Select All ({uploadedFiles.length})
-                          </span>
-                        </div>
-                        <div className="divide-y divide-gray-600">
-                          {uploadedFiles.map((file, index) => (
-                            <div key={index} className="p-2 hover:bg-gray-700/50 transition-colors">
-                              <div className="flex items-center space-x-2">
-                                <input
-                                  type="checkbox"
-                                  checked={selectedFiles.has(file)}
-                                  onChange={(e) => handleFileSelection(file, e.target.checked)}
-                                  className="rounded"
-                                />
-                                <div className="flex-1 min-w-0">
-                                  <div className="text-xs font-medium text-gray-300 truncate">
-                                    📄 {file}
-                                  </div>
+                      <div className="divide-y divide-gray-600">
+                        {uploadedFiles.map((file, index) => (
+                          <div key={index} className="p-2 hover:bg-gray-700/50 transition-colors">
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                checked={selectedFiles.has(file)}
+                                onChange={(e) => handleFileSelection(file, e.target.checked)}
+                                className="rounded"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <div className="text-xs font-medium text-gray-300 truncate">
+                                  📄 {file}
                                 </div>
                               </div>
                             </div>
-                          ))}
-                        </div>
+                          </div>
+                        ))}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Collapsed Sidebar Expand Bar */}
+      {!sidebarOpen && (
+        <div className="flex-shrink-0 w-12 bg-gradient-to-b from-gray-900 to-gray-800 border-r border-gray-700 flex flex-col cursor-pointer">
+          {/* Header area to match sidebar header height */}
+          <div className="p-4 border-b border-gray-700 flex items-center justify-center">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="text-gray-400 hover:text-white transition-colors p-1 rounded transform rotate-0 hover:scale-125"
+              title="Expand sidebar"
+            >
+              <span className="text-lg font-bold">&gt;</span>
+            </button>
+          </div>
+          {/* Rest of the bar */}
+          <div className="flex-1"></div>
+        </div>
+      )}
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
@@ -793,18 +792,9 @@ QUICK RESPONSE MODE ⚡:
           <div className="mario-header p-6 rounded-t-lg">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center space-x-3">
-                {!sidebarOpen && (
-                  <button
-                    onClick={() => setSidebarOpen(true)}
-                    className="text-white hover:text-yellow-300 transition-colors p-2 rounded mario-button"
-                    title="Open sidebar"
-                  >
-                    <span className="text-lg">☰</span>
-                  </button>
-                )}
                 <span className={`mario-star text-yellow-300 text-3xl ${powerUpMode ? 'animate-spin' : 'floating-animation'}`}>⭐</span>
                 <h1 className={`text-xl md:text-2xl font-bold mario-text text-white ${powerUpMode ? 'animate-pulse glow-text' : ''}`}>
-                  LUIGI
+                SUPER MARIO WORLD RAG TERMINAL
                 </h1>
                 <span className="mario-coin text-yellow-300 text-3xl">🪙</span>
                 {powerUpMode && (
@@ -848,202 +838,201 @@ QUICK RESPONSE MODE ⚡:
               )}
             </div>
           </div>
-                </div>
+        </div>
 
         {/* Messages Display - Flexible Height */}
         <div className="flex-1 mx-4 mb-2 mario-border overflow-hidden flex flex-col">
-              <div className="flex-1 p-4 overflow-y-auto">
-                <div className="space-y-3">
-                  {messages.map((message, index) => (
-                                          <div key={index} className="mario-message p-3">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-start space-x-2">
-                            <span className="text-mario-red font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
-                              {message.role === 'user' ? '🎮 MARIO' : message.role === 'assistant' ? '🤖 LUIGI' : '🍄 SYSTEM'}
-                            </span>
-                            <span className="text-mario-brown text-xs font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
-                              [{message.timestamp.toLocaleTimeString()}]
-                            </span>
-                          </div>
-                          
-                          {/* Indicators on the right side */}
-                          <div className="flex items-center space-x-2">
-                            {message.role === 'assistant' && message.usedRAG && (
-                              <span className="text-red-500 text-xs font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
-                                🔍 RAG
-                              </span>
-                            )}
-                                                    {message.role === 'assistant' && message.usedPowerUp && (
-                          <span className="text-xs font-normal animate-pulse" style={{ 
-                            fontFamily: 'Arial, sans-serif',
-                            color: '#FFD700',
-                            textShadow: '0 0 4px rgba(255, 215, 0, 0.6)'
-                          }}>
-                            ⭐ POWER-UP
-                          </span>
-                        )}
-                          </div>
-                        </div>
-                        
-                        <div className="ml-4">
-                          <div 
-                            className="text-sm font-normal" 
-                            style={{ fontFamily: 'Arial, sans-serif' }}
-                            dangerouslySetInnerHTML={renderMarkdown(message.content)}
-                          />
-                          
-                          {message.role === 'assistant' && index === messages.length - 1 && isLoading && (
-                            <span className="animate-pulse text-mario-red">▋</span>
-                          )}
-                        </div>
+          <div className="flex-1 p-4 overflow-y-auto">
+            <div className="space-y-3">
+              {messages.map((message, index) => (
+                <div key={index} className="mario-message p-3">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-start space-x-2">
+                      <span className="text-mario-red font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
+                        {message.role === 'user' ? '🎮 MARIO' : message.role === 'assistant' ? '🤖 LUIGI' : '🍄 SYSTEM'}
+                      </span>
+                      <span className="text-mario-brown text-xs font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
+                        [{message.timestamp.toLocaleTimeString()}]
+                      </span>
                     </div>
-                  ))}
-                  <div ref={messagesEndRef} />
+                    
+                    {/* Indicators on the right side */}
+                    <div className="flex items-center space-x-2">
+                      {message.role === 'assistant' && message.usedRAG && (
+                        <span className="text-red-500 text-xs font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
+                          🔍 RAG
+                        </span>
+                      )}
+                      {message.role === 'assistant' && message.usedPowerUp && (
+                        <span className="text-xs font-normal animate-pulse" style={{ 
+                          fontFamily: 'Arial, sans-serif',
+                          color: '#FFD700',
+                          textShadow: '0 0 4px rgba(255, 215, 0, 0.6)'
+                        }}>
+                          ⭐ POWER-UP
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="ml-4">
+                    <div 
+                      className="text-sm font-normal" 
+                      style={{ fontFamily: 'Arial, sans-serif' }}
+                      dangerouslySetInnerHTML={renderMarkdown(message.content)}
+                    />
+                    
+                    {message.role === 'assistant' && index === messages.length - 1 && isLoading && (
+                      <span className="animate-pulse text-mario-red">▋</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+          </div>
+        </div>
+
+        {/* Enhanced Input Area - Stick to Bottom */}
+        <div className="flex-shrink-0 mx-4 mb-4 mario-border slide-in">
+          <form onSubmit={handleSubmit} className="p-6">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <span className="text-red-500 font-bold mario-text text-3xl animate-pulse">{'>'}</span>
+                <span className="text-sm text-mario-brown font-semibold">LUIGI</span>
+              </div>
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                disabled={isLoading}
+                rows={input.split('\n').length || 1}
+                className={`flex-1 mario-input p-4 text-mario-dark placeholder-mario-brown/60 font-normal text-lg transition-all duration-300 resize-none ${
+                  powerUpMode ? 'border-2 bg-yellow-50 shadow-lg' : ''
+                } ${isLoading ? 'animate-pulse' : ''}`}
+                style={{ 
+                  fontFamily: 'Fira Code, Arial, sans-serif',
+                  minHeight: '60px',
+                  maxHeight: '200px',
+                  ...(powerUpMode && {
+                    borderColor: '#FFD700',
+                    boxShadow: '0 0 25px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 215, 0, 0.4)',
+                    animation: 'pulse-glow 2s infinite'
+                  })
+                }}
+                placeholder={
+                  isLoading 
+                    ? "🔄 Processing..." 
+                    : powerUpMode 
+                      ? "⭐ Power-up mode! Ask complex questions for deep analysis..."
+                      : useRAG 
+                        ? "🔍 Ask about your documents... (Shift+Enter for new line)"
+                        : "💬 Type your message or command... (Shift+Enter for new line)"
+                }
+              />
+              
+              {/* Enhanced Mode Toggles */}
+              <div className="flex items-center space-x-6">
+                {/* Enhanced RAG Toggle */}
+                <div className="flex flex-col items-center space-y-2 group">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-lg group-hover:scale-110 transition-transform">🔍</span>
+                    <button
+                      onClick={handleRAGToggle}
+                      disabled={uploadedFiles.length === 0}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 ${
+                        useRAG ? 'bg-green-500 shadow-lg shadow-green-500/50' : 'bg-red-500 shadow-lg shadow-red-500/50'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-all duration-300 shadow-md ${
+                          useRAG ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                  <span className={`text-xs font-bold tracking-wider ${useRAG ? 'text-green-600 glow-text' : 'text-red-600'}`}>
+                    RAG
+                  </span>
+                </div>
+
+                {/* Enhanced Power-Up Toggle */}
+                <div className="flex flex-col items-center space-y-2 group">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-lg group-hover:animate-spin transition-transform">⭐</span>
+                    <button
+                      onClick={() => setPowerUpMode(!powerUpMode)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 focus:outline-none transform hover:scale-105 ${
+                        powerUpMode ? 'bg-yellow-500' : 'bg-red-500'
+                      }`}
+                      style={powerUpMode ? {
+                        backgroundColor: '#FFD700',
+                        boxShadow: '0 0 15px rgba(255, 215, 0, 0.8), 0 0 25px rgba(255, 215, 0, 0.4)',
+                        animation: 'pulse-glow 2s infinite'
+                      } : {
+                        boxShadow: '0 0 10px rgba(239, 68, 68, 0.5)'
+                      }}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-all duration-300 shadow-md ${
+                          powerUpMode ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                  <span className={`text-xs font-bold tracking-wider ${powerUpMode ? 'text-yellow-500 glow-text' : 'text-red-600'}`} style={powerUpMode ? {
+                    color: '#FFD700',
+                    textShadow: '0 0 8px rgba(255, 215, 0, 0.8)'
+                  } : {}}>
+                    POWER
+                  </span>
                 </div>
               </div>
+
+              <button
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                className={`mario-button px-6 py-3 text-white font-bold mario-text-small disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95 ${
+                  powerUpMode ? 'hover:bg-yellow-600' : ''
+                } ${isLoading ? 'animate-pulse' : ''}`}
+                style={powerUpMode ? {
+                  backgroundColor: '#FFD700',
+                  boxShadow: '0 0 20px rgba(255, 215, 0, 0.9), 0 0 35px rgba(255, 215, 0, 0.5)',
+                  animation: 'pulse-glow 1.5s infinite'
+                } : {
+                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+                }}
+              >
+                {powerUpMode 
+                  ? '⭐ POWER' 
+                  : useRAG 
+                    ? '🔍 RAG' 
+                    : '🚀 SEND'
+                }
+              </button>
             </div>
-
-            {/* Enhanced Input Area - Stick to Bottom */}
-            <div className="flex-shrink-0 mx-4 mb-4 mario-border slide-in">
-              <form onSubmit={handleSubmit} className="p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-red-500 font-bold mario-text text-3xl animate-pulse">{'>'}</span>
-                    <span className="text-sm text-mario-brown font-semibold">LUIGI</span>
-                  </div>
-                  <textarea
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    disabled={isLoading}
-                    rows={input.split('\n').length || 1}
-                    className={`flex-1 mario-input p-4 text-mario-dark placeholder-mario-brown/60 font-normal text-lg transition-all duration-300 resize-none ${
-                      powerUpMode ? 'border-2 bg-yellow-50 shadow-lg' : ''
-                    } ${isLoading ? 'animate-pulse' : ''}`}
-                    style={{ 
-                      fontFamily: 'Fira Code, Arial, sans-serif',
-                      minHeight: '60px',
-                      maxHeight: '200px',
-                      ...(powerUpMode && {
-                        borderColor: '#FFD700',
-                        boxShadow: '0 0 25px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 215, 0, 0.4)',
-                        animation: 'pulse-glow 2s infinite'
-                      })
-                    }}
-                    placeholder={
-                      isLoading 
-                        ? "🔄 Processing..." 
-                        : powerUpMode 
-                          ? "⭐ Power-up mode! Ask complex questions for deep analysis..."
-                          : useRAG 
-                            ? "🔍 Ask about your documents... (Shift+Enter for new line)"
-                            : "💬 Type your message or command... (Shift+Enter for new line)"
-                    }
-                  />
-                  
-                  {/* Enhanced Mode Toggles */}
-                  <div className="flex items-center space-x-6">
-                    {/* Enhanced RAG Toggle */}
-                    <div className="flex flex-col items-center space-y-2 group">
-                      <div className="flex items-center space-x-3">
-                        <span className="text-lg group-hover:scale-110 transition-transform">🔍</span>
-                        <button
-                          onClick={handleRAGToggle}
-                          disabled={uploadedFiles.length === 0}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 ${
-                            useRAG ? 'bg-green-500 shadow-lg shadow-green-500/50' : 'bg-red-500 shadow-lg shadow-red-500/50'
-                          }`}
-                        >
-                          <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-all duration-300 shadow-md ${
-                              useRAG ? 'translate-x-6' : 'translate-x-1'
-                            }`}
-                          />
-                        </button>
-                      </div>
-                      <span className={`text-xs font-bold tracking-wider ${useRAG ? 'text-green-600 glow-text' : 'text-red-600'}`}>
-                        RAG
-                      </span>
-                    </div>
-
-                    {/* Enhanced Power-Up Toggle */}
-                    <div className="flex flex-col items-center space-y-2 group">
-                      <div className="flex items-center space-x-3">
-                        <span className="text-lg group-hover:animate-spin transition-transform">⭐</span>
-                        <button
-                          onClick={() => setPowerUpMode(!powerUpMode)}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 focus:outline-none transform hover:scale-105 ${
-                            powerUpMode ? 'bg-yellow-500' : 'bg-red-500'
-                          }`}
-                          style={powerUpMode ? {
-                            backgroundColor: '#FFD700',
-                            boxShadow: '0 0 15px rgba(255, 215, 0, 0.8), 0 0 25px rgba(255, 215, 0, 0.4)',
-                            animation: 'pulse-glow 2s infinite'
-                          } : {
-                            boxShadow: '0 0 10px rgba(239, 68, 68, 0.5)'
-                          }}
-                        >
-                          <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-all duration-300 shadow-md ${
-                              powerUpMode ? 'translate-x-6' : 'translate-x-1'
-                            }`}
-                          />
-                        </button>
-                      </div>
-                      <span className={`text-xs font-bold tracking-wider ${powerUpMode ? 'text-yellow-500 glow-text' : 'text-red-600'}`} style={powerUpMode ? {
-                        color: '#FFD700',
-                        textShadow: '0 0 8px rgba(255, 215, 0, 0.8)'
-                      } : {}}>
-                        POWER
-                      </span>
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isLoading || !input.trim()}
-                    className={`mario-button px-6 py-3 text-white font-bold mario-text-small disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95 ${
-                      powerUpMode ? 'hover:bg-yellow-600' : ''
-                    } ${isLoading ? 'animate-pulse' : ''}`}
-                    style={powerUpMode ? {
-                      backgroundColor: '#FFD700',
-                      boxShadow: '0 0 20px rgba(255, 215, 0, 0.9), 0 0 35px rgba(255, 215, 0, 0.5)',
-                      animation: 'pulse-glow 1.5s infinite'
-                    } : {
-                      boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
-                    }}
-                  >
-                    {powerUpMode 
-                      ? '⭐ POWER' 
-                      : useRAG 
-                        ? '🔍 RAG' 
-                        : '🚀 SEND'
-                    }
-                  </button>
-                </div>
-                <div className="text-xs mt-2 text-mario-brown font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
-                  Press ENTER to send, SHIFT+ENTER for new line, /help for commands 
-                  {useRAG && ' | 🔍 RAG Active'}
-                  {powerUpMode && (
-                    <span style={{ color: '#FFD700', textShadow: '0 0 2px rgba(255, 215, 0, 0.6)' }}>
-                      {' | ⭐ Power Active'}
-                    </span>
-                  )}
-                </div>
-              </form>
+            <div className="text-xs mt-2 text-mario-brown font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
+              Press ENTER to send, SHIFT+ENTER for new line, /help for commands 
+              {useRAG && ' | 🔍 RAG Active'}
+              {powerUpMode && (
+                <span style={{ color: '#FFD700', textShadow: '0 0 2px rgba(255, 215, 0, 0.6)' }}>
+                  {' | ⭐ Power Active'}
+                </span>
+              )}
             </div>
+          </form>
+        </div>
 
-            {/* Footer */}
-            <div className="flex-shrink-0 text-center pb-4 text-xs text-mario-brown mario-text-small font-normal">
-                              <div className="flex items-center justify-center space-x-4">
-                  <span>🍄 AI ENGINEER CHALLENGE</span>
-                  <span className="mario-star">⭐</span>
-                  <span>SUPER MARIO WORLD RAG v2.2.0</span>
-                  <span className="mario-coin">🪙</span>
-                  {useRAG && <span className="text-mario-yellow">🔍 RAG ACTIVE</span>}
-                  {powerUpMode && <span className="text-yellow-400 animate-pulse">⭐ POWER-UP ACTIVE ⭐</span>}
-                </div>
-            </div>
+        {/* Footer */}
+        <div className="flex-shrink-0 text-center pb-4 text-xs text-mario-brown mario-text-small font-normal">
+          <div className="flex items-center justify-center space-x-4">
+            <span>🍄 AI ENGINEER CHALLENGE</span>
+            <span className="mario-star">⭐</span>
+            <span>SUPER MARIO WORLD RAG v2.2.0</span>
+            <span className="mario-coin">🪙</span>
+            {useRAG && <span className="text-mario-yellow">🔍 RAG ACTIVE</span>}
+            {powerUpMode && <span className="text-yellow-400 animate-pulse">⭐ POWER-UP ACTIVE ⭐</span>}
+          </div>
         </div>
       </div>
     </div>
