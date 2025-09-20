@@ -562,16 +562,16 @@ QUICK RESPONSE MODE ⚡:
 
           return (
           <div className="h-screen flex flex-col mario-bg text-mario-dark" style={{ fontFamily: 'Arial, sans-serif' }}>
-            {/* Header */}
-            <div className="flex-shrink-0 mario-border m-4 mb-2">
-              <div className="mario-header p-4 rounded-t-lg">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className={`mario-star text-mario-gold text-2xl ${powerUpMode ? 'animate-spin' : ''}`}>⭐</span>
-                    <h1 className={`text-xl font-bold mario-text text-white ${powerUpMode ? 'animate-pulse' : ''}`}>
+            {/* Enhanced Header */}
+            <div className="flex-shrink-0 mario-border m-4 mb-2 slide-in">
+              <div className="mario-header p-6 rounded-t-lg">
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div className="flex items-center space-x-3">
+                    <span className={`mario-star text-yellow-300 text-3xl ${powerUpMode ? 'animate-spin' : 'floating-animation'}`}>⭐</span>
+                    <h1 className={`text-xl md:text-2xl font-bold mario-text text-white ${powerUpMode ? 'animate-pulse glow-text' : ''}`}>
                       SUPER MARIO WORLD RAG TERMINAL
                     </h1>
-                    <span className="mario-coin text-mario-gold text-2xl">🪙</span>
+                    <span className="mario-coin text-yellow-300 text-3xl">🪙</span>
                     {powerUpMode && (
                       <>
                         <span className="text-yellow-400 text-xl animate-bounce">⭐</span>
@@ -580,32 +580,58 @@ QUICK RESPONSE MODE ⚡:
                       </>
                     )}
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 bg-mario-red rounded-full animate-bounce-mario"></div>
-                    <div className="w-4 h-4 bg-mario-yellow rounded-full animate-bounce-mario" style={{animationDelay: '0.1s'}}></div>
-                    <div className="w-4 h-4 bg-mario-green rounded-full animate-bounce-mario" style={{animationDelay: '0.2s'}}></div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-5 h-5 bg-red-500 rounded-full shadow-lg animate-pulse" style={{animationDelay: '0s'}}></div>
+                    <div className="w-5 h-5 bg-yellow-400 rounded-full shadow-lg animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                    <div className="w-5 h-5 bg-green-500 rounded-full shadow-lg animate-pulse" style={{animationDelay: '1s'}}></div>
                   </div>
                 </div>
-                <div className="text-sm mt-2 text-white mario-text-small">
-                  🎮 Connected to Mushroom Kingdom RAG AI v2.2.0 | 📁 {uploadedFiles.length} files loaded
+                <div className="mt-4 flex flex-wrap gap-3 items-center justify-center lg:justify-start">
+                  <div className="glass-effect px-4 py-2 rounded-lg">
+                    <span className="text-sm text-white mario-text-small glow-text">
+                      🎮 Connected to Mushroom Kingdom RAG AI v2.2.0
+                    </span>
+                  </div>
+                  <div className="glass-effect px-4 py-2 rounded-lg">
+                    <span className="text-sm text-white mario-text-small glow-text">
+                      📁 {uploadedFiles.length} files loaded
+                    </span>
+                  </div>
+                  {useRAG && (
+                    <div className="glass-effect px-4 py-2 rounded-lg border border-green-400/30">
+                      <span className="text-sm text-green-300 mario-text-small glow-text">
+                        🔍 RAG Active
+                      </span>
+                    </div>
+                  )}
+                  {powerUpMode && (
+                    <div className="glass-effect px-4 py-2 rounded-lg border border-yellow-400/30">
+                      <span className="text-sm text-yellow-300 mario-text-small glow-text animate-pulse">
+                        ⭐ Power Mode
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Settings and PDF Upload - Side by Side with Collapsible Headers */}
+            {/* Enhanced Settings and Document Manager - Side by Side */}
             <div className="flex-shrink-0 mx-4 mb-2">
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 
-                {/* Settings Panel - Takes 2 columns */}
-                <div className="mario-border lg:col-span-2">
+                {/* Enhanced Settings Panel - Takes 2 columns */}
+                <div className="mario-border lg:col-span-2 slide-in">
                   <div 
-                    className="mario-header p-3 rounded-t-lg cursor-pointer hover:bg-mario-red/80 transition-colors"
+                    className="mario-header p-4 rounded-t-lg cursor-pointer hover:bg-gradient-to-r hover:from-red-600 hover:to-orange-500 transition-all duration-300 transform hover:scale-[1.02] group"
                     onClick={() => toggleSections(!showSettings)}
                   >
                     <div className="flex items-center justify-between">
-                      <h2 className="text-lg font-bold mario-text text-white">🍄 POWER-UP CONFIGURATION</h2>
-                      <span className="text-white text-xl">
-                        {showSettings ? '🔽' : '▶️'}
+                      <div className="flex items-center space-x-3">
+                        <span className="text-2xl group-hover:animate-spin transition-transform">🍄</span>
+                        <h2 className="text-lg font-bold mario-text text-white glow-text">POWER-UP CONFIGURATION</h2>
+                      </div>
+                      <span className={`text-white text-xl transition-transform duration-300 ${showSettings ? 'rotate-180' : ''}`}>
+                        🔽
                       </span>
                     </div>
                   </div>
@@ -650,16 +676,24 @@ QUICK RESPONSE MODE ⚡:
                   )}
                 </div>
 
-                {/* PDF Upload Section - Takes 3 columns */}
-                <div className="mario-border lg:col-span-3">
+                {/* Enhanced Document Manager Section - Takes 3 columns */}
+                <div className="mario-border lg:col-span-3 slide-in" style={{animationDelay: '0.1s'}}>
                   <div 
-                    className="mario-header p-3 rounded-t-lg cursor-pointer hover:bg-mario-red/80 transition-colors"
+                    className="mario-header p-4 rounded-t-lg cursor-pointer hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-500 transition-all duration-300 transform hover:scale-[1.02] group"
                     onClick={() => toggleSections(!showDocumentManager)}
                   >
                     <div className="flex items-center justify-between">
-                      <h2 className="text-lg font-bold mario-text text-white">📚 DOCUMENT MANAGER</h2>
-                      <span className="text-white text-xl">
-                        {showDocumentManager ? '🔽' : '▶️'}
+                      <div className="flex items-center space-x-3">
+                        <span className="text-2xl group-hover:animate-bounce transition-transform">📚</span>
+                        <h2 className="text-lg font-bold mario-text text-white glow-text">DOCUMENT MANAGER</h2>
+                        {uploadedFiles.length > 0 && (
+                          <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                            {uploadedFiles.length}
+                          </span>
+                        )}
+                      </div>
+                      <span className={`text-white text-xl transition-transform duration-300 ${showDocumentManager ? 'rotate-180' : ''}`}>
+                        🔽
                       </span>
                     </div>
                   </div>
@@ -668,30 +702,37 @@ QUICK RESPONSE MODE ⚡:
                     <div className="p-4">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         
-                        {/* Left: File Upload Area - Takes 1 column */}
-                        <div className="space-y-3 md:col-span-1">
-                          <div className="mario-text-small font-normal text-sm font-bold">📤 Upload Documents</div>
+                        {/* Enhanced File Upload Area - Takes 1 column */}
+                        <div className="space-y-4 md:col-span-1">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xl">📤</span>
+                            <div className="mario-text-small font-normal text-sm font-bold text-mario-brown glow-text">Upload Documents</div>
+                          </div>
                           <div
-                            className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
+                            className={`border-3 border-dashed rounded-xl p-6 text-center transition-all duration-300 transform ${
                               dragActive 
-                                ? 'border-mario-yellow bg-mario-yellow/20' 
-                                : 'border-mario-brown hover:border-mario-red'
+                                ? 'border-yellow-400 bg-gradient-to-br from-yellow-50 to-yellow-100 scale-105 shadow-lg shadow-yellow-200/50' 
+                                : 'border-mario-brown hover:border-blue-500 hover:bg-gradient-to-br hover:from-blue-50 hover:to-blue-100 hover:scale-102 hover:shadow-md'
                             }`}
                             onDragEnter={handleDrag}
                             onDragLeave={handleDrag}
                             onDragOver={handleDrag}
                             onDrop={handleDrop}
                           >
-                            <div className="space-y-2">
-                              <div className="text-2xl">📄</div>
+                            <div className="space-y-3">
+                              <div className={`text-4xl transition-transform duration-300 ${dragActive ? 'animate-bounce' : 'hover:scale-110'}`}>
+                                {isUploading ? '🔄' : '📄'}
+                              </div>
                               <div className="mario-text-small font-normal text-sm">
                                 {isUploading ? (
-                                  <div className="text-mario-red">🔄 Processing PDFs...</div>
+                                  <div className="text-blue-600 font-bold animate-pulse">🔄 Processing files...</div>
                                 ) : (
                                   <>
-                                    <div>Drag & drop documents here</div>
-                                                                          <div className="text-xs text-mario-brown">or click to browse</div>
-                                      <div className="text-xs text-mario-brown mt-1">Supports: PDF, TXT, CSV, JSON, XML</div>
+                                    <div className="font-semibold text-gray-700">Drag & drop documents here</div>
+                                    <div className="text-xs text-mario-brown opacity-75">or click to browse</div>
+                                    <div className="text-xs bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-bold mt-2">
+                                      📊 PDF • 📝 TXT • 📈 CSV • 🔗 JSON • 📄 XML
+                                    </div>
                                   </>
                                 )}
                               </div>
@@ -829,26 +870,29 @@ QUICK RESPONSE MODE ⚡:
               </div>
             </div>
 
-            {/* Input Area - Stick to Bottom */}
-            <div className="flex-shrink-0 mx-4 mb-4 mario-border">
-              <form onSubmit={handleSubmit} className="p-4">
-                <div className="flex items-center space-x-3">
-                  <span className="text-mario-red font-normal mario-text text-2xl">{'>'}</span>
+            {/* Enhanced Input Area - Stick to Bottom */}
+            <div className="flex-shrink-0 mx-4 mb-4 mario-border slide-in">
+              <form onSubmit={handleSubmit} className="p-6">
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-red-500 font-bold mario-text text-3xl animate-pulse">{'>'}</span>
+                    <span className="text-sm text-mario-brown font-semibold">LUIGI</span>
+                  </div>
                   <input
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
                     disabled={isLoading}
-                    className={`flex-1 mario-input p-3 text-mario-dark placeholder-mario-brown/50 font-normal ${
-                      powerUpMode ? 'border-2 bg-yellow-50' : ''
-                    }`}
+                    className={`flex-1 mario-input p-4 text-mario-dark placeholder-mario-brown/60 font-normal text-lg transition-all duration-300 ${
+                      powerUpMode ? 'border-2 bg-yellow-50 shadow-lg' : ''
+                    } ${isLoading ? 'animate-pulse' : ''}`}
                     style={{ 
-                      fontFamily: 'Arial, sans-serif',
+                      fontFamily: 'Fira Code, Arial, sans-serif',
                       ...(powerUpMode && {
                         borderColor: '#FFD700',
-                        boxShadow: '0 0 20px rgba(255, 215, 0, 0.6), 0 0 30px rgba(255, 215, 0, 0.3)',
-                        animation: 'pulse 2s infinite'
+                        boxShadow: '0 0 25px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 215, 0, 0.4)',
+                        animation: 'pulse-glow 2s infinite'
                       })
                     }}
                     placeholder={
@@ -857,60 +901,63 @@ QUICK RESPONSE MODE ⚡:
                         : powerUpMode 
                           ? "⭐ Power-up mode! Ask complex questions for deep analysis..."
                           : useRAG 
-                            ? "🔍 Ask about your PDFs..." 
+                            ? "🔍 Ask about your documents..." 
                             : "💬 Type your message or command..."
                     }
                   />
                   
-                  {/* Mode Toggles */}
-                  <div className="flex items-center space-x-4">
-                    {/* RAG Toggle */}
-                    <div className="flex flex-col items-center space-y-1">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-mario-brown text-xs font-normal">🔍</span>
+                  {/* Enhanced Mode Toggles */}
+                  <div className="flex items-center space-x-6">
+                    {/* Enhanced RAG Toggle */}
+                    <div className="flex flex-col items-center space-y-2 group">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-lg group-hover:scale-110 transition-transform">🔍</span>
                         <button
                           onClick={handleRAGToggle}
                           disabled={uploadedFiles.length === 0}
-                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
-                            useRAG ? 'bg-mario-green' : 'bg-mario-red'
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 ${
+                            useRAG ? 'bg-green-500 shadow-lg shadow-green-500/50' : 'bg-red-500 shadow-lg shadow-red-500/50'
                           }`}
                         >
                           <span
-                            className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                              useRAG ? 'translate-x-5' : 'translate-x-1'
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-all duration-300 shadow-md ${
+                              useRAG ? 'translate-x-6' : 'translate-x-1'
                             }`}
                           />
                         </button>
                       </div>
-                      <span className={`text-xs font-normal ${useRAG ? 'text-mario-green' : 'text-mario-red'}`}>
+                      <span className={`text-xs font-bold tracking-wider ${useRAG ? 'text-green-600 glow-text' : 'text-red-600'}`}>
                         RAG
                       </span>
                     </div>
 
-                    {/* Power-Up Toggle */}
-                    <div className="flex flex-col items-center space-y-1">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-mario-brown text-xs font-normal">⭐</span>
+                    {/* Enhanced Power-Up Toggle */}
+                    <div className="flex flex-col items-center space-y-2 group">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-lg group-hover:animate-spin transition-transform">⭐</span>
                         <button
                           onClick={() => setPowerUpMode(!powerUpMode)}
-                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${
-                            powerUpMode ? 'bg-yellow-400' : 'bg-mario-red'
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 focus:outline-none transform hover:scale-105 ${
+                            powerUpMode ? 'bg-yellow-500' : 'bg-red-500'
                           }`}
                           style={powerUpMode ? {
                             backgroundColor: '#FFD700',
-                            boxShadow: '0 0 12px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.4)'
-                          } : {}}
+                            boxShadow: '0 0 15px rgba(255, 215, 0, 0.8), 0 0 25px rgba(255, 215, 0, 0.4)',
+                            animation: 'pulse-glow 2s infinite'
+                          } : {
+                            boxShadow: '0 0 10px rgba(239, 68, 68, 0.5)'
+                          }}
                         >
                           <span
-                            className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                              powerUpMode ? 'translate-x-5' : 'translate-x-1'
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-all duration-300 shadow-md ${
+                              powerUpMode ? 'translate-x-6' : 'translate-x-1'
                             }`}
                           />
                         </button>
                       </div>
-                      <span className={`text-xs font-normal ${powerUpMode ? 'text-yellow-300' : 'text-mario-red'}`} style={powerUpMode ? {
+                      <span className={`text-xs font-bold tracking-wider ${powerUpMode ? 'text-yellow-500 glow-text' : 'text-red-600'}`} style={powerUpMode ? {
                         color: '#FFD700',
-                        textShadow: '0 0 4px rgba(255, 215, 0, 0.6)'
+                        textShadow: '0 0 8px rgba(255, 215, 0, 0.8)'
                       } : {}}>
                         POWER
                       </span>
@@ -920,14 +967,16 @@ QUICK RESPONSE MODE ⚡:
                   <button
                     type="submit"
                     disabled={isLoading || !input.trim()}
-                    className={`mario-button p-3 text-white font-normal mario-text-small disabled:opacity-50 disabled:cursor-not-allowed ${
+                    className={`mario-button px-6 py-3 text-white font-bold mario-text-small disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95 ${
                       powerUpMode ? 'hover:bg-yellow-600' : ''
-                    }`}
+                    } ${isLoading ? 'animate-pulse' : ''}`}
                     style={powerUpMode ? {
                       backgroundColor: '#FFD700',
-                      boxShadow: '0 0 15px rgba(255, 215, 0, 0.8), 0 0 25px rgba(255, 215, 0, 0.4)',
-                      animation: 'pulse 1.5s infinite'
-                    } : {}}
+                      boxShadow: '0 0 20px rgba(255, 215, 0, 0.9), 0 0 35px rgba(255, 215, 0, 0.5)',
+                      animation: 'pulse-glow 1.5s infinite'
+                    } : {
+                      boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+                    }}
                   >
                     {powerUpMode 
                       ? '⭐ POWER' 
