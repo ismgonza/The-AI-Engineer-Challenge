@@ -102,7 +102,7 @@ export default function Home() {
     setMessages([
       {
         role: 'system',
-        content: '⚡ TechASSISTANT - Engineering Documentation Assistant v3.0.0\n\n🔧 Welcome to your AI-powered technical documentation companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Technical RAG Mode**: Upload technical documentation (PDF, TXT, CSV, JSON, XML, MD, YAML) and perform comprehensive analysis\n🔬 **Together AI Integration**: Access powerful technical LLMs like Llama 3.1-405B for complex engineering analysis\n🛠️ **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more specialized domains\n📊 **Analysis Depth**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)\n⚡ **Power-Up Mode**: Enhanced critical thinking for complex technical problems\n🧠 **Conversation Memory**: Maintains technical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general technical analysis\n• **Together AI**: Specialized engineering models (Llama 3.1 series, CodeLlama for code analysis)\n\n**Supported file types**: Technical docs (PDF/MD), Code files, API specs (JSON/YAML), System configs (XML/YAML)\n\n**Quick commands**:\n- **/help**: Show all available commands\n- **/engineering**: Toggle engineering analysis mode\n- **/clear**: Reset screen & conversation memory\n- **/files**: Show uploaded technical documents\n- **/files filename**: Deep technical document analysis\n- **/depth [deep/standard/quick]**: Set analysis thoroughness\n\n📝 **Professional Focus**: Designed for engineering teams and technical decision-making.\n\n⚡ Ready for professional technical analysis! 🔧📊',
+        content: '⚡ TechLUIGI - Engineering Documentation Assistant v3.0.0\n\n🔧 Welcome to your AI-powered technical documentation companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Technical RAG Mode**: Upload technical documentation (PDF, TXT, CSV, JSON, XML, MD, YAML) and perform comprehensive analysis\n🔬 **Together AI Integration**: Access powerful technical LLMs like Llama 3.1-405B for complex engineering analysis\n🛠️ **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more specialized domains\n📊 **Analysis Depth**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)\n⚡ **Power-Up Mode**: Enhanced critical thinking for complex technical problems\n🧠 **Conversation Memory**: Maintains technical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general technical analysis\n• **Together AI**: Specialized engineering models (Llama 3.1 series, CodeLlama for code analysis)\n\n**Supported file types**: Technical docs (PDF/MD), Code files, API specs (JSON/YAML), System configs (XML/YAML)\n\n**Quick commands**:\n- **/help**: Show all available commands\n- **/config**: Configure application settings\n- **/clear**: Reset screen & conversation memory\n- **/files**: Show uploaded technical documents\n- **/files #**: Deep technical document analysis by number\n- **/depth [deep/standard/quick]**: Set analysis thoroughness\n\n📝 **Professional Focus**: Designed for engineering teams and technical decision-making.\n\n⚡ Ready for professional technical analysis! 🔧📊',
         timestamp: new Date()
       }
     ])
@@ -585,7 +585,7 @@ QUICK RESPONSE MODE ⚡:
         // Reset conversation completely - both visual and memory
         setMessages([{
           role: 'system',
-          content: '🧹 **COMPLETE RESET PERFORMED**\n\n✅ **Screen cleared**\n✅ **Conversation memory wiped**\n✅ **Context history reset**\n\n🚀 Starting fresh! The AI will not remember any previous conversations.\n\n💡 **Welcome back to ASSISTANT RAG System!**\nYour files are still available if you had any uploaded.\nType **/help** for available commands. 👤',
+          content: '🧹 **COMPLETE RESET PERFORMED**\n\n✅ **Screen cleared**\n✅ **Conversation memory wiped**\n✅ **Context history reset**\n\n🚀 Starting fresh! The AI will not remember any previous conversations.\n\n💡 **Welcome back to TechLUIGI Engineering Assistant!**\nYour files are still available if you had any uploaded.\nType **/help** for available commands. 👤',
           timestamp: new Date()
         }])
         // Additional state resets for a truly fresh start
@@ -730,20 +730,12 @@ QUICK RESPONSE MODE ⚡:
           
           {/* Sidebar Content */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {/* Medical Research Configuration Section */}
+            {/* App Configuration Section */}
             <div className="bg-gray-800 rounded-lg border border-gray-600">
               <div className="p-3 border-b border-gray-600">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xl">⚙️</span>
-                    <h3 className="text-sm font-bold text-white">APP CONFIG</h3>
-                  </div>
-                                      <button
-                     onClick={() => {/* Config display - no toggle needed */}}
-                     className="px-2 py-1 rounded text-xs font-bold transition-colors bg-blue-500 text-white hover:bg-blue-600"
-                   >
-                     ⚙️ CONFIG
-                   </button>
+                <div className="flex items-center space-x-2">
+                  <span className="text-xl">⚙️</span>
+                  <h3 className="text-sm font-bold text-white">APP CONFIG</h3>
                 </div>
               </div>
               
