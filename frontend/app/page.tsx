@@ -39,11 +39,11 @@ export default function Home() {
   // New state for sidebar
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
-  // New state for Medical Research features
-  const [medicalMode, setMedicalMode] = useState(false)
+  // New state for Engineering Documentation features
+  const [engineeringMode, setEngineeringMode] = useState(false)
   const [provider, setProvider] = useState('openai') // 'openai' or 'together'
-  const [medicalSpecialty, setMedicalSpecialty] = useState('general')
-  const [evidenceLevel, setEvidenceLevel] = useState('high')
+  const [engineeringSpecialty, setEngineeringSpecialty] = useState('software')
+  const [analysisDepth, setAnalysisDepth] = useState('standard')
   const [togetherApiKey, setTogetherApiKey] = useState('')
 
   const scrollToBottom = () => {
@@ -103,7 +103,7 @@ export default function Home() {
     setMessages([
       {
         role: 'system',
-        content: '🏥 MEDLUIGI - Medical Research Assistant v3.0.0\n\n🩺 Welcome to your AI-powered medical research companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Medical RAG Mode**: Upload medical literature (PDF, TXT, CSV, JSON, XML) and perform evidence-based research\n🔬 **Together AI Integration**: Access powerful medical LLMs like Llama 3.1-405B for research\n🏥 **Medical Specialties**: Cardiology, Oncology, Neurology, and more specialized analysis\n📊 **Evidence Levels**: High (RCTs, Meta-analyses), Medium (Observational), Low (Case studies)\n🍄💪 **Power-Up Mode**: Enhanced critical thinking for complex medical reasoning\n🧠 **Conversation Memory**: Maintains clinical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general medical analysis\n• **Together AI**: Specialized medical models (Llama 3.1 series, medical fine-tuned models)\n\n**Supported file types**: Medical PDFs, Clinical data (CSV), Research papers (PDF), Lab results (JSON/XML)\n\n**Quick commands**:\n- **/help**: Show all available commands\n- **/medical**: Toggle medical research mode\n- **/clear**: Reset screen & conversation memory\n- **/files**: Show uploaded medical documents\n- **/files filename**: Deep medical document analysis\n- **/evidence [high/medium/low]**: Set evidence standard\n\n⚠️ **DISCLAIMER**: For educational and research purposes only. Always consult qualified healthcare professionals for medical decisions.\n\n🔬 Ready for evidence-based medical research! 🏥⭐',
+        content: '⚡ TechLUIGI - Engineering Documentation Assistant v3.0.0\n\n🔧 Welcome to your AI-powered technical documentation companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Technical RAG Mode**: Upload technical documentation (PDF, TXT, CSV, JSON, XML, MD, YAML) and perform comprehensive analysis\n🔬 **Together AI Integration**: Access powerful technical LLMs like Llama 3.1-405B for complex engineering analysis\n🛠️ **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more specialized domains\n📊 **Analysis Depth**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)\n⚡ **Power-Up Mode**: Enhanced critical thinking for complex technical problems\n🧠 **Conversation Memory**: Maintains technical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general technical analysis\n• **Together AI**: Specialized engineering models (Llama 3.1 series, CodeLlama for code analysis)\n\n**Supported file types**: Technical docs (PDF/MD), Code files, API specs (JSON/YAML), System configs (XML/YAML)\n\n**Quick commands**:\n- **/help**: Show all available commands\n- **/engineering**: Toggle engineering analysis mode\n- **/clear**: Reset screen & conversation memory\n- **/files**: Show uploaded technical documents\n- **/files filename**: Deep technical document analysis\n- **/depth [deep/standard/quick]**: Set analysis thoroughness\n\n📝 **Professional Focus**: Designed for engineering teams and technical decision-making.\n\n⚡ Ready for professional technical analysis! 🔧📊',
         timestamp: new Date()
       }
     ])
@@ -405,7 +405,7 @@ QUICK RESPONSE MODE ⚡:
             filename_or_index: target,
             model: model,
             provider: provider,
-            medical_mode: medicalMode
+            engineering_mode: engineeringMode
           }),
         })
 
@@ -493,11 +493,11 @@ QUICK RESPONSE MODE ⚡:
           model: model,
           api_key: currentApiKey,
           use_rag: useRAG,
-          // Medical research parameters
+          // Engineering analysis parameters
           provider: provider,
-          medical_specialty: medicalMode ? medicalSpecialty : null,
-          evidence_level: medicalMode ? evidenceLevel : 'high',
-          use_medical_mode: medicalMode
+          engineering_specialty: engineeringMode ? engineeringSpecialty : null,
+          analysis_depth: engineeringMode ? analysisDepth : 'standard',
+          use_engineering_mode: engineeringMode
         }),
       })
 
@@ -555,32 +555,32 @@ QUICK RESPONSE MODE ⚡:
       case '/help':
         setMessages(prev => [...prev, {
           role: 'system',
-          content: medicalMode ? 
-          `🏥 **Medical Research Commands:**
+          content: engineeringMode ? 
+          `⚡ **Engineering Analysis Commands:**
 - **/help**: Show this help
-- **/clear**: Clear screen & reset clinical conversation memory
-- **/status**: Show medical system status
-- **/files**: Show uploaded medical documents
-- **/files filename**: Deep medical document analysis
-- **/files #**: Analyze medical document by number
-- **/medical**: Toggle medical research mode 🏥
-- **/evidence [high/medium/low]**: Set evidence standard
-- **/specialty [name]**: Set medical specialty focus
+- **/clear**: Clear screen & reset technical conversation memory
+- **/status**: Show engineering system status
+- **/files**: Show uploaded technical documents
+- **/files filename**: Deep technical document analysis
+- **/files #**: Analyze technical document by number
+- **/engineering**: Toggle engineering analysis mode ⚡
+- **/depth [deep/standard/quick]**: Set analysis thoroughness
+- **/specialty [name]**: Set engineering specialty focus
 - **/provider [openai/together]**: Switch AI provider
 
 ⌨️ **Keyboard Shortcuts:**
 - **ENTER**: Send message
 - **SHIFT+ENTER**: New line in message
 
-🏥 **Medical Features:**
-- **Medical RAG Mode**: Upload medical literature and perform evidence-based research
-- **Together AI Integration**: Access specialized medical LLMs (Llama 3.1-405B)
-- **Medical Specialties**: Cardiology, Oncology, Neurology, and more
-- **Evidence Levels**: High (RCTs), Medium (Observational), Low (Case studies)
-- **Power-Up Mode**: Enhanced critical thinking for complex medical cases
-- **Clinical Memory**: Maintains context across medical consultations
+⚡ **Engineering Features:**
+- **Technical RAG Mode**: Upload technical documentation and perform comprehensive analysis
+- **Together AI Integration**: Access specialized engineering LLMs (Llama 3.1-405B, CodeLlama)
+- **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more
+- **Analysis Depths**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)
+- **Power-Up Mode**: Enhanced critical thinking for complex technical problems
+- **Technical Memory**: Maintains context across engineering consultations
 
-⚠️ **Medical Disclaimer**: For educational and research purposes only. Always consult qualified healthcare professionals for medical decisions.` :
+📝 **Professional Focus**: Designed for engineering teams and technical decision-making.` :
           `🎯 **Available commands:**
 - **/help**: Show this help
 - **/clear**: Clear screen & reset conversation memory
@@ -622,12 +622,12 @@ QUICK RESPONSE MODE ⚡:
       case '/status':
         setMessages(prev => [...prev, {
           role: 'system',
-          content: medicalMode ? 
-          `🏥 **Medical System Status:**
+          content: engineeringMode ? 
+          `⚡ **Engineering System Status:**
 - **Provider**: ${provider.toUpperCase()} ${provider === 'together' && togetherApiKey ? '✅' : provider === 'openai' && apiKey ? '✅' : '❌'}
-- **Medical Mode**: ${medicalMode ? '🏥 Active' : '❌ Inactive'}
-- **Specialty**: ${medicalSpecialty.charAt(0).toUpperCase() + medicalSpecialty.slice(1)}
-- **Evidence Level**: ${evidenceLevel.toUpperCase()}
+- **Engineering Mode**: ${engineeringMode ? '⚡ Active' : '❌ Inactive'}
+- **Specialty**: ${engineeringSpecialty.charAt(0).toUpperCase() + engineeringSpecialty.slice(1)}
+- **Analysis Depth**: ${analysisDepth.toUpperCase()}
 - **RAG Mode**: ${useRAG ? '🔍 Active' : '💬 Inactive'}
 - **Uploaded Documents**: ${uploadedFiles.length}
 - **Thinking Mode**: ${powerUpMode ? '🍄💪 Critical Thinking' : '⚡ Quick Answers'}
@@ -638,50 +638,50 @@ QUICK RESPONSE MODE ⚡:
 - **RAG Mode**: ${useRAG ? '🔍 Active' : '💬 Inactive'}
 - **Uploaded Files**: ${uploadedFiles.length}
 - **Thinking Mode**: ${powerUpMode ? '🍄💪 Critical Thinking' : '⚡ Quick Answers'}
-- **Medical Mode**: ${medicalMode ? '🏥 Available' : '❌ Standard Mode'}`,
+- **Engineering Mode**: ${engineeringMode ? '⚡ Available' : '❌ Standard Mode'}`,
           timestamp: new Date()
         }])
         break
       
-      case '/medical':
-        setMedicalMode(!medicalMode)
+      case '/engineering':
+        setEngineeringMode(!engineeringMode)
         setMessages(prev => [...prev, {
           role: 'system',
-          content: `🏥 Medical research mode ${!medicalMode ? '**ACTIVATED**' : '**DEACTIVATED**'}\n\n${!medicalMode ? 
-            '✅ **Medical features enabled:**\n- Evidence-based analysis\n- Medical specialty focus\n- Together AI medical models\n- Clinical terminology\n- Safety disclaimers\n\n⚠️ Remember: For educational/research purposes only!' :
+          content: `⚡ Engineering analysis mode ${!engineeringMode ? '**ACTIVATED**' : '**DEACTIVATED**'}\n\n${!engineeringMode ? 
+            '✅ **Engineering features enabled:**\n- Technical documentation analysis\n- Engineering specialty focus\n- Together AI engineering models\n- Professional technical terminology\n- Industry standards integration\n\n📝 Professional focus for engineering teams!' :
             '✅ **Standard mode restored:**\n- General AI assistant\n- Standard OpenAI models\n- Broad knowledge base'}`,
           timestamp: new Date()
         }])
         break
         
-      case '/evidence':
-        const evidenceLevels = ['high', 'medium', 'low']
-        const newLevel = commandParts[1]?.toLowerCase()
-        if (newLevel && evidenceLevels.includes(newLevel)) {
-          setEvidenceLevel(newLevel)
+      case '/depth':
+        const analysisLevels = ['deep', 'standard', 'quick']
+        const newDepth = commandParts[1]?.toLowerCase()
+        if (newDepth && analysisLevels.includes(newDepth)) {
+          setAnalysisDepth(newDepth)
           setMessages(prev => [...prev, {
             role: 'system',
-            content: `📊 Evidence level set to **${newLevel.toUpperCase()}**\n\n${
-              newLevel === 'high' ? '🔬 **High Evidence Standards:**\n- Systematic reviews\n- Meta-analyses\n- Randomized controlled trials (RCTs)\n- Clear evidence hierarchy' :
-              newLevel === 'medium' ? '📚 **Medium Evidence Standards:**\n- Observational studies\n- Cohort studies\n- Case-control studies\n- Clinical expertise' :
-              '📝 **Low Evidence Standards:**\n- Case studies\n- Expert opinions\n- Preliminary research\n- Exploratory analysis'
+            content: `📊 Analysis depth set to **${newDepth.toUpperCase()}**\n\n${
+              newDepth === 'deep' ? '🔬 **Deep Analysis:**\n- Comprehensive technical analysis\n- Architectural implications\n- Long-term maintainability\n- Performance and scalability considerations' :
+              newDepth === 'standard' ? '📚 **Standard Analysis:**\n- Balanced technical analysis\n- Key technical aspects\n- Common issues and patterns\n- Practical recommendations' :
+              '⚡ **Quick Analysis:**\n- Rapid technical overview\n- Critical issues identification\n- Immediate concerns\n- Actionable insights'
             }`,
             timestamp: new Date()
           }])
         } else {
           setMessages(prev => [...prev, {
             role: 'system',
-            content: `❌ Invalid evidence level. Use: **/evidence [high/medium/low]**\n\n**Current**: ${evidenceLevel.toUpperCase()}`,
+            content: `❌ Invalid analysis depth. Use: **/depth [deep/standard/quick]**\n\n**Current**: ${analysisDepth.toUpperCase()}`,
             timestamp: new Date()
           }])
         }
         break
         
       case '/specialty':
-        const specialties = ['general', 'cardiology', 'oncology', 'neurology', 'pediatrics', 'psychiatry', 'surgery', 'radiology', 'pathology', 'emergency']
+        const specialties = ['software', 'systems', 'network', 'security', 'data', 'devops', 'api', 'cloud', 'mobile', 'embedded']
         const newSpecialty = commandParts[1]?.toLowerCase()
         if (newSpecialty && specialties.includes(newSpecialty)) {
-          setMedicalSpecialty(newSpecialty)
+          setEngineeringSpecialty(newSpecialty)
           setMessages(prev => [...prev, {
             role: 'system',
             content: `🏥 Medical specialty set to **${newSpecialty.charAt(0).toUpperCase() + newSpecialty.slice(1)}**\n\n✅ Enhanced focus on ${newSpecialty} clinical guidelines, protocols, and specialized knowledge.`,
@@ -690,7 +690,7 @@ QUICK RESPONSE MODE ⚡:
         } else {
           setMessages(prev => [...prev, {
             role: 'system',
-            content: `❌ Invalid specialty. Available options:\n${specialties.map(s => `- **${s.charAt(0).toUpperCase() + s.slice(1)}**`).join('\n')}\n\n**Current**: ${medicalSpecialty.charAt(0).toUpperCase() + medicalSpecialty.slice(1)}`,
+            content: `❌ Invalid specialty. Available options:\n${specialties.map(s => `- **${s.charAt(0).toUpperCase() + s.slice(1)}**`).join('\n')}\n\n**Current**: ${engineeringSpecialty.charAt(0).toUpperCase() + engineeringSpecialty.slice(1)}`,
             timestamp: new Date()
           }])
         }
@@ -746,14 +746,14 @@ QUICK RESPONSE MODE ⚡:
   }
 
   return (
-    <div className="h-screen flex mario-bg text-mario-dark" style={{ fontFamily: 'Arial, sans-serif' }}>
+    <div className="h-screen flex tech-bg text-mario-dark" style={{ fontFamily: 'Arial, sans-serif' }}>
       {/* Sidebar */}
       <div className={`flex-shrink-0 transition-all duration-300 ${sidebarOpen ? 'w-80' : 'w-0'} overflow-hidden`}>
         <div className="h-full flex flex-col bg-gradient-to-b from-gray-900 to-gray-800 border-r border-gray-700">
           {/* Sidebar Header */}
           <div className="p-4 border-b border-gray-700">
             <div className="flex items-center justify-between">
-              <h2 className="text-white font-bold mario-text">⚙️ CONTROLS</h2>
+              <h2 className="text-white font-bold tech-text">⚙️ CONTROLS</h2>
               <button
                 onClick={() => setSidebarOpen(false)}
                 className="text-gray-400 hover:text-white transition-colors p-1 rounded"
@@ -770,24 +770,24 @@ QUICK RESPONSE MODE ⚡:
               <div className="p-3 border-b border-gray-600">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="text-xl">{medicalMode ? '🏥' : '🍄'}</span>
-                    <h3 className="text-sm font-bold text-white">{medicalMode ? 'MEDICAL RESEARCH' : 'POWER-UP CONFIG'}</h3>
+                    <span className="text-xl">{engineeringMode ? '⚡' : '🍄'}</span>
+                    <h3 className="text-sm font-bold text-white">{engineeringMode ? 'ENGINEERING ANALYSIS' : 'POWER-UP CONFIG'}</h3>
                   </div>
                   <button
-                    onClick={() => setMedicalMode(!medicalMode)}
+                    onClick={() => setEngineeringMode(!engineeringMode)}
                     className={`px-2 py-1 rounded text-xs font-bold transition-colors ${
-                      medicalMode 
+                      engineeringMode 
                         ? 'bg-red-500 text-white hover:bg-red-600' 
                         : 'bg-blue-500 text-white hover:bg-blue-600'
                     }`}
                   >
-                    {medicalMode ? '🏥 MED' : '🍄 STD'}
+                    {engineeringMode ? '⚡ ENG' : '🍄 STD'}
                   </button>
                 </div>
               </div>
               
               <div className="p-3 space-y-3">
-                {medicalMode ? (
+                {engineeringMode ? (
                   <>
                     {/* Medical Research Controls */}
                     <div className="space-y-2">
@@ -829,8 +829,8 @@ QUICK RESPONSE MODE ⚡:
                     <div className="space-y-2">
                       <label className="block text-xs font-semibold text-gray-300">🏥 Medical Specialty</label>
                       <select
-                        value={medicalSpecialty}
-                        onChange={(e) => setMedicalSpecialty(e.target.value)}
+                        value={engineeringSpecialty}
+                        onChange={(e) => setEngineeringSpecialty(e.target.value)}
                         className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
                       >
                         <option value="general">General Medicine</option>
@@ -849,8 +849,8 @@ QUICK RESPONSE MODE ⚡:
                     <div className="space-y-2">
                       <label className="block text-xs font-semibold text-gray-300">📊 Evidence Level</label>
                       <select
-                        value={evidenceLevel}
-                        onChange={(e) => setEvidenceLevel(e.target.value)}
+                        value={analysisDepth}
+                        onChange={(e) => setAnalysisDepth(e.target.value)}
                         className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
                       >
                         <option value="high">High (RCTs, Meta-analyses)</option>
@@ -1053,15 +1053,15 @@ QUICK RESPONSE MODE ⚡:
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Enhanced Header */}
-        <div className="flex-shrink-0 mario-border m-4 mb-2 slide-in">
-          <div className="mario-header p-6 rounded-t-lg">
+        <div className="flex-shrink-0 tech-border m-4 mb-2 slide-in">
+          <div className="tech-header p-6 rounded-t-lg">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center space-x-3">
-                <span className={`mario-star text-yellow-300 text-3xl ${powerUpMode ? 'animate-spin' : 'floating-animation'}`}>⭐</span>
-                <h1 className={`text-xl md:text-2xl font-bold mario-text text-white ${powerUpMode ? 'animate-pulse glow-text' : ''}`}>
-                {medicalMode ? 'MEDLUIGI - Medical Research AI' : 'LUIGI - AI Research Assistant'}
+                <span className={`tech-star text-yellow-300 text-3xl ${powerUpMode ? 'animate-spin' : 'floating-animation'}`}>⭐</span>
+                <h1 className={`text-xl md:text-2xl font-bold tech-text text-white ${powerUpMode ? 'animate-pulse glow-text' : ''}`}>
+                {engineeringMode ? 'TechLUIGI - Engineering Documentation AI' : 'LUIGI - AI Research Assistant'}
                 </h1>
-                <span className="mario-coin text-yellow-300 text-3xl">🪙</span>
+                <span className="tech-icon text-yellow-300 text-3xl">🪙</span>
                 {powerUpMode && (
                   <>
                     <span className="text-yellow-400 text-xl animate-bounce">⭐</span>
@@ -1078,25 +1078,25 @@ QUICK RESPONSE MODE ⚡:
             </div>
             <div className="mt-4 flex flex-wrap gap-3 items-center justify-center lg:justify-start">
               <div className="glass-effect px-4 py-2 rounded-lg">
-                <span className="text-sm text-white mario-text-small glow-text">
+                <span className="text-sm text-white tech-text-small glow-text">
                   🎮 Connected to Mushroom Kingdom RAG AI v2.2.0
                 </span>
               </div>
               <div className="glass-effect px-4 py-2 rounded-lg">
-                <span className="text-sm text-white mario-text-small glow-text">
+                <span className="text-sm text-white tech-text-small glow-text">
                   📁 {uploadedFiles.length} files loaded
                 </span>
               </div>
               {useRAG && (
                 <div className="glass-effect px-4 py-2 rounded-lg border border-green-400/30">
-                  <span className="text-sm text-green-300 mario-text-small glow-text">
+                  <span className="text-sm text-green-300 tech-text-small glow-text">
                     🔍 RAG Active
                   </span>
                 </div>
               )}
               {powerUpMode && (
                 <div className="glass-effect px-4 py-2 rounded-lg border border-yellow-400/30">
-                  <span className="text-sm text-yellow-300 mario-text-small glow-text animate-pulse">
+                  <span className="text-sm text-yellow-300 tech-text-small glow-text animate-pulse">
                     ⭐ Power Mode
                   </span>
                 </div>
@@ -1106,11 +1106,11 @@ QUICK RESPONSE MODE ⚡:
         </div>
 
         {/* Messages Display - Flexible Height */}
-        <div className="flex-1 mx-4 mb-2 mario-border overflow-hidden flex flex-col">
+        <div className="flex-1 mx-4 mb-2 tech-border overflow-hidden flex flex-col">
           <div className="flex-1 p-4 overflow-y-auto">
             <div className="space-y-3">
               {messages.map((message, index) => (
-                <div key={index} className="mario-message p-3">
+                <div key={index} className="tech-message p-3">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-start space-x-2">
                       <span className="text-mario-red font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
@@ -1159,11 +1159,11 @@ QUICK RESPONSE MODE ⚡:
         </div>
 
         {/* Enhanced Input Area - Stick to Bottom */}
-        <div className="flex-shrink-0 mx-4 mb-4 mario-border slide-in">
+        <div className="flex-shrink-0 mx-4 mb-4 tech-border slide-in">
           <form onSubmit={handleSubmit} className="p-6">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <span className="text-red-500 font-bold mario-text text-3xl animate-pulse">{'>'}</span>
+                <span className="text-red-500 font-bold tech-text text-3xl animate-pulse">{'>'}</span>
                 <span className="text-sm text-mario-brown font-semibold">LUIGI</span>
               </div>
               <textarea
@@ -1172,7 +1172,7 @@ QUICK RESPONSE MODE ⚡:
                 onKeyPress={handleKeyPress}
                 disabled={isLoading}
                 rows={input.split('\n').length || 1}
-                className={`flex-1 mario-input p-4 text-mario-dark placeholder-mario-brown/60 font-normal text-lg transition-all duration-300 resize-none ${
+                className={`flex-1 tech-input p-4 text-mario-dark placeholder-mario-brown/60 font-normal text-lg transition-all duration-300 resize-none ${
                   powerUpMode ? 'border-2 bg-yellow-50 shadow-lg' : ''
                 } ${isLoading ? 'animate-pulse' : ''}`}
                 style={{ 
@@ -1257,7 +1257,7 @@ QUICK RESPONSE MODE ⚡:
               <button
                 type="submit"
                 disabled={isLoading || !input.trim()}
-                className={`mario-button px-6 py-3 text-white font-bold mario-text-small disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95 ${
+                className={`tech-button px-6 py-3 text-white font-bold tech-text-small disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95 ${
                   powerUpMode ? 'hover:bg-yellow-600' : ''
                 } ${isLoading ? 'animate-pulse' : ''}`}
                 style={powerUpMode ? {
@@ -1289,12 +1289,12 @@ QUICK RESPONSE MODE ⚡:
         </div>
 
         {/* Footer */}
-        <div className="flex-shrink-0 text-center pb-4 text-xs text-mario-brown mario-text-small font-normal">
+        <div className="flex-shrink-0 text-center pb-4 text-xs text-mario-brown tech-text-small font-normal">
           <div className="flex items-center justify-center space-x-4">
             <span>🍄 AI ENGINEER CHALLENGE</span>
-            <span className="mario-star">⭐</span>
+            <span className="tech-star">⭐</span>
             <span>SUPER MARIO WORLD RAG v2.2.0</span>
-            <span className="mario-coin">🪙</span>
+            <span className="tech-icon">🪙</span>
             {useRAG && <span className="text-mario-yellow">🔍 RAG ACTIVE</span>}
             {powerUpMode && <span className="text-yellow-400 animate-pulse">⭐ POWER-UP ACTIVE ⭐</span>}
           </div>

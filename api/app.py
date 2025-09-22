@@ -196,11 +196,11 @@ class ChatRequest(BaseModel):
     model: Optional[str] = "gpt-4o-mini"  # Optional model selection with default
     api_key: str                # OpenAI API key for authentication
     use_rag: bool = False       # Whether to use RAG (context from uploaded PDFs)
-    # Add medical research specific fields
+    # Add engineering analysis specific fields
     provider: Optional[str] = "openai"  # "openai" or "together"
-    medical_specialty: Optional[str] = None  # "general", "cardiology", "oncology", etc.
-    evidence_level: Optional[str] = "high"  # "high", "medium", "low" - for medical evidence filtering
-    use_medical_mode: bool = False  # Enable medical-specific features
+    engineering_specialty: Optional[str] = None  # "software", "systems", "network", etc.
+    analysis_depth: Optional[str] = "standard"  # "deep", "standard", "quick" - analysis thoroughness
+    use_engineering_mode: bool = False  # Enable engineering-specific features
 
 # Define data model for RAG responses
 class RAGResponse(BaseModel):
@@ -214,13 +214,13 @@ class FileAnalysisRequest(BaseModel):
     filename_or_index: str  # Can be filename like "doc.pdf" or index like "1"
     model: Optional[str] = "gpt-4o-mini"
 
-# Medical model mappings for Together AI
-MEDICAL_MODELS = {
+# Engineering model mappings for Together AI
+ENGINEERING_MODELS = {
     "together": {
         "general": "meta-llama/Llama-3.1-8B-Instruct-Turbo",
         "advanced": "meta-llama/Llama-3.1-70B-Instruct-Turbo", 
         "research": "meta-llama/Llama-3.1-405B-Instruct-Turbo",
-        "biomedical": "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",  # Good for medical reasoning
+        "code": "meta-llama/CodeLlama-70b-Instruct-hf",  # Specialized for code analysis
     },
     "openai": {
         "general": "gpt-4o-mini",
@@ -229,7 +229,7 @@ MEDICAL_MODELS = {
     }
 }
 
-def get_medical_client(provider: str, api_key: str):
+def get_engineering_client(provider: str, api_key: str):
     """Get the appropriate client based on provider"""
     if provider == "together":
         if not TOGETHER_AVAILABLE:
@@ -238,41 +238,55 @@ def get_medical_client(provider: str, api_key: str):
     else:
         return OpenAI(api_key=api_key)
 
-def get_medical_model(provider: str, medical_complexity: str = "general") -> str:
-    """Get appropriate model for medical research based on complexity"""
-    models = MEDICAL_MODELS.get(provider, MEDICAL_MODELS["openai"])
-    return models.get(medical_complexity, models["general"])
+def get_engineering_model(provider: str, complexity: str = "general") -> str:
+    """Get appropriate model for engineering analysis based on complexity"""
+    models = ENGINEERING_MODELS.get(provider, ENGINEERING_MODELS["openai"])
+    return models.get(complexity, models["general"])
 
-def create_medical_system_prompt(specialty: str = None, evidence_level: str = "high") -> str:
-    """Create specialized medical system prompt"""
-    base_prompt = """You are MedLUIGI, an advanced medical research assistant specializing in evidence-based healthcare analysis. 
+def create_engineering_system_prompt(specialty: str = None, analysis_depth: str = "standard") -> str:
+    """Create specialized engineering system prompt"""
+    base_prompt = """You are TechLUIGI, an advanced engineering documentation assistant specializing in technical analysis and documentation review.
 
 CORE PRINCIPLES:
-- Provide accurate, evidence-based medical information
-- Always indicate when information requires professional medical consultation
-- Use clinical terminology appropriately while remaining accessible
-- Cite evidence levels when making recommendations
-- Acknowledge limitations and uncertainties
+- Provide accurate, technically sound analysis of engineering documentation
+- Use precise technical terminology while maintaining clarity
+- Reference industry standards, best practices, and established patterns
+- Identify potential issues, improvements, and optimization opportunities
+- Maintain focus on practical engineering applications
 
-RESPONSE GUIDELINES:
-- Structure responses with clear sections: Assessment, Evidence, Recommendations
-- Include confidence levels for clinical statements
-- Highlight critical safety considerations
-- Suggest follow-up questions for deeper analysis"""
+ANALYSIS FRAMEWORK:
+- Structure responses with clear sections: Overview, Technical Analysis, Recommendations
+- Include confidence levels for technical assessments
+- Highlight critical technical considerations and potential risks
+- Suggest follow-up questions for deeper technical exploration
+- Reference relevant standards (IEEE, ISO, RFC, etc.) where applicable"""
 
     if specialty:
-        base_prompt += f"\n\nSPECIALTY FOCUS: {specialty.title()}\n- Apply specialized knowledge in {specialty}\n- Reference relevant clinical guidelines and protocols"
+        specialty_focuses = {
+            "software": "Focus on software architecture, code quality, design patterns, and development best practices",
+            "systems": "Focus on system architecture, scalability, reliability, and infrastructure design", 
+            "network": "Focus on network protocols, security, performance, and infrastructure",
+            "security": "Focus on security architecture, threat analysis, compliance, and risk assessment",
+            "data": "Focus on data architecture, processing pipelines, storage solutions, and analytics",
+            "devops": "Focus on CI/CD, infrastructure as code, monitoring, and deployment strategies",
+            "api": "Focus on API design, documentation standards, integration patterns, and versioning",
+            "cloud": "Focus on cloud architecture, services integration, cost optimization, and scalability",
+            "mobile": "Focus on mobile app architecture, performance, platform-specific considerations",
+            "embedded": "Focus on embedded systems, hardware-software integration, real-time constraints"
+        }
+        focus = specialty_focuses.get(specialty.lower(), f"Focus on {specialty} engineering principles and best practices")
+        base_prompt += f"\n\nSPECIALTY FOCUS: {specialty.title()} Engineering\n- {focus}\n- Apply domain-specific technical knowledge and industry standards"
     
-    if evidence_level == "high":
-        base_prompt += "\n\nEVIDENCE STANDARDS: High\n- Prioritize systematic reviews, meta-analyses, and RCTs\n- Clearly distinguish between evidence levels"
-    elif evidence_level == "medium":
-        base_prompt += "\n\nEVIDENCE STANDARDS: Medium\n- Include observational studies and clinical expertise\n- Note evidence quality limitations"
+    if analysis_depth == "deep":
+        base_prompt += "\n\nANALYSIS DEPTH: Comprehensive\n- Perform thorough technical analysis\n- Consider architectural implications and long-term maintainability\n- Evaluate performance, scalability, and security considerations"
+    elif analysis_depth == "standard":
+        base_prompt += "\n\nANALYSIS DEPTH: Standard\n- Provide balanced technical analysis\n- Focus on key technical aspects and common issues\n- Include practical recommendations and next steps"
     else:
-        base_prompt += "\n\nEVIDENCE STANDARDS: Exploratory\n- Include case studies and expert opinions\n- Clearly label preliminary or limited evidence"
+        base_prompt += "\n\nANALYSIS DEPTH: Quick\n- Provide rapid technical overview\n- Highlight critical issues and immediate concerns\n- Focus on actionable insights"
 
     base_prompt += """
 
-SAFETY DISCLAIMER: This is for educational and research purposes only. Always consult qualified healthcare professionals for medical decisions."""
+PROFESSIONAL CONTEXT: This analysis is for engineering teams and technical decision-making. Maintain professional engineering standards and practices."""
 
     return base_prompt
 

@@ -2,24 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&family=Fira+Code:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Fira+Code:wght@300;400;500&display=swap');
 
 :root {
   --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 30, 58, 138;
-  --background-mid-rgb: 59, 130, 246;
-  --background-end-rgb: 147, 197, 253;
-  --mario-red: #dc2626;
-  --mario-red-light: #f87171;
-  --mario-red-dark: #991b1b;
-  --mario-blue: #1d4ed8;
-  --mario-blue-light: #3b82f6;
-  --mario-yellow: #fbbf24;
-  --mario-yellow-light: #fcd34d;
-  --mario-green: #16a34a;
-  --mario-green-light: #4ade80;
-  --mario-brown: #8b4513;
-  --mario-brown-light: #a0522d;
+  --background-start-rgb: 15, 23, 42;
+  --background-mid-rgb: 30, 41, 59;
+  --background-end-rgb: 51, 65, 85;
+  --tech-blue: #0f172a;
+  --tech-blue-light: #1e293b;
+  --tech-blue-dark: #020617;
+  --tech-cyan: #06b6d4;
+  --tech-cyan-light: #22d3ee;
+  --tech-green: #10b981;
+  --tech-green-light: #34d399;
+  --tech-orange: #f97316;
+  --tech-orange-light: #fb923c;
+  --tech-gray: #64748b;
+  --tech-gray-light: #94a3b8;
 }
 
 * {
@@ -32,7 +32,7 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  font-family: 'Fira Code', 'VT323', 'Courier New', monospace;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   font-weight: 400;
 }
 
@@ -53,21 +53,21 @@ a {
   text-decoration: none;
 }
 
-/* Enhanced Mario World styles */
-.mario-bg {
+/* Professional Engineering Theme */
+.tech-bg {
   background: linear-gradient(135deg, 
-    #1e3a8a 0%, 
-    #3b82f6 25%, 
-    #60a5fa 50%, 
-    #93c5fd 75%, 
-    #dbeafe 100%);
+    #0f172a 0%, 
+    #1e293b 25%, 
+    #334155 50%, 
+    #475569 75%, 
+    #64748b 100%);
   background-size: 400% 400%;
   animation: gradient-shift 8s ease infinite;
   position: relative;
   min-height: 100vh;
 }
 
-.mario-bg::before {
+.tech-bg::before {
   content: "";
   position: fixed;
   top: 0;
@@ -78,18 +78,18 @@ a {
     radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 60% 80%, rgba(251, 191, 36, 0.1) 0%, transparent 30%);
+    radial-gradient(circle at 60% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 30%);
   pointer-events: none;
   z-index: 1;
 }
 
-.mario-container {
+.tech-container {
   position: relative;
   z-index: 2;
   backdrop-filter: blur(0.5px);
 }
 
-.mario-border {
+.tech-border {
   border: 3px solid rgba(139, 69, 19, 0.8);
   border-radius: 16px;
   box-shadow: 
@@ -105,7 +105,7 @@ a {
   transition: all 0.3s ease;
 }
 
-.mario-border:hover {
+.tech-border:hover {
   transform: translateY(-2px);
   box-shadow: 
     inset 0 1px 0 rgba(255, 255, 255, 0.2),
@@ -115,22 +115,22 @@ a {
     0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-.mario-header {
+.tech-header {
   background: linear-gradient(135deg, 
-    var(--mario-red) 0%, 
-    var(--mario-red-light) 25%,
+    var(--tech-cyan) 0%, 
+    var(--tech-cyan-light) 25%,
     #ff6600 50%, 
-    var(--mario-yellow) 75%,
-    var(--mario-yellow-light) 100%);
+    var(--tech-orange) 75%,
+    var(--tech-orange-light) 100%);
   background-size: 200% 200%;
   animation: header-glow 6s ease infinite;
   border-radius: 12px 12px 0 0;
-  border-bottom: 3px solid var(--mario-brown);
+  border-bottom: 3px solid var(--tech-gray);
   position: relative;
   overflow: hidden;
 }
 
-.mario-header::before {
+.tech-header::before {
   content: "";
   position: absolute;
   top: 0;
@@ -144,7 +144,7 @@ a {
   animation: shimmer 3s ease infinite;
 }
 
-.mario-text {
+.tech-text {
   text-shadow: 
     1px 1px 0px #000, 
     -1px -1px 0px #000, 
@@ -156,7 +156,7 @@ a {
   letter-spacing: 1px;
 }
 
-.mario-text-small {
+.tech-text-small {
   text-shadow: 
     0.5px 0.5px 0px rgba(0, 0, 0, 0.8), 
     -0.5px -0.5px 0px rgba(0, 0, 0, 0.8), 
@@ -167,12 +167,12 @@ a {
   letter-spacing: 0.5px;
 }
 
-.mario-button {
+.tech-button {
   background: linear-gradient(145deg, 
-    var(--mario-red-light) 0%, 
-    var(--mario-red) 50%,
-    var(--mario-red-dark) 100%);
-  border: 3px solid var(--mario-brown);
+    var(--tech-cyan-light) 0%, 
+    var(--tech-cyan) 50%,
+    var(--tech-blue-dark) 100%);
+  border: 3px solid var(--tech-gray);
   border-radius: 12px;
   box-shadow: 
     inset 0 1px 0 rgba(255, 255, 255, 0.2),
@@ -184,7 +184,7 @@ a {
   overflow: hidden;
 }
 
-.mario-button::before {
+.tech-button::before {
   content: "";
   position: absolute;
   top: 0;
@@ -198,7 +198,7 @@ a {
   transition: left 0.5s ease;
 }
 
-.mario-button:hover {
+.tech-button:hover {
   transform: translateY(-3px) scale(1.02);
   box-shadow: 
     inset 0 1px 0 rgba(255, 255, 255, 0.3),
@@ -207,15 +207,15 @@ a {
     0 4px 12px rgba(0, 0, 0, 0.2);
   background: linear-gradient(145deg, 
     #f87171 0%, 
-    var(--mario-red-light) 50%,
-    var(--mario-red) 100%);
+    var(--tech-cyan-light) 50%,
+    var(--tech-cyan) 100%);
 }
 
-.mario-button:hover::before {
+.tech-button:hover::before {
   left: 100%;
 }
 
-.mario-button:active {
+.tech-button:active {
   transform: translateY(-1px) scale(0.98);
   box-shadow: 
     inset 0 1px 0 rgba(255, 255, 255, 0.2),
@@ -223,9 +223,9 @@ a {
     0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.mario-input {
+.tech-input {
   background: rgba(255, 255, 255, 0.95);
-  border: 3px solid var(--mario-brown);
+  border: 3px solid var(--tech-gray);
   border-radius: 12px;
   box-shadow: 
     inset 0 2px 6px rgba(0, 0, 0, 0.1),
@@ -235,9 +235,9 @@ a {
   font-family: 'Fira Code', monospace;
 }
 
-.mario-input:focus {
+.tech-input:focus {
   outline: none;
-  border-color: var(--mario-yellow);
+  border-color: var(--tech-orange);
   box-shadow: 
     inset 0 2px 6px rgba(0, 0, 0, 0.1),
     0 0 0 3px rgba(251, 191, 36, 0.2),
@@ -246,12 +246,12 @@ a {
   background: rgba(255, 255, 255, 1);
 }
 
-.mario-input::placeholder {
+.tech-input::placeholder {
   color: rgba(139, 69, 19, 0.6);
   font-style: italic;
 }
 
-.mario-message {
+.tech-message {
   background: rgba(255, 255, 255, 0.98);
   border: 2px solid rgba(139, 69, 19, 0.3);
   border-radius: 12px;
@@ -263,7 +263,7 @@ a {
   transition: all 0.2s ease;
 }
 
-.mario-message:hover {
+.tech-message:hover {
   transform: translateY(-1px);
   box-shadow: 
     0 6px 16px rgba(0, 0, 0, 0.15),
@@ -271,19 +271,19 @@ a {
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
-.mario-coin {
+.tech-icon {
   display: inline-block;
   animation: coin-spin 2s linear infinite;
   filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.3));
 }
 
-.mario-star {
+.tech-star {
   display: inline-block;
   animation: star-twinkle 1.5s ease-in-out infinite;
   filter: drop-shadow(0 2px 4px rgba(255, 255, 0, 0.4));
 }
 
-.mario-power-up {
+.tech-power-up {
   display: inline-block;
   animation: power-up 2s ease-in-out infinite;
   filter: drop-shadow(0 2px 4px rgba(255, 102, 0, 0.4));
@@ -302,10 +302,10 @@ a {
 
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(145deg, 
-    var(--mario-red-light) 0%, 
-    var(--mario-red) 100%);
+    var(--tech-cyan-light) 0%, 
+    var(--tech-cyan) 100%);
   border-radius: 8px;
-  border: 2px solid var(--mario-brown);
+  border: 2px solid var(--tech-gray);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transition: background 0.3s ease;
 }
@@ -313,7 +313,7 @@ a {
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(145deg, 
     #f87171 0%, 
-    var(--mario-red-light) 100%);
+    var(--tech-cyan-light) 100%);
 }
 
 /* Enhanced animations */
@@ -332,7 +332,7 @@ a {
   100% { left: 100%; }
 }
 
-@keyframes mario-jump {
+@keyframes tech-pulse {
   0% { transform: translateY(0) scale(1); }
   30% { transform: translateY(-8px) scale(1.05); }
   50% { transform: translateY(-12px) scale(1.1); }
