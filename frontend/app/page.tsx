@@ -102,7 +102,7 @@ export default function Home() {
     setMessages([
       {
         role: 'system',
-        content: '⚡ Expert AI Assistant v3.0.0\n\n🔧 Welcome to your AI-powered technical documentation companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Technical RAG Mode**: Upload technical documentation (PDF, TXT, CSV, JSON, XML, MD, YAML) and perform comprehensive analysis\n🔬 **Together AI Integration**: Access powerful technical LLMs like Llama 3.1-405B for complex engineering analysis\n🛠️ **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more specialized domains\n📊 **Analysis Depth**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)\n⚡ **Enhanced Mode**: Enhanced critical thinking for complex technical problems\n🧠 **Conversation Memory**: Maintains technical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general technical analysis\n• **Together AI**: Specialized engineering models (Llama 3.1 series, CodeLlama for code analysis)\n\n**Supported file types**: Technical docs (PDF/MD), Code files, API specs (JSON/YAML), System configs (XML/YAML)\n\n**Quick commands**:\n- **/help**: Show all available commands\n- **/config**: Configure application settings\n- **/clear**: Reset screen & conversation memory\n- **/files**: Show uploaded technical documents\n- **/files #**: Deep technical document analysis by number\n- **/depth [deep/standard/quick]**: Set analysis thoroughness\n\n📝 **Professional Focus**: Designed for engineering teams and technical decision-making.\n\n⚡ Ready for professional technical analysis! 🔧📊',
+        content: '⚡ Expert AI Assistant v3.0.0\n\n🔧 Welcome to your AI-powered technical documentation companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Technical RAG Mode**: Upload technical documentation (PDF, TXT, CSV, JSON, XML, MD, YAML) and perform comprehensive analysis\n🔬 **Together AI Integration**: Access powerful technical LLMs like Llama 3.1-405B for complex engineering analysis\n🛠️ **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more specialized domains\n📊 **Analysis Depth**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)\n⚡ **Enhanced Mode**: Enhanced critical thinking for complex technical problems\n🧠 **Conversation Memory**: Maintains technical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general technical analysis\n• **Together AI**: Specialized engineering models (Llama 3.1 series, CodeLlama for code analysis)\n\n**Quick commands**:\n**/help**: Show all available commands\n\n📝 **Professional Focus**: Designed for engineering teams and technical decision-making.\n\n⚡ Ready for professional technical analysis! 🔧📊',
         timestamp: new Date()
       }
     ])
@@ -121,6 +121,21 @@ export default function Home() {
     setShowSettings(shouldExpand)
     setShowDocumentManager(shouldExpand)
   }, [apiKey])
+
+  // Auto-switch to appropriate model when provider changes
+  useEffect(() => {
+    if (provider === 'openai') {
+      // If current model is not an OpenAI model, switch to default
+      if (model.includes('llama') || model.includes('CodeLlama')) {
+        setModel('gpt-4o-mini')
+      }
+    } else {
+      // If current model is not a Together AI model, switch to default
+      if (!model.includes('llama')) {
+        setModel('meta-llama/Llama-3.1-8B-Instruct-Turbo')
+      }
+    }
+  }, [provider, model])
 
   const fetchUploadedFiles = async () => {
     if (!apiKey) return
@@ -748,31 +763,41 @@ QUICK RESPONSE MODE ⚡:
                         onChange={(e) => setProvider(e.target.value)}
                         className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
                       >
-                        <option value="openai">OpenAI (GPT-4o)</option>
-                        <option value="together">Together AI (Llama 3.1 Engineering)</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="together">Together AI</option>
                       </select>
                     </div>
                     
-                    {provider === 'together' && (
-                      <div className="space-y-2">
-                        <label className="block text-xs font-semibold text-gray-300">🔑 Together AI Key</label>
-                        <input
-                          type="password"
-                          value={togetherApiKey}
-                          onChange={(e) => setTogetherApiKey(e.target.value)}
-                          className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
-                          placeholder="together-api-key..."
-                        />
-                      </div>
-                    )}
+                    {/* Together AI API Key - Always visible */}
+                    <div className="space-y-2">
+                      <label className="block text-xs font-semibold text-gray-300">🔑 Together AI Key</label>
+                      <input
+                        type="password"
+                        value={togetherApiKey}
+                        onChange={(e) => setTogetherApiKey(e.target.value)}
+                        disabled={provider !== 'together'}
+                        className={`w-full border rounded p-2 text-sm focus:outline-none ${
+                          provider === 'together'
+                            ? 'bg-gray-700 border-gray-600 text-white focus:border-blue-500' 
+                            : 'bg-gray-800 border-gray-700 text-gray-500 cursor-not-allowed'
+                        }`}
+                        placeholder="together-api-key..."
+                      />
+                    </div>
                     
+                    {/* OpenAI API Key - Always visible */}
                     <div className="space-y-2">
                       <label className="block text-xs font-semibold text-gray-300">🔑 OpenAI API Key</label>
                       <input
                         type="password"
                         value={apiKey}
                         onChange={(e) => setApiKey(e.target.value)}
-                        className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                        disabled={provider !== 'openai'}
+                        className={`w-full border rounded p-2 text-sm focus:outline-none ${
+                          provider === 'openai'
+                            ? 'bg-gray-700 border-gray-600 text-white focus:border-blue-500' 
+                            : 'bg-gray-800 border-gray-700 text-gray-500 cursor-not-allowed'
+                        }`}
                         placeholder="sk-..."
                       />
                     </div>
@@ -817,9 +842,20 @@ QUICK RESPONSE MODE ⚡:
                     onChange={(e) => setModel(e.target.value)}
                     className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
                   >
-                    <option value="gpt-4o-mini">GPT-4o-mini</option>
-                    <option value="gpt-4o">GPT-4o</option>
-                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                    {provider === 'openai' ? (
+                      <>
+                        <option value="gpt-4o-mini">GPT-4o-mini (Fast)</option>
+                        <option value="gpt-4o">GPT-4o (Advanced)</option>
+                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo (General)</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="meta-llama/Llama-3.1-8B-Instruct-Turbo">Llama 3.1 8B (Fast)</option>
+                        <option value="meta-llama/Llama-3.1-70B-Instruct-Turbo">Llama 3.1 70B (Advanced)</option>
+                        <option value="meta-llama/Llama-3.1-405B-Instruct-Turbo">Llama 3.1 405B (Research)</option>
+                        <option value="meta-llama/CodeLlama-70b-Instruct-hf">CodeLlama 70B (Code Analysis)</option>
+                      </>
+                    )}
                   </select>
                 </div>
                 
@@ -994,7 +1030,6 @@ QUICK RESPONSE MODE ⚡:
           <div className="tech-header p-6 rounded-t-lg">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center space-x-3">
-                <span className={`tech-star text-yellow-300 text-3xl ${enhancedMode ? 'animate-pulse' : 'floating-animation'}`}>✨</span>
                 <h1 className={`text-xl md:text-2xl font-bold tech-text text-white ${enhancedMode ? 'animate-pulse glow-text' : ''}`}>
                 Expert AI Assistant
                 </h1>
@@ -1006,11 +1041,6 @@ QUICK RESPONSE MODE ⚡:
                     <span className="text-yellow-400 text-xl animate-bounce" style={{animationDelay: '0.5s'}}>✨</span>
                   </>
                 )}
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-5 h-5 bg-red-500 rounded-full shadow-lg animate-pulse" style={{animationDelay: '0s'}}></div>
-                <div className="w-5 h-5 bg-yellow-400 rounded-full shadow-lg animate-pulse" style={{animationDelay: '0.5s'}}></div>
-                <div className="w-5 h-5 bg-green-500 rounded-full shadow-lg animate-pulse" style={{animationDelay: '1s'}}></div>
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-3 items-center justify-center lg:justify-start">
