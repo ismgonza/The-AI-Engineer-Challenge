@@ -39,8 +39,7 @@ export default function Home() {
   // New state for sidebar
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
-  // New state for Engineering Documentation features
-  const [engineeringMode, setEngineeringMode] = useState(false)
+  // App Configuration features (always enabled)
   const [provider, setProvider] = useState('openai') // 'openai' or 'together'
   const [engineeringSpecialty, setEngineeringSpecialty] = useState('software')
   const [analysisDepth, setAnalysisDepth] = useState('standard')
@@ -103,7 +102,7 @@ export default function Home() {
     setMessages([
       {
         role: 'system',
-        content: '⚡ TechASSISTANT - Engineering Documentation Assistant v3.0.0\n\n🔧 Welcome to your AI-powered technical documentation companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Technical RAG Mode**: Upload technical documentation (PDF, TXT, CSV, JSON, XML, MD, YAML) and perform comprehensive analysis\n🔬 **Together AI Integration**: Access powerful technical LLMs like Llama 3.1-405B for complex engineering analysis\n🛠️ **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more specialized domains\n📊 **Analysis Depth**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)\n⚡ **Power-Up Mode**: Enhanced critical thinking for complex technical problems\n🧠 **Conversation Memory**: Maintains technical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general technical analysis\n• **Together AI**: Specialized engineering models (Llama 3.1 series, CodeLlama for code analysis)\n\n**Supported file types**: Technical docs (PDF/MD), Code files, API specs (JSON/YAML), System configs (XML/YAML)\n\n**Quick commands**:\n- **/help**: Show all available commands\n- **/engineering**: Toggle engineering analysis mode\n- **/clear**: Reset screen & conversation memory\n- **/files**: Show uploaded technical documents\n- **/files #**: Deep technical document analysis by number\n- **/depth [deep/standard/quick]**: Set analysis thoroughness\n\n📝 **Professional Focus**: Designed for engineering teams and technical decision-making.\n\n⚡ Ready for professional technical analysis! 🔧📊',
+        content: '⚡ TechASSISTANT - Engineering Documentation Assistant v3.0.0\n\n🔧 Welcome to your AI-powered technical documentation companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Technical RAG Mode**: Upload technical documentation (PDF, TXT, CSV, JSON, XML, MD, YAML) and perform comprehensive analysis\n🔬 **Together AI Integration**: Access powerful technical LLMs like Llama 3.1-405B for complex engineering analysis\n🛠️ **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more specialized domains\n📊 **Analysis Depth**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)\n⚡ **Power-Up Mode**: Enhanced critical thinking for complex technical problems\n🧠 **Conversation Memory**: Maintains technical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general technical analysis\n• **Together AI**: Specialized engineering models (Llama 3.1 series, CodeLlama for code analysis)\n\n**Supported file types**: Technical docs (PDF/MD), Code files, API specs (JSON/YAML), System configs (XML/YAML)\n\n**Quick commands**:\n- **/help**: Show all available commands\n- **/engineering**: Toggle engineering analysis mode\n- **/clear**: Reset screen & conversation memory\n- **/files**: Show uploaded technical documents\n- **/files filename**: Deep technical document analysis\n- **/depth [deep/standard/quick]**: Set analysis thoroughness\n\n📝 **Professional Focus**: Designed for engineering teams and technical decision-making.\n\n⚡ Ready for professional technical analysis! 🔧📊',
         timestamp: new Date()
       }
     ])
@@ -357,7 +356,7 @@ QUICK RESPONSE MODE ⚡:
     if (parts.length === 1) {
       setMessages(prev => [...prev, {
         role: 'system',
-        content: `📚 Uploaded files (${uploadedFiles.length}):\n${uploadedFiles.map((file, index) => `${index + 1}. 📄 ${file}`).join('\n')}\n\n📄 DOCS mode: ${useRAG ? '✅ Active' : '❌ Inactive'}\n\n💡 Tip: Type "**/files #**" to analyze a specific file! (e.g., **/files 1**)`,
+        content: `📚 Uploaded files (${uploadedFiles.length}):\n${uploadedFiles.map((file, index) => `${index + 1}. 📄 ${file}`).join('\n')}\n\n📄 DOCS mode: ${useRAG ? '✅ Active' : '❌ Inactive'}\n\n💡 Tip: Type "**/files filename.pdf**" or "**/files #**" to analyze a specific file!`,
         timestamp: new Date()
       }])
       return
@@ -405,7 +404,7 @@ QUICK RESPONSE MODE ⚡:
             filename_or_index: target,
             model: model,
             provider: provider,
-            engineering_mode: engineeringMode
+            engineering_mode: true
           }),
         })
 
@@ -436,7 +435,7 @@ QUICK RESPONSE MODE ⚡:
     // Invalid syntax
     setMessages(prev => [...prev, {
       role: 'system',
-      content: '❓ Invalid syntax! Use:\n- **/files**: Show all files\n- **/files #**: Analyze file by number',
+      content: '❓ Invalid syntax! Use:\n- **/files**: Show all files\n- **/files filename.pdf**: Analyze specific file\n- **/files #**: Analyze file by number',
       timestamp: new Date()
     }])
   }
@@ -495,9 +494,9 @@ QUICK RESPONSE MODE ⚡:
           use_rag: useRAG,
           // Engineering analysis parameters
           provider: provider,
-          engineering_specialty: engineeringMode ? engineeringSpecialty : null,
-          analysis_depth: engineeringMode ? analysisDepth : 'standard',
-          use_engineering_mode: engineeringMode
+          engineering_specialty: engineeringSpecialty,
+          analysis_depth: analysisDepth,
+          use_engineering_mode: true
         }),
       })
 
@@ -555,14 +554,13 @@ QUICK RESPONSE MODE ⚡:
       case '/help':
         setMessages(prev => [...prev, {
           role: 'system',
-          content: engineeringMode ? 
-          `⚡ **Engineering Analysis Commands:**
+          content: `⚡ **Available Commands:**
 - **/help**: Show this help
 - **/clear**: Clear screen & reset technical conversation memory
-- **/status**: Show engineering system status
+- **/status**: Show system status
 - **/files**: Show uploaded technical documents
 - **/files #**: Analyze technical document by number
-- **/engineering**: Toggle engineering analysis mode ⚡
+- **/config**: Configure application settings ⚙️
 - **/depth [deep/standard/quick]**: Set analysis thoroughness
 - **/specialty [name]**: Set engineering specialty focus
 - **/provider [openai/together]**: Switch AI provider
@@ -571,34 +569,15 @@ QUICK RESPONSE MODE ⚡:
 - **ENTER**: Send message
 - **SHIFT+ENTER**: New line in message
 
-⚡ **Engineering Features:**
+⚡ **Features:**
 - **Technical RAG Mode**: Upload technical documentation and perform comprehensive analysis
 - **Together AI Integration**: Access specialized engineering LLMs (Llama 3.1-405B, CodeLlama)
 - **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more
 - **Analysis Depths**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)
-- **Power-Up Mode**: Enhanced critical thinking for complex technical problems
+- **Enhanced Mode**: Critical thinking for complex technical problems
 - **Technical Memory**: Maintains context across engineering consultations
 
-📝 **Professional Focus**: Designed for engineering teams and technical decision-making.` :
-          `🎯 **Available commands:**
-- **/help**: Show this help
-- **/clear**: Clear screen & reset conversation memory
-- **/status**: Show connection status
-- **/files**: Show uploaded files
-- **/files #**: Analyze file by number
-- **/engineering**: Toggle engineering analysis mode ⚡
-
-⌨️ **Keyboard Shortcuts:**
-- **ENTER**: Send message
-- **SHIFT+ENTER**: New line in message
-
-📚 **Features:**
-- **RAG Mode**: Upload documents (PDF, TXT, CSV, JSON, XML) and chat with them
-- **Power-Up Mode**: Critical thinking vs quick answers (toggle in input area)
-- **File Analysis**: Get suggested questions and summaries
-- **Memory Reset**: Use \`/clear\` for fresh conversations
-- **Multi-Format Support**: PDF, TXT, CSV, JSON, XML files
-- **Multi-line Input**: Use Shift+Enter for longer messages`,
+📝 **Professional Focus**: Designed for engineering teams and technical decision-making.`,
           timestamp: new Date()
         }])
         break
