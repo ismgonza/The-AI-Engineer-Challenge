@@ -735,24 +735,24 @@ QUICK RESPONSE MODE ⚡:
               <div className="p-3 border-b border-gray-600">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="text-xl">{engineeringMode ? '⚡' : '⚙️'}</span>
-                    <h3 className="text-sm font-bold text-white">{engineeringMode ? 'ENGINEERING ANALYSIS' : 'ENHANCED CONFIG'}</h3>
+                    <span className="text-xl">{true ? '⚡' : '⚙️'}</span>
+                    <h3 className="text-sm font-bold text-white">{true ? 'ENGINEERING ANALYSIS' : 'ENHANCED CONFIG'}</h3>
                   </div>
                   <button
-                    onClick={() => setEngineeringMode(!engineeringMode)}
+                    onClick={() => {/* Config display - no toggle needed */}}
                     className={`px-2 py-1 rounded text-xs font-bold transition-colors ${
-                      engineeringMode 
+                      true 
                         ? 'bg-red-500 text-white hover:bg-red-600' 
                         : 'bg-blue-500 text-white hover:bg-blue-600'
                     }`}
                   >
-                    {engineeringMode ? '⚡ ENG' : '⚙️ STD'}
+                    {true ? '⚡ ENG' : '⚙️ STD'}
                   </button>
                 </div>
               </div>
               
               <div className="p-3 space-y-3">
-                {engineeringMode ? (
+                {
                   <>
                     {/* Medical Research Controls */}
                     <div className="space-y-2">
@@ -824,7 +824,7 @@ QUICK RESPONSE MODE ⚡:
                       </select>
                     </div>
                   </>
-                ) : (
+                
                   <>
                     {/* Standard Configuration Controls */}
                     <div className="space-y-2">
@@ -906,7 +906,7 @@ QUICK RESPONSE MODE ⚡:
                           <div className="text-blue-400 text-xs font-bold animate-pulse">
                             🔄 Processing...
                           </div>
-                        ) : (
+                        
                           <>
                             <div className="font-bold text-gray-300 text-xs">
                               Drag & drop here
@@ -956,7 +956,7 @@ QUICK RESPONSE MODE ⚡:
                       <div className="text-lg mb-1">📁</div>
                       <div className="text-xs">No files uploaded</div>
                     </div>
-                  ) : (
+                  
                     <div className="border rounded border-gray-600 bg-gray-900/50 max-h-40 overflow-y-auto">
                       <div className="p-2 border-b border-gray-600 bg-gray-800/50 flex items-center space-x-2">
                         <input
@@ -1024,7 +1024,7 @@ QUICK RESPONSE MODE ⚡:
               <div className="flex items-center space-x-3">
                 <span className={`tech-star text-yellow-300 text-3xl ${powerUpMode ? 'animate-pulse' : 'floating-animation'}`}>✨</span>
                 <h1 className={`text-xl md:text-2xl font-bold tech-text text-white ${powerUpMode ? 'animate-pulse glow-text' : ''}`}>
-                {engineeringMode ? 'TechASSISTANT - Engineering Documentation AI' : 'ASSISTANT - AI Research Assistant'}
+                {true ? 'TechASSISTANT - Engineering Documentation AI' : 'ASSISTANT - AI Research Assistant'}
                 </h1>
                 <span className="tech-icon text-yellow-300 text-3xl">🔧</span>
                 {powerUpMode && (
