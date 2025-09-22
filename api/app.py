@@ -26,6 +26,12 @@ from aimakerspace.openai_utils.embedding import EmbeddingModel
 from aimakerspace.vectordatabase import VectorDatabase
 from aimakerspace.text_utils import PDFLoader, CharacterTextSplitter, TextFileLoader
 
+# Add Together AI import
+try:
+    from together import Together
+    TOGETHER_AVAILABLE = True
+except ImportError:
+    TOGETHER_AVAILABLE = False
 
 # Custom loaders for different file types
 class CSVLoader:
@@ -187,9 +193,14 @@ class ChatRequest(BaseModel):
     messages: List[ChatMessage]  # Full conversation history
     developer_message: str       # System message for context
     user_message: str           # Current user message (for backward compatibility)
-    model: Optional[str] = "gpt-4.1-mini"  # Optional model selection with default
+    model: Optional[str] = "gpt-4o-mini"  # Optional model selection with default
     api_key: str                # OpenAI API key for authentication
     use_rag: bool = False       # Whether to use RAG (context from uploaded PDFs)
+    # Add medical research specific fields
+    provider: Optional[str] = "openai"  # "openai" or "together"
+    medical_specialty: Optional[str] = None  # "general", "cardiology", "oncology", etc.
+    evidence_level: Optional[str] = "high"  # "high", "medium", "low" - for medical evidence filtering
+    use_medical_mode: bool = False  # Enable medical-specific features
 
 # Define data model for RAG responses
 class RAGResponse(BaseModel):
@@ -201,7 +212,69 @@ class RAGResponse(BaseModel):
 class FileAnalysisRequest(BaseModel):
     api_key: str
     filename_or_index: str  # Can be filename like "doc.pdf" or index like "1"
-    model: Optional[str] = "gpt-4.1-mini"
+    model: Optional[str] = "gpt-4o-mini"
+
+# Medical model mappings for Together AI
+MEDICAL_MODELS = {
+    "together": {
+        "general": "meta-llama/Llama-3.1-8B-Instruct-Turbo",
+        "advanced": "meta-llama/Llama-3.1-70B-Instruct-Turbo", 
+        "research": "meta-llama/Llama-3.1-405B-Instruct-Turbo",
+        "biomedical": "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",  # Good for medical reasoning
+    },
+    "openai": {
+        "general": "gpt-4o-mini",
+        "advanced": "gpt-4o",
+        "research": "gpt-4-turbo",
+    }
+}
+
+def get_medical_client(provider: str, api_key: str):
+    """Get the appropriate client based on provider"""
+    if provider == "together":
+        if not TOGETHER_AVAILABLE:
+            raise HTTPException(status_code=400, detail="Together AI not available. Install with: pip install together")
+        return Together(api_key=api_key)
+    else:
+        return OpenAI(api_key=api_key)
+
+def get_medical_model(provider: str, medical_complexity: str = "general") -> str:
+    """Get appropriate model for medical research based on complexity"""
+    models = MEDICAL_MODELS.get(provider, MEDICAL_MODELS["openai"])
+    return models.get(medical_complexity, models["general"])
+
+def create_medical_system_prompt(specialty: str = None, evidence_level: str = "high") -> str:
+    """Create specialized medical system prompt"""
+    base_prompt = """You are MedLUIGI, an advanced medical research assistant specializing in evidence-based healthcare analysis. 
+
+CORE PRINCIPLES:
+- Provide accurate, evidence-based medical information
+- Always indicate when information requires professional medical consultation
+- Use clinical terminology appropriately while remaining accessible
+- Cite evidence levels when making recommendations
+- Acknowledge limitations and uncertainties
+
+RESPONSE GUIDELINES:
+- Structure responses with clear sections: Assessment, Evidence, Recommendations
+- Include confidence levels for clinical statements
+- Highlight critical safety considerations
+- Suggest follow-up questions for deeper analysis"""
+
+    if specialty:
+        base_prompt += f"\n\nSPECIALTY FOCUS: {specialty.title()}\n- Apply specialized knowledge in {specialty}\n- Reference relevant clinical guidelines and protocols"
+    
+    if evidence_level == "high":
+        base_prompt += "\n\nEVIDENCE STANDARDS: High\n- Prioritize systematic reviews, meta-analyses, and RCTs\n- Clearly distinguish between evidence levels"
+    elif evidence_level == "medium":
+        base_prompt += "\n\nEVIDENCE STANDARDS: Medium\n- Include observational studies and clinical expertise\n- Note evidence quality limitations"
+    else:
+        base_prompt += "\n\nEVIDENCE STANDARDS: Exploratory\n- Include case studies and expert opinions\n- Clearly label preliminary or limited evidence"
+
+    base_prompt += """
+
+SAFETY DISCLAIMER: This is for educational and research purposes only. Always consult qualified healthcare professionals for medical decisions."""
+
+    return base_prompt
 
 @app.post("/api/upload-files")
 async def upload_files(

@@ -12,5 +12,6 @@ dependencies = [
     "pydantic>=2.11.4",
     "pypdf2>=3.0.1",
     "python-dotenv>=1.1.1",
+    "together>=1.5.25",
     "uvicorn>=0.34.2",
 ]

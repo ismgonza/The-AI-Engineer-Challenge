@@ -170,3 +170,6 @@ frontend/node_modules/
 frontend/.next/
 frontend/build/
 frontend/dist/
+frontend/next-env.d.ts
+
+.DS_Store

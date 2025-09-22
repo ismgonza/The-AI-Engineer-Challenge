@@ -15,7 +15,7 @@ export default function Home() {
   const [input, setInput] = useState('')
   const [developerMessage, setDeveloperMessage] = useState('You are a helpful AI assistant.')
   const [apiKey, setApiKey] = useState('')
-  const [model, setModel] = useState('gpt-4.1-mini')
+  const [model, setModel] = useState('gpt-4o-mini')
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -38,6 +38,13 @@ export default function Home() {
   
   // New state for sidebar
   const [sidebarOpen, setSidebarOpen] = useState(true)
+
+  // New state for Medical Research features
+  const [medicalMode, setMedicalMode] = useState(false)
+  const [provider, setProvider] = useState('openai') // 'openai' or 'together'
+  const [medicalSpecialty, setMedicalSpecialty] = useState('general')
+  const [evidenceLevel, setEvidenceLevel] = useState('high')
+  const [togetherApiKey, setTogetherApiKey] = useState('')
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -96,7 +103,7 @@ export default function Home() {
     setMessages([
       {
         role: 'system',
-        content: 'SUPER MARIO WORLD RAG TERMINAL v2.2.0\n\n🍄 Welcome to the enhanced Mushroom Kingdom console!\n\n✨ FEATURES:\n🎯 **RAG Mode**: Upload documents (PDF, TXT, CSV, JSON, XML) and chat with them\n🔍 Smart document search with vector embeddings\n📚 Analyze files to get suggested questions and summaries\n🍄💪 **Power-Up Mode**: Toggle between critical thinking and quick answers\n🧠 **Conversation Memory**: Full context awareness across the session\n⚡ Use the toggles in the header to control modes!\n\nSupported file types: PDF, TXT, CSV, JSON, XML\n\nQuick commands:\n- **/help**: Show all available commands\n- **/clear**: Reset screen & conversation memory for fresh start\n- **/files**: Show uploaded files\n- **/files filename**: Analyze specific file\n- **/files #**: Analyze file by number\n\n💡 **Memory Feature**: I remember our entire conversation until you use `/clear`!\n\nLet\'s-a go! 🍄⭐',
+        content: '🏥 MEDLUIGI - Medical Research Assistant v3.0.0\n\n🩺 Welcome to your AI-powered medical research companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Medical RAG Mode**: Upload medical literature (PDF, TXT, CSV, JSON, XML) and perform evidence-based research\n🔬 **Together AI Integration**: Access powerful medical LLMs like Llama 3.1-405B for research\n🏥 **Medical Specialties**: Cardiology, Oncology, Neurology, and more specialized analysis\n📊 **Evidence Levels**: High (RCTs, Meta-analyses), Medium (Observational), Low (Case studies)\n🍄💪 **Power-Up Mode**: Enhanced critical thinking for complex medical reasoning\n🧠 **Conversation Memory**: Maintains clinical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general medical analysis\n• **Together AI**: Specialized medical models (Llama 3.1 series, medical fine-tuned models)\n\n**Supported file types**: Medical PDFs, Clinical data (CSV), Research papers (PDF), Lab results (JSON/XML)\n\n**Quick commands**:\n- **/help**: Show all available commands\n- **/medical**: Toggle medical research mode\n- **/clear**: Reset screen & conversation memory\n- **/files**: Show uploaded medical documents\n- **/files filename**: Deep medical document analysis\n- **/evidence [high/medium/low]**: Set evidence standard\n\n⚠️ **DISCLAIMER**: For educational and research purposes only. Always consult qualified healthcare professionals for medical decisions.\n\n🔬 Ready for evidence-based medical research! 🏥⭐',
         timestamp: new Date()
       }
     ])
@@ -376,15 +383,29 @@ QUICK RESPONSE MODE ⚡:
       }])
 
       try {
+        // Get the appropriate API key based on provider
+        const currentApiKey = provider === 'together' ? togetherApiKey : apiKey
+        
+        if (!currentApiKey) {
+          setMessages(prev => [...prev, {
+            role: 'system',
+            content: `❌ Please set your ${provider === 'together' ? 'Together AI' : 'OpenAI'} API key in the sidebar configuration.`,
+            timestamp: new Date()
+          }])
+          return
+        }
+
         const response = await fetch('/api/analyze-file', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            api_key: apiKey,
+            api_key: currentApiKey,
             filename_or_index: target,
-            model: model
+            model: model,
+            provider: provider,
+            medical_mode: medicalMode
           }),
         })
 
@@ -446,6 +467,20 @@ QUICK RESPONSE MODE ⚡:
         content: msg.content
       }))
 
+      // Get the appropriate API key based on provider
+      const currentApiKey = provider === 'together' ? togetherApiKey : apiKey
+      
+      if (!currentApiKey) {
+        const errorMessage: Message = {
+          role: 'system',
+          content: `❌ Please set your ${provider === 'together' ? 'Together AI' : 'OpenAI'} API key in the sidebar configuration.`,
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, errorMessage])
+        setIsLoading(false)
+        return
+      }
+
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -456,8 +491,13 @@ QUICK RESPONSE MODE ⚡:
           developer_message: getEnhancedDeveloperMessage(),
           user_message: userMessage,      // Keep for backward compatibility
           model: model,
-          api_key: apiKey,
-          use_rag: useRAG
+          api_key: currentApiKey,
+          use_rag: useRAG,
+          // Medical research parameters
+          provider: provider,
+          medical_specialty: medicalMode ? medicalSpecialty : null,
+          evidence_level: medicalMode ? evidenceLevel : 'high',
+          use_medical_mode: medicalMode
         }),
       })
 
@@ -515,7 +555,52 @@ QUICK RESPONSE MODE ⚡:
       case '/help':
         setMessages(prev => [...prev, {
           role: 'system',
-          content: '🎯 Available commands:\n- **/help**: Show this help\n- **/clear**: Clear screen & reset conversation memory\n- **/status**: Show connection status\n- **/files**: Show uploaded files\n- **/files filename**: Analyze specific file\n- **/files #**: Analyze file by number\n\n⌨️ Keyboard Shortcuts:\n- **ENTER**: Send message\n- **SHIFT+ENTER**: New line in message\n\n📚 Features:\n- **RAG Mode**: Upload documents (PDF, TXT, CSV, JSON, XML) and chat with them (toggle in input area)\n- **Power-Up Mode**: Critical thinking vs quick answers (toggle in input area)\n- **File Analysis**: Get suggested questions and summaries\n- **Memory Reset**: Use `/clear` for fresh conversations\n- **Multi-Format Support**: PDF, TXT, CSV, JSON, XML files\n- **Multi-line Input**: Use Shift+Enter for longer messages',
+          content: medicalMode ? 
+          `🏥 **Medical Research Commands:**
+- **/help**: Show this help
+- **/clear**: Clear screen & reset clinical conversation memory
+- **/status**: Show medical system status
+- **/files**: Show uploaded medical documents
+- **/files filename**: Deep medical document analysis
+- **/files #**: Analyze medical document by number
+- **/medical**: Toggle medical research mode 🏥
+- **/evidence [high/medium/low]**: Set evidence standard
+- **/specialty [name]**: Set medical specialty focus
+- **/provider [openai/together]**: Switch AI provider
+
+⌨️ **Keyboard Shortcuts:**
+- **ENTER**: Send message
+- **SHIFT+ENTER**: New line in message
+
+🏥 **Medical Features:**
+- **Medical RAG Mode**: Upload medical literature and perform evidence-based research
+- **Together AI Integration**: Access specialized medical LLMs (Llama 3.1-405B)
+- **Medical Specialties**: Cardiology, Oncology, Neurology, and more
+- **Evidence Levels**: High (RCTs), Medium (Observational), Low (Case studies)
+- **Power-Up Mode**: Enhanced critical thinking for complex medical cases
+- **Clinical Memory**: Maintains context across medical consultations
+
+⚠️ **Medical Disclaimer**: For educational and research purposes only. Always consult qualified healthcare professionals for medical decisions.` :
+          `🎯 **Available commands:**
+- **/help**: Show this help
+- **/clear**: Clear screen & reset conversation memory
+- **/status**: Show connection status
+- **/files**: Show uploaded files
+- **/files filename**: Analyze specific file
+- **/files #**: Analyze file by number
+- **/medical**: Enable medical research mode 🏥
+
+⌨️ **Keyboard Shortcuts:**
+- **ENTER**: Send message
+- **SHIFT+ENTER**: New line in message
+
+📚 **Features:**
+- **RAG Mode**: Upload documents (PDF, TXT, CSV, JSON, XML) and chat with them
+- **Power-Up Mode**: Critical thinking vs quick answers (toggle in input area)
+- **File Analysis**: Get suggested questions and summaries
+- **Memory Reset**: Use \`/clear\` for fresh conversations
+- **Multi-Format Support**: PDF, TXT, CSV, JSON, XML files
+- **Multi-line Input**: Use Shift+Enter for longer messages`,
           timestamp: new Date()
         }])
         break
@@ -537,9 +622,100 @@ QUICK RESPONSE MODE ⚡:
       case '/status':
         setMessages(prev => [...prev, {
           role: 'system',
-          content: `📊 Status:\n- API Key: ${apiKey ? '✅ Set' : '❌ Not set'}\n- Model: ${model}\n- RAG Mode: ${useRAG ? '🔍 Active' : '💬 Inactive'}\n- Uploaded Files: ${uploadedFiles.length}\n- Thinking Mode: ${powerUpMode ? '🍄💪 Critical Thinking' : '⚡ Quick Answers'}\n- Developer Message: ${developerMessage.substring(0, 50)}...`,
+          content: medicalMode ? 
+          `🏥 **Medical System Status:**
+- **Provider**: ${provider.toUpperCase()} ${provider === 'together' && togetherApiKey ? '✅' : provider === 'openai' && apiKey ? '✅' : '❌'}
+- **Medical Mode**: ${medicalMode ? '🏥 Active' : '❌ Inactive'}
+- **Specialty**: ${medicalSpecialty.charAt(0).toUpperCase() + medicalSpecialty.slice(1)}
+- **Evidence Level**: ${evidenceLevel.toUpperCase()}
+- **RAG Mode**: ${useRAG ? '🔍 Active' : '💬 Inactive'}
+- **Uploaded Documents**: ${uploadedFiles.length}
+- **Thinking Mode**: ${powerUpMode ? '🍄💪 Critical Thinking' : '⚡ Quick Answers'}
+- **Model**: ${model}` :
+          `📊 **System Status:**
+- **API Key**: ${apiKey ? '✅ Set' : '❌ Not set'}
+- **Model**: ${model}
+- **RAG Mode**: ${useRAG ? '🔍 Active' : '💬 Inactive'}
+- **Uploaded Files**: ${uploadedFiles.length}
+- **Thinking Mode**: ${powerUpMode ? '🍄💪 Critical Thinking' : '⚡ Quick Answers'}
+- **Medical Mode**: ${medicalMode ? '🏥 Available' : '❌ Standard Mode'}`,
           timestamp: new Date()
         }])
+        break
+      
+      case '/medical':
+        setMedicalMode(!medicalMode)
+        setMessages(prev => [...prev, {
+          role: 'system',
+          content: `🏥 Medical research mode ${!medicalMode ? '**ACTIVATED**' : '**DEACTIVATED**'}\n\n${!medicalMode ? 
+            '✅ **Medical features enabled:**\n- Evidence-based analysis\n- Medical specialty focus\n- Together AI medical models\n- Clinical terminology\n- Safety disclaimers\n\n⚠️ Remember: For educational/research purposes only!' :
+            '✅ **Standard mode restored:**\n- General AI assistant\n- Standard OpenAI models\n- Broad knowledge base'}`,
+          timestamp: new Date()
+        }])
+        break
+        
+      case '/evidence':
+        const evidenceLevels = ['high', 'medium', 'low']
+        const newLevel = commandParts[1]?.toLowerCase()
+        if (newLevel && evidenceLevels.includes(newLevel)) {
+          setEvidenceLevel(newLevel)
+          setMessages(prev => [...prev, {
+            role: 'system',
+            content: `📊 Evidence level set to **${newLevel.toUpperCase()}**\n\n${
+              newLevel === 'high' ? '🔬 **High Evidence Standards:**\n- Systematic reviews\n- Meta-analyses\n- Randomized controlled trials (RCTs)\n- Clear evidence hierarchy' :
+              newLevel === 'medium' ? '📚 **Medium Evidence Standards:**\n- Observational studies\n- Cohort studies\n- Case-control studies\n- Clinical expertise' :
+              '📝 **Low Evidence Standards:**\n- Case studies\n- Expert opinions\n- Preliminary research\n- Exploratory analysis'
+            }`,
+            timestamp: new Date()
+          }])
+        } else {
+          setMessages(prev => [...prev, {
+            role: 'system',
+            content: `❌ Invalid evidence level. Use: **/evidence [high/medium/low]**\n\n**Current**: ${evidenceLevel.toUpperCase()}`,
+            timestamp: new Date()
+          }])
+        }
+        break
+        
+      case '/specialty':
+        const specialties = ['general', 'cardiology', 'oncology', 'neurology', 'pediatrics', 'psychiatry', 'surgery', 'radiology', 'pathology', 'emergency']
+        const newSpecialty = commandParts[1]?.toLowerCase()
+        if (newSpecialty && specialties.includes(newSpecialty)) {
+          setMedicalSpecialty(newSpecialty)
+          setMessages(prev => [...prev, {
+            role: 'system',
+            content: `🏥 Medical specialty set to **${newSpecialty.charAt(0).toUpperCase() + newSpecialty.slice(1)}**\n\n✅ Enhanced focus on ${newSpecialty} clinical guidelines, protocols, and specialized knowledge.`,
+            timestamp: new Date()
+          }])
+        } else {
+          setMessages(prev => [...prev, {
+            role: 'system',
+            content: `❌ Invalid specialty. Available options:\n${specialties.map(s => `- **${s.charAt(0).toUpperCase() + s.slice(1)}**`).join('\n')}\n\n**Current**: ${medicalSpecialty.charAt(0).toUpperCase() + medicalSpecialty.slice(1)}`,
+            timestamp: new Date()
+          }])
+        }
+        break
+        
+      case '/provider':
+        const newProvider = commandParts[1]?.toLowerCase()
+        if (newProvider === 'openai' || newProvider === 'together') {
+          setProvider(newProvider)
+          setMessages(prev => [...prev, {
+            role: 'system',
+            content: `🔬 AI Provider switched to **${newProvider.toUpperCase()}**\n\n${
+              newProvider === 'together' ? 
+              '✅ **Together AI Features:**\n- Llama 3.1 medical models\n- Specialized biomedical reasoning\n- Research-grade analysis\n- Cost-effective inference\n\n⚠️ Make sure to set your Together AI API key!' :
+              '✅ **OpenAI Features:**\n- GPT-4o medical capabilities\n- Reliable performance\n- General medical knowledge\n- Proven clinical applications'
+            }`,
+            timestamp: new Date()
+          }])
+        } else {
+          setMessages(prev => [...prev, {
+            role: 'system',
+            content: `❌ Invalid provider. Use: **/provider [openai/together]**\n\n**Current**: ${provider.toUpperCase()}`,
+            timestamp: new Date()
+          }])
+        }
         break
 
       default:
@@ -589,48 +765,137 @@ QUICK RESPONSE MODE ⚡:
           
           {/* Sidebar Content */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {/* PowerUp Configuration Section */}
+            {/* Medical Research Configuration Section */}
             <div className="bg-gray-800 rounded-lg border border-gray-600">
               <div className="p-3 border-b border-gray-600">
-                <div className="flex items-center space-x-2">
-                  <span className="text-xl">🍄</span>
-                  <h3 className="text-sm font-bold text-white">POWER-UP CONFIG</h3>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xl">{medicalMode ? '🏥' : '🍄'}</span>
+                    <h3 className="text-sm font-bold text-white">{medicalMode ? 'MEDICAL RESEARCH' : 'POWER-UP CONFIG'}</h3>
+                  </div>
+                  <button
+                    onClick={() => setMedicalMode(!medicalMode)}
+                    className={`px-2 py-1 rounded text-xs font-bold transition-colors ${
+                      medicalMode 
+                        ? 'bg-red-500 text-white hover:bg-red-600' 
+                        : 'bg-blue-500 text-white hover:bg-blue-600'
+                    }`}
+                  >
+                    {medicalMode ? '🏥 MED' : '🍄 STD'}
+                  </button>
                 </div>
               </div>
               
               <div className="p-3 space-y-3">
-                <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-gray-300">🔑 OpenAI API Key</label>
-                  <input
-                    type="password"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
-                    placeholder="sk-..."
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-gray-300">🤖 Model</label>
-                  <select
-                    value={model}
-                    onChange={(e) => setModel(e.target.value)}
-                    className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
-                  >
-                    <option value="gpt-4.1-mini">GPT-4.1-mini</option>
-                    <option value="gpt-4">GPT-4</option>
-                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-gray-300">🎯 Developer Message</label>
-                  <textarea
-                    value={developerMessage}
-                    onChange={(e) => setDeveloperMessage(e.target.value)}
-                    rows={2}
-                    className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500 resize-none"
-                    placeholder="Enter system prompt..."
-                  />
-                </div>
+                {medicalMode ? (
+                  <>
+                    {/* Medical Research Controls */}
+                    <div className="space-y-2">
+                      <label className="block text-xs font-semibold text-gray-300">🔬 AI Provider</label>
+                      <select
+                        value={provider}
+                        onChange={(e) => setProvider(e.target.value)}
+                        className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                      >
+                        <option value="openai">OpenAI (GPT-4o)</option>
+                        <option value="together">Together AI (Llama 3.1 Medical)</option>
+                      </select>
+                    </div>
+                    
+                    {provider === 'together' && (
+                      <div className="space-y-2">
+                        <label className="block text-xs font-semibold text-gray-300">🔑 Together AI Key</label>
+                        <input
+                          type="password"
+                          value={togetherApiKey}
+                          onChange={(e) => setTogetherApiKey(e.target.value)}
+                          className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                          placeholder="together-api-key..."
+                        />
+                      </div>
+                    )}
+                    
+                    <div className="space-y-2">
+                      <label className="block text-xs font-semibold text-gray-300">🔑 OpenAI API Key</label>
+                      <input
+                        type="password"
+                        value={apiKey}
+                        onChange={(e) => setApiKey(e.target.value)}
+                        className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                        placeholder="sk-..."
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-xs font-semibold text-gray-300">🏥 Medical Specialty</label>
+                      <select
+                        value={medicalSpecialty}
+                        onChange={(e) => setMedicalSpecialty(e.target.value)}
+                        className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                      >
+                        <option value="general">General Medicine</option>
+                        <option value="cardiology">Cardiology</option>
+                        <option value="oncology">Oncology</option>
+                        <option value="neurology">Neurology</option>
+                        <option value="pediatrics">Pediatrics</option>
+                        <option value="psychiatry">Psychiatry</option>
+                        <option value="surgery">Surgery</option>
+                        <option value="radiology">Radiology</option>
+                        <option value="pathology">Pathology</option>
+                        <option value="emergency">Emergency Medicine</option>
+                      </select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-xs font-semibold text-gray-300">📊 Evidence Level</label>
+                      <select
+                        value={evidenceLevel}
+                        onChange={(e) => setEvidenceLevel(e.target.value)}
+                        className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                      >
+                        <option value="high">High (RCTs, Meta-analyses)</option>
+                        <option value="medium">Medium (Observational studies)</option>
+                        <option value="low">Low (Case studies, Expert opinion)</option>
+                      </select>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Standard Configuration Controls */}
+                    <div className="space-y-2">
+                      <label className="block text-xs font-semibold text-gray-300">🔑 OpenAI API Key</label>
+                      <input
+                        type="password"
+                        value={apiKey}
+                        onChange={(e) => setApiKey(e.target.value)}
+                        className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                        placeholder="sk-..."
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-xs font-semibold text-gray-300">🤖 Model</label>
+                      <select
+                        value={model}
+                        onChange={(e) => setModel(e.target.value)}
+                        className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                      >
+                        <option value="gpt-4o-mini">GPT-4o-mini</option>
+                        <option value="gpt-4o">GPT-4o</option>
+                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-xs font-semibold text-gray-300">🎯 Developer Message</label>
+                      <textarea
+                        value={developerMessage}
+                        onChange={(e) => setDeveloperMessage(e.target.value)}
+                        rows={2}
+                        className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500 resize-none"
+                        placeholder="Enter system prompt..."
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -794,7 +1059,7 @@ QUICK RESPONSE MODE ⚡:
               <div className="flex items-center space-x-3">
                 <span className={`mario-star text-yellow-300 text-3xl ${powerUpMode ? 'animate-spin' : 'floating-animation'}`}>⭐</span>
                 <h1 className={`text-xl md:text-2xl font-bold mario-text text-white ${powerUpMode ? 'animate-pulse glow-text' : ''}`}>
-                SUPER MARIO WORLD RAG TERMINAL
+                {medicalMode ? 'MEDLUIGI - Medical Research AI' : 'LUIGI - AI Research Assistant'}
                 </h1>
                 <span className="mario-coin text-yellow-300 text-3xl">🪙</span>
                 {powerUpMode && (
