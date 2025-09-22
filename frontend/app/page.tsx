@@ -103,7 +103,7 @@ export default function Home() {
     setMessages([
       {
         role: 'system',
-        content: '⚡ TechLUIGI - Engineering Documentation Assistant v3.0.0\n\n🔧 Welcome to your AI-powered technical documentation companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Technical RAG Mode**: Upload technical documentation (PDF, TXT, CSV, JSON, XML, MD, YAML) and perform comprehensive analysis\n🔬 **Together AI Integration**: Access powerful technical LLMs like Llama 3.1-405B for complex engineering analysis\n🛠️ **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more specialized domains\n📊 **Analysis Depth**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)\n⚡ **Power-Up Mode**: Enhanced critical thinking for complex technical problems\n🧠 **Conversation Memory**: Maintains technical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general technical analysis\n• **Together AI**: Specialized engineering models (Llama 3.1 series, CodeLlama for code analysis)\n\n**Supported file types**: Technical docs (PDF/MD), Code files, API specs (JSON/YAML), System configs (XML/YAML)\n\n**Quick commands**:\n- **/help**: Show all available commands\n- **/engineering**: Toggle engineering analysis mode\n- **/clear**: Reset screen & conversation memory\n- **/files**: Show uploaded technical documents\n- **/files filename**: Deep technical document analysis\n- **/depth [deep/standard/quick]**: Set analysis thoroughness\n\n📝 **Professional Focus**: Designed for engineering teams and technical decision-making.\n\n⚡ Ready for professional technical analysis! 🔧📊',
+        content: '⚡ TechASSISTANT - Engineering Documentation Assistant v3.0.0\n\n🔧 Welcome to your AI-powered technical documentation companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Technical RAG Mode**: Upload technical documentation (PDF, TXT, CSV, JSON, XML, MD, YAML) and perform comprehensive analysis\n🔬 **Together AI Integration**: Access powerful technical LLMs like Llama 3.1-405B for complex engineering analysis\n🛠️ **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more specialized domains\n📊 **Analysis Depth**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)\n⚡ **Power-Up Mode**: Enhanced critical thinking for complex technical problems\n🧠 **Conversation Memory**: Maintains technical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general technical analysis\n• **Together AI**: Specialized engineering models (Llama 3.1 series, CodeLlama for code analysis)\n\n**Supported file types**: Technical docs (PDF/MD), Code files, API specs (JSON/YAML), System configs (XML/YAML)\n\n**Quick commands**:\n- **/help**: Show all available commands\n- **/engineering**: Toggle engineering analysis mode\n- **/clear**: Reset screen & conversation memory\n- **/files**: Show uploaded technical documents\n- **/files filename**: Deep technical document analysis\n- **/depth [deep/standard/quick]**: Set analysis thoroughness\n\n📝 **Professional Focus**: Designed for engineering teams and technical decision-making.\n\n⚡ Ready for professional technical analysis! 🔧📊',
         timestamp: new Date()
       }
     ])
@@ -307,7 +307,7 @@ export default function Home() {
     if (powerUpMode) {
       return `${baseMessage}
 
-CRITICAL THINKING MODE ACTIVATED 🍄💪:
+CRITICAL THINKING MODE ACTIVATED ⚙️💪:
 - Think deeply and analytically about each question
 - Provide comprehensive, well-reasoned responses
 - Consider multiple perspectives and potential implications
@@ -357,7 +357,7 @@ QUICK RESPONSE MODE ⚡:
     if (parts.length === 1) {
       setMessages(prev => [...prev, {
         role: 'system',
-        content: `📚 Uploaded files (${uploadedFiles.length}):\n${uploadedFiles.map((file, index) => `${index + 1}. 📄 ${file}`).join('\n')}\n\n🔍 RAG mode: ${useRAG ? '✅ Active' : '❌ Inactive'}\n\n💡 Tip: Type "**/files filename.pdf**" or "**/files #**" to analyze a specific file!`,
+        content: `📚 Uploaded files (${uploadedFiles.length}):\n${uploadedFiles.map((file, index) => `${index + 1}. 📄 ${file}`).join('\n')}\n\n📄 DOCS mode: ${useRAG ? '✅ Active' : '❌ Inactive'}\n\n💡 Tip: Type "**/files filename.pdf**" or "**/files #**" to analyze a specific file!`,
         timestamp: new Date()
       }])
       return
@@ -588,7 +588,7 @@ QUICK RESPONSE MODE ⚡:
 - **/files**: Show uploaded files
 - **/files filename**: Analyze specific file
 - **/files #**: Analyze file by number
-- **/medical**: Enable medical research mode 🏥
+- **/engineering**: Toggle engineering analysis mode ⚡
 
 ⌨️ **Keyboard Shortcuts:**
 - **ENTER**: Send message
@@ -608,7 +608,7 @@ QUICK RESPONSE MODE ⚡:
         // Reset conversation completely - both visual and memory
         setMessages([{
           role: 'system',
-          content: '🧹 **COMPLETE RESET PERFORMED**\n\n✅ **Screen cleared**\n✅ **Conversation memory wiped**\n✅ **Context history reset**\n\n🚀 Starting fresh! The AI will not remember any previous conversations.\n\n💡 **Welcome back to LUIGI RAG System!**\nYour files are still available if you had any uploaded.\nType **/help** for available commands. 🎮',
+          content: '🧹 **COMPLETE RESET PERFORMED**\n\n✅ **Screen cleared**\n✅ **Conversation memory wiped**\n✅ **Context history reset**\n\n🚀 Starting fresh! The AI will not remember any previous conversations.\n\n💡 **Welcome back to ASSISTANT RAG System!**\nYour files are still available if you had any uploaded.\nType **/help** for available commands. 👤',
           timestamp: new Date()
         }])
         // Additional state resets for a truly fresh start
@@ -630,14 +630,14 @@ QUICK RESPONSE MODE ⚡:
 - **Analysis Depth**: ${analysisDepth.toUpperCase()}
 - **RAG Mode**: ${useRAG ? '🔍 Active' : '💬 Inactive'}
 - **Uploaded Documents**: ${uploadedFiles.length}
-- **Thinking Mode**: ${powerUpMode ? '🍄💪 Critical Thinking' : '⚡ Quick Answers'}
+- **Thinking Mode**: ${powerUpMode ? '⚙️💪 Critical Thinking' : '📋 Standard Analysis'}
 - **Model**: ${model}` :
           `📊 **System Status:**
 - **API Key**: ${apiKey ? '✅ Set' : '❌ Not set'}
 - **Model**: ${model}
 - **RAG Mode**: ${useRAG ? '🔍 Active' : '💬 Inactive'}
 - **Uploaded Files**: ${uploadedFiles.length}
-- **Thinking Mode**: ${powerUpMode ? '🍄💪 Critical Thinking' : '⚡ Quick Answers'}
+- **Thinking Mode**: ${powerUpMode ? '⚙️💪 Critical Thinking' : '📋 Standard Analysis'}
 - **Engineering Mode**: ${engineeringMode ? '⚡ Available' : '❌ Standard Mode'}`,
           timestamp: new Date()
         }])
@@ -684,7 +684,7 @@ QUICK RESPONSE MODE ⚡:
           setEngineeringSpecialty(newSpecialty)
           setMessages(prev => [...prev, {
             role: 'system',
-            content: `🏥 Medical specialty set to **${newSpecialty.charAt(0).toUpperCase() + newSpecialty.slice(1)}**\n\n✅ Enhanced focus on ${newSpecialty} clinical guidelines, protocols, and specialized knowledge.`,
+            content: `🔧 Engineering specialty set to **${newSpecialty.charAt(0).toUpperCase() + newSpecialty.slice(1)}**\n\n✅ Enhanced focus on ${newSpecialty} engineering standards, best practices, and specialized knowledge.`,
             timestamp: new Date()
           }])
         } else {
@@ -704,8 +704,8 @@ QUICK RESPONSE MODE ⚡:
             role: 'system',
             content: `🔬 AI Provider switched to **${newProvider.toUpperCase()}**\n\n${
               newProvider === 'together' ? 
-              '✅ **Together AI Features:**\n- Llama 3.1 medical models\n- Specialized biomedical reasoning\n- Research-grade analysis\n- Cost-effective inference\n\n⚠️ Make sure to set your Together AI API key!' :
-              '✅ **OpenAI Features:**\n- GPT-4o medical capabilities\n- Reliable performance\n- General medical knowledge\n- Proven clinical applications'
+              '✅ **Together AI Features:**\n- Llama 3.1 engineering models\n- Specialized technical reasoning\n- Enterprise-grade analysis\n- Cost-effective inference\n\n⚠️ Make sure to set your Together AI API key!' :
+              '✅ **OpenAI Features:**\n- GPT-4o technical capabilities\n- Reliable performance\n- General technical knowledge\n- Proven enterprise applications'
             }`,
             timestamp: new Date()
           }])
@@ -721,7 +721,7 @@ QUICK RESPONSE MODE ⚡:
       default:
         setMessages(prev => [...prev, {
           role: 'system',
-          content: `❓ Unknown command: ${mainCommand}. Type /help for available commands. 🎮`,
+          content: `❓ Unknown command: ${mainCommand}. Type /help for available commands. 👤`,
           timestamp: new Date()
         }])
     }
@@ -746,7 +746,7 @@ QUICK RESPONSE MODE ⚡:
   }
 
   return (
-    <div className="h-screen flex tech-bg text-mario-dark" style={{ fontFamily: 'Arial, sans-serif' }}>
+    <div className="h-screen flex tech-bg text-slate-800" style={{ fontFamily: 'Arial, sans-serif' }}>
       {/* Sidebar */}
       <div className={`flex-shrink-0 transition-all duration-300 ${sidebarOpen ? 'w-80' : 'w-0'} overflow-hidden`}>
         <div className="h-full flex flex-col bg-gradient-to-b from-gray-900 to-gray-800 border-r border-gray-700">
@@ -770,8 +770,8 @@ QUICK RESPONSE MODE ⚡:
               <div className="p-3 border-b border-gray-600">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="text-xl">{engineeringMode ? '⚡' : '🍄'}</span>
-                    <h3 className="text-sm font-bold text-white">{engineeringMode ? 'ENGINEERING ANALYSIS' : 'POWER-UP CONFIG'}</h3>
+                    <span className="text-xl">{engineeringMode ? '⚡' : '⚙️'}</span>
+                    <h3 className="text-sm font-bold text-white">{engineeringMode ? 'ENGINEERING ANALYSIS' : 'ENHANCED CONFIG'}</h3>
                   </div>
                   <button
                     onClick={() => setEngineeringMode(!engineeringMode)}
@@ -781,7 +781,7 @@ QUICK RESPONSE MODE ⚡:
                         : 'bg-blue-500 text-white hover:bg-blue-600'
                     }`}
                   >
-                    {engineeringMode ? '⚡ ENG' : '🍄 STD'}
+                    {engineeringMode ? '⚡ ENG' : '⚙️ STD'}
                   </button>
                 </div>
               </div>
@@ -798,7 +798,7 @@ QUICK RESPONSE MODE ⚡:
                         className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
                       >
                         <option value="openai">OpenAI (GPT-4o)</option>
-                        <option value="together">Together AI (Llama 3.1 Medical)</option>
+                        <option value="together">Together AI (Llama 3.1 Engineering)</option>
                       </select>
                     </div>
                     
@@ -827,35 +827,35 @@ QUICK RESPONSE MODE ⚡:
                     </div>
                     
                     <div className="space-y-2">
-                      <label className="block text-xs font-semibold text-gray-300">🏥 Medical Specialty</label>
+                      <label className="block text-xs font-semibold text-gray-300">🔧 Engineering Specialty</label>
                       <select
                         value={engineeringSpecialty}
                         onChange={(e) => setEngineeringSpecialty(e.target.value)}
                         className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
                       >
-                        <option value="general">General Medicine</option>
-                        <option value="cardiology">Cardiology</option>
-                        <option value="oncology">Oncology</option>
-                        <option value="neurology">Neurology</option>
-                        <option value="pediatrics">Pediatrics</option>
-                        <option value="psychiatry">Psychiatry</option>
-                        <option value="surgery">Surgery</option>
-                        <option value="radiology">Radiology</option>
-                        <option value="pathology">Pathology</option>
-                        <option value="emergency">Emergency Medicine</option>
+                        <option value="software">Software Engineering</option>
+                        <option value="systems">Systems Engineering</option>
+                        <option value="network">Network Engineering</option>
+                        <option value="security">Security Engineering</option>
+                        <option value="data">Data Engineering</option>
+                        <option value="devops">DevOps Engineering</option>
+                        <option value="api">API Engineering</option>
+                        <option value="cloud">Cloud Engineering</option>
+                        <option value="mobile">Mobile Engineering</option>
+                        <option value="embedded">Embedded Systems</option>
                       </select>
                     </div>
                     
                     <div className="space-y-2">
-                      <label className="block text-xs font-semibold text-gray-300">📊 Evidence Level</label>
+                      <label className="block text-xs font-semibold text-gray-300">📊 Analysis Depth</label>
                       <select
                         value={analysisDepth}
                         onChange={(e) => setAnalysisDepth(e.target.value)}
                         className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
                       >
-                        <option value="high">High (RCTs, Meta-analyses)</option>
-                        <option value="medium">Medium (Observational studies)</option>
-                        <option value="low">Low (Case studies, Expert opinion)</option>
+                        <option value="deep">Deep (Comprehensive Analysis)</option>
+                        <option value="standard">Standard (Balanced Analysis)</option>
+                        <option value="quick">Quick (Rapid Overview)</option>
                       </select>
                     </div>
                   </>
@@ -1057,16 +1057,16 @@ QUICK RESPONSE MODE ⚡:
           <div className="tech-header p-6 rounded-t-lg">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center space-x-3">
-                <span className={`tech-star text-yellow-300 text-3xl ${powerUpMode ? 'animate-spin' : 'floating-animation'}`}>⭐</span>
+                <span className={`tech-star text-yellow-300 text-3xl ${powerUpMode ? 'animate-pulse' : 'floating-animation'}`}>✨</span>
                 <h1 className={`text-xl md:text-2xl font-bold tech-text text-white ${powerUpMode ? 'animate-pulse glow-text' : ''}`}>
-                {engineeringMode ? 'TechLUIGI - Engineering Documentation AI' : 'LUIGI - AI Research Assistant'}
+                {engineeringMode ? 'TechASSISTANT - Engineering Documentation AI' : 'ASSISTANT - AI Research Assistant'}
                 </h1>
-                <span className="tech-icon text-yellow-300 text-3xl">🪙</span>
+                <span className="tech-icon text-yellow-300 text-3xl">🔧</span>
                 {powerUpMode && (
                   <>
-                    <span className="text-yellow-400 text-xl animate-bounce">⭐</span>
+                    <span className="text-yellow-400 text-xl animate-bounce">✨</span>
                     <span className="text-yellow-300 text-lg animate-pulse">✨</span>
-                    <span className="text-yellow-400 text-xl animate-bounce" style={{animationDelay: '0.5s'}}>⭐</span>
+                    <span className="text-yellow-400 text-xl animate-bounce" style={{animationDelay: '0.5s'}}>✨</span>
                   </>
                 )}
               </div>
@@ -1079,7 +1079,7 @@ QUICK RESPONSE MODE ⚡:
             <div className="mt-4 flex flex-wrap gap-3 items-center justify-center lg:justify-start">
               <div className="glass-effect px-4 py-2 rounded-lg">
                 <span className="text-sm text-white tech-text-small glow-text">
-                  🎮 Connected to Mushroom Kingdom RAG AI v2.2.0
+                  👤 TechASSISTANT Engineering Documentation AI v3.0.0
                 </span>
               </div>
               <div className="glass-effect px-4 py-2 rounded-lg">
@@ -1090,14 +1090,14 @@ QUICK RESPONSE MODE ⚡:
               {useRAG && (
                 <div className="glass-effect px-4 py-2 rounded-lg border border-green-400/30">
                   <span className="text-sm text-green-300 tech-text-small glow-text">
-                    🔍 RAG Active
+                    📄 DOCS Active
                   </span>
                 </div>
               )}
               {powerUpMode && (
                 <div className="glass-effect px-4 py-2 rounded-lg border border-yellow-400/30">
                   <span className="text-sm text-yellow-300 tech-text-small glow-text animate-pulse">
-                    ⭐ Power Mode
+                    ✨ Power Mode
                   </span>
                 </div>
               )}
@@ -1113,10 +1113,10 @@ QUICK RESPONSE MODE ⚡:
                 <div key={index} className="tech-message p-3">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-start space-x-2">
-                      <span className="text-mario-red font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
-                        {message.role === 'user' ? '🎮 MARIO' : message.role === 'assistant' ? '🤖 LUIGI' : '🍄 SYSTEM'}
+                      <span className="text-slate-600 font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
+                        {message.role === 'user' ? '👤 USER' : message.role === 'assistant' ? '🤖 ASSISTANT' : '⚙️ SYSTEM'}
                       </span>
-                      <span className="text-mario-brown text-xs font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
+                      <span className="text-slate-600 text-xs font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
                         [{message.timestamp.toLocaleTimeString()}]
                       </span>
                     </div>
@@ -1125,7 +1125,7 @@ QUICK RESPONSE MODE ⚡:
                     <div className="flex items-center space-x-2">
                       {message.role === 'assistant' && message.usedRAG && (
                         <span className="text-red-500 text-xs font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
-                          🔍 RAG
+                          📄 DOCS
                         </span>
                       )}
                       {message.role === 'assistant' && message.usedPowerUp && (
@@ -1134,7 +1134,7 @@ QUICK RESPONSE MODE ⚡:
                           color: '#FFD700',
                           textShadow: '0 0 4px rgba(255, 215, 0, 0.6)'
                         }}>
-                          ⭐ POWER-UP
+                          ✨ ENHANCED
                         </span>
                       )}
                     </div>
@@ -1148,7 +1148,7 @@ QUICK RESPONSE MODE ⚡:
                     />
                     
                     {message.role === 'assistant' && index === messages.length - 1 && isLoading && (
-                      <span className="animate-pulse text-mario-red">▋</span>
+                      <span className="animate-pulse text-slate-600">▋</span>
                     )}
                   </div>
                 </div>
@@ -1163,8 +1163,8 @@ QUICK RESPONSE MODE ⚡:
           <form onSubmit={handleSubmit} className="p-6">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <span className="text-red-500 font-bold tech-text text-3xl animate-pulse">{'>'}</span>
-                <span className="text-sm text-mario-brown font-semibold">LUIGI</span>
+                <span className="text-red-500 font-bold tech-text text-2xl text-slate-600">{'>'}</span>
+                <span className="text-sm text-slate-600 font-semibold">ASSISTANT</span>
               </div>
               <textarea
                 value={input}
@@ -1172,7 +1172,7 @@ QUICK RESPONSE MODE ⚡:
                 onKeyPress={handleKeyPress}
                 disabled={isLoading}
                 rows={input.split('\n').length || 1}
-                className={`flex-1 tech-input p-4 text-mario-dark placeholder-mario-brown/60 font-normal text-lg transition-all duration-300 resize-none ${
+                className={`flex-1 tech-input p-4 text-slate-800 placeholder-slate-500/60 font-normal text-lg transition-all duration-300 resize-none ${
                   powerUpMode ? 'border-2 bg-yellow-50 shadow-lg' : ''
                 } ${isLoading ? 'animate-pulse' : ''}`}
                 style={{ 
@@ -1189,7 +1189,7 @@ QUICK RESPONSE MODE ⚡:
                   isLoading 
                     ? "🔄 Processing..." 
                     : powerUpMode 
-                      ? "⭐ Power-up mode! Ask complex questions for deep analysis..."
+                      ? "✨ Enhanced mode! Ask complex questions for deep analysis..."
                       : useRAG 
                         ? "🔍 Ask about your documents... (Shift+Enter for new line)"
                         : "💬 Type your message or command... (Shift+Enter for new line)"
@@ -1224,7 +1224,7 @@ QUICK RESPONSE MODE ⚡:
                 {/* Enhanced Power-Up Toggle */}
                 <div className="flex flex-col items-center space-y-2 group">
                   <div className="flex items-center space-x-3">
-                    <span className="text-lg group-hover:animate-spin transition-transform">⭐</span>
+                    <span className="text-lg group-hover:animate-pulse transition-transform">✨</span>
                     <button
                       onClick={() => setPowerUpMode(!powerUpMode)}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 focus:outline-none transform hover:scale-105 ${
@@ -1269,19 +1269,19 @@ QUICK RESPONSE MODE ⚡:
                 }}
               >
                 {powerUpMode 
-                  ? '⭐ POWER' 
+                  ? '✨ POWER' 
                   : useRAG 
-                    ? '🔍 RAG' 
-                    : '🚀 SEND'
+                    ? '📄 DOCS' 
+                    : '📤 SEND'
                 }
               </button>
             </div>
-            <div className="text-xs mt-2 text-mario-brown font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
+            <div className="text-xs mt-2 text-slate-600 font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
               Press ENTER to send, SHIFT+ENTER for new line, /help for commands 
-              {useRAG && ' | 🔍 RAG Active'}
+              {useRAG && ' | 📄 DOCS Active'}
               {powerUpMode && (
                 <span style={{ color: '#FFD700', textShadow: '0 0 2px rgba(255, 215, 0, 0.6)' }}>
-                  {' | ⭐ Power Active'}
+                  {' | ✨ Power Active'}
                 </span>
               )}
             </div>
@@ -1289,14 +1289,14 @@ QUICK RESPONSE MODE ⚡:
         </div>
 
         {/* Footer */}
-        <div className="flex-shrink-0 text-center pb-4 text-xs text-mario-brown tech-text-small font-normal">
+        <div className="flex-shrink-0 text-center pb-4 text-xs text-slate-600 tech-text-small font-normal">
           <div className="flex items-center justify-center space-x-4">
-            <span>🍄 AI ENGINEER CHALLENGE</span>
-            <span className="tech-star">⭐</span>
-            <span>SUPER MARIO WORLD RAG v2.2.0</span>
-            <span className="tech-icon">🪙</span>
-            {useRAG && <span className="text-mario-yellow">🔍 RAG ACTIVE</span>}
-            {powerUpMode && <span className="text-yellow-400 animate-pulse">⭐ POWER-UP ACTIVE ⭐</span>}
+            <span>⚙️ PROFESSIONAL DOCUMENTATION SYSTEM</span>
+            <span className="tech-star">✨</span>
+            <span>TechASSISTANT Engineering Assistant v3.0.0</span>
+            <span className="tech-icon">🔧</span>
+            {useRAG && <span className="text-amber-500">📄 DOCS ACTIVE</span>}
+            {powerUpMode && <span className="text-yellow-400 animate-pulse">✨ ENHANCED ACTIVE ✨</span>}
           </div>
         </div>
       </div>
