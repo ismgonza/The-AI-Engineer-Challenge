@@ -103,7 +103,7 @@ export default function Home() {
     setMessages([
       {
         role: 'system',
-        content: '⚡ TechASSISTANT - Engineering Documentation Assistant v3.0.0\n\n🔧 Welcome to your AI-powered technical documentation companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Technical RAG Mode**: Upload technical documentation (PDF, TXT, CSV, JSON, XML, MD, YAML) and perform comprehensive analysis\n🔬 **Together AI Integration**: Access powerful technical LLMs like Llama 3.1-405B for complex engineering analysis\n🛠️ **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more specialized domains\n📊 **Analysis Depth**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)\n⚡ **Power-Up Mode**: Enhanced critical thinking for complex technical problems\n🧠 **Conversation Memory**: Maintains technical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general technical analysis\n• **Together AI**: Specialized engineering models (Llama 3.1 series, CodeLlama for code analysis)\n\n**Supported file types**: Technical docs (PDF/MD), Code files, API specs (JSON/YAML), System configs (XML/YAML)\n\n**Quick commands**:\n- **/help**: Show all available commands\n- **/engineering**: Toggle engineering analysis mode\n- **/clear**: Reset screen & conversation memory\n- **/files**: Show uploaded technical documents\n- **/files filename**: Deep technical document analysis\n- **/depth [deep/standard/quick]**: Set analysis thoroughness\n\n📝 **Professional Focus**: Designed for engineering teams and technical decision-making.\n\n⚡ Ready for professional technical analysis! 🔧📊',
+        content: '⚡ TechASSISTANT - Engineering Documentation Assistant v3.0.0\n\n🔧 Welcome to your AI-powered technical documentation companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Technical RAG Mode**: Upload technical documentation (PDF, TXT, CSV, JSON, XML, MD, YAML) and perform comprehensive analysis\n🔬 **Together AI Integration**: Access powerful technical LLMs like Llama 3.1-405B for complex engineering analysis\n🛠️ **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more specialized domains\n📊 **Analysis Depth**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)\n⚡ **Power-Up Mode**: Enhanced critical thinking for complex technical problems\n🧠 **Conversation Memory**: Maintains technical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general technical analysis\n• **Together AI**: Specialized engineering models (Llama 3.1 series, CodeLlama for code analysis)\n\n**Supported file types**: Technical docs (PDF/MD), Code files, API specs (JSON/YAML), System configs (XML/YAML)\n\n**Quick commands**:\n- **/help**: Show all available commands\n- **/engineering**: Toggle engineering analysis mode\n- **/clear**: Reset screen & conversation memory\n- **/files**: Show uploaded technical documents\n- **/files #**: Deep technical document analysis by number\n- **/depth [deep/standard/quick]**: Set analysis thoroughness\n\n📝 **Professional Focus**: Designed for engineering teams and technical decision-making.\n\n⚡ Ready for professional technical analysis! 🔧📊',
         timestamp: new Date()
       }
     ])
@@ -357,7 +357,7 @@ QUICK RESPONSE MODE ⚡:
     if (parts.length === 1) {
       setMessages(prev => [...prev, {
         role: 'system',
-        content: `📚 Uploaded files (${uploadedFiles.length}):\n${uploadedFiles.map((file, index) => `${index + 1}. 📄 ${file}`).join('\n')}\n\n📄 DOCS mode: ${useRAG ? '✅ Active' : '❌ Inactive'}\n\n💡 Tip: Type "**/files filename.pdf**" or "**/files #**" to analyze a specific file!`,
+        content: `📚 Uploaded files (${uploadedFiles.length}):\n${uploadedFiles.map((file, index) => `${index + 1}. 📄 ${file}`).join('\n')}\n\n📄 DOCS mode: ${useRAG ? '✅ Active' : '❌ Inactive'}\n\n💡 Tip: Type "**/files #**" to analyze a specific file! (e.g., **/files 1**)`,
         timestamp: new Date()
       }])
       return
@@ -436,7 +436,7 @@ QUICK RESPONSE MODE ⚡:
     // Invalid syntax
     setMessages(prev => [...prev, {
       role: 'system',
-      content: '❓ Invalid syntax! Use:\n- **/files**: Show all files\n- **/files filename.pdf**: Analyze specific file\n- **/files #**: Analyze file by number',
+      content: '❓ Invalid syntax! Use:\n- **/files**: Show all files\n- **/files #**: Analyze file by number',
       timestamp: new Date()
     }])
   }
@@ -561,7 +561,6 @@ QUICK RESPONSE MODE ⚡:
 - **/clear**: Clear screen & reset technical conversation memory
 - **/status**: Show engineering system status
 - **/files**: Show uploaded technical documents
-- **/files filename**: Deep technical document analysis
 - **/files #**: Analyze technical document by number
 - **/engineering**: Toggle engineering analysis mode ⚡
 - **/depth [deep/standard/quick]**: Set analysis thoroughness
@@ -586,7 +585,6 @@ QUICK RESPONSE MODE ⚡:
 - **/clear**: Clear screen & reset conversation memory
 - **/status**: Show connection status
 - **/files**: Show uploaded files
-- **/files filename**: Analyze specific file
 - **/files #**: Analyze file by number
 - **/engineering**: Toggle engineering analysis mode ⚡
 
