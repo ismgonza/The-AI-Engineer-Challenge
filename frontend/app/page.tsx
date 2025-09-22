@@ -599,34 +599,22 @@ QUICK RESPONSE MODE ⚡:
       case '/status':
         setMessages(prev => [...prev, {
           role: 'system',
-          content: engineeringMode ? 
-          `⚡ **Engineering System Status:**
+          content: `⚡ **System Status:**
 - **Provider**: ${provider.toUpperCase()} ${provider === 'together' && togetherApiKey ? '✅' : provider === 'openai' && apiKey ? '✅' : '❌'}
-- **Engineering Mode**: ${engineeringMode ? '⚡ Active' : '❌ Inactive'}
 - **Specialty**: ${engineeringSpecialty.charAt(0).toUpperCase() + engineeringSpecialty.slice(1)}
 - **Analysis Depth**: ${analysisDepth.toUpperCase()}
-- **RAG Mode**: ${useRAG ? '🔍 Active' : '💬 Inactive'}
+- **Document Mode**: ${useRAG ? '📄 Active' : '💬 Inactive'}
 - **Uploaded Documents**: ${uploadedFiles.length}
-- **Thinking Mode**: ${powerUpMode ? '⚙️💪 Critical Thinking' : '📋 Standard Analysis'}
-- **Model**: ${model}` :
-          `📊 **System Status:**
-- **API Key**: ${apiKey ? '✅ Set' : '❌ Not set'}
-- **Model**: ${model}
-- **RAG Mode**: ${useRAG ? '🔍 Active' : '💬 Inactive'}
-- **Uploaded Files**: ${uploadedFiles.length}
-- **Thinking Mode**: ${powerUpMode ? '⚙️💪 Critical Thinking' : '📋 Standard Analysis'}
-- **Engineering Mode**: ${engineeringMode ? '⚡ Available' : '❌ Standard Mode'}`,
+- **Enhanced Mode**: ${powerUpMode ? '⚡ Active' : '📋 Standard'}
+- **Model**: ${model}`,
           timestamp: new Date()
         }])
         break
       
-      case '/engineering':
-        setEngineeringMode(!engineeringMode)
+      case '/config':
         setMessages(prev => [...prev, {
           role: 'system',
-          content: `⚡ Engineering analysis mode ${!engineeringMode ? '**ACTIVATED**' : '**DEACTIVATED**'}\n\n${!engineeringMode ? 
-            '✅ **Engineering features enabled:**\n- Technical documentation analysis\n- Engineering specialty focus\n- Together AI engineering models\n- Professional technical terminology\n- Industry standards integration\n\n📝 Professional focus for engineering teams!' :
-            '✅ **Standard mode restored:**\n- General AI assistant\n- Standard OpenAI models\n- Broad knowledge base'}`,
+          content: `⚙️ **App Configuration**\n\n✅ **Current Settings:**\n- Provider: ${provider.toUpperCase()}\n- Specialty: ${engineeringSpecialty.charAt(0).toUpperCase() + engineeringSpecialty.slice(1)}\n- Analysis Depth: ${analysisDepth.toUpperCase()}\n- Document Mode: ${useRAG ? 'Active' : 'Inactive'}\n- Enhanced Mode: ${powerUpMode ? 'Active' : 'Standard'}\n\n💡 Use **/provider**, **/specialty**, and **/depth** commands to modify settings.`,
           timestamp: new Date()
         }])
         break
