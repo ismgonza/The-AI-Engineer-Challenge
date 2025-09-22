@@ -65,7 +65,7 @@ MEDICAL_MODELS = {
 #### **Medical System Prompts:**
 ```python
 def create_medical_system_prompt(specialty: str = None, evidence_level: str = "high") -> str:
-    base_prompt = """You are MedLUIGI, an advanced medical research assistant specializing in evidence-based healthcare analysis.
+    base_prompt = """You are an Expert AI Assistant, an advanced engineering documentation assistant specializing in technical analysis.
     
     CORE PRINCIPLES:
     - Provide accurate, evidence-based medical information
