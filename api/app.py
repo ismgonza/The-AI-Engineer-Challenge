@@ -245,7 +245,7 @@ def get_engineering_model(provider: str, complexity: str = "general") -> str:
 
 def create_engineering_system_prompt(specialty: str = None, analysis_depth: str = "standard") -> str:
     """Create specialized engineering system prompt"""
-    base_prompt = """You are TechLUIGI, an advanced engineering documentation assistant specializing in technical analysis and documentation review.
+    base_prompt = """You are an Expert AI Assistant, an advanced engineering documentation assistant specializing in technical analysis and documentation review.
 
 CORE PRINCIPLES:
 - Provide accurate, technically sound analysis of engineering documentation

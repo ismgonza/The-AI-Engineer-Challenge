@@ -102,7 +102,7 @@ export default function Home() {
     setMessages([
       {
         role: 'system',
-        content: '⚡ TechLUIGI - Engineering Documentation Assistant v3.0.0\n\n🔧 Welcome to your AI-powered technical documentation companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Technical RAG Mode**: Upload technical documentation (PDF, TXT, CSV, JSON, XML, MD, YAML) and perform comprehensive analysis\n🔬 **Together AI Integration**: Access powerful technical LLMs like Llama 3.1-405B for complex engineering analysis\n🛠️ **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more specialized domains\n📊 **Analysis Depth**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)\n⚡ **Enhanced Mode**: Enhanced critical thinking for complex technical problems\n🧠 **Conversation Memory**: Maintains technical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general technical analysis\n• **Together AI**: Specialized engineering models (Llama 3.1 series, CodeLlama for code analysis)\n\n**Supported file types**: Technical docs (PDF/MD), Code files, API specs (JSON/YAML), System configs (XML/YAML)\n\n**Quick commands**:\n- **/help**: Show all available commands\n- **/config**: Configure application settings\n- **/clear**: Reset screen & conversation memory\n- **/files**: Show uploaded technical documents\n- **/files #**: Deep technical document analysis by number\n- **/depth [deep/standard/quick]**: Set analysis thoroughness\n\n📝 **Professional Focus**: Designed for engineering teams and technical decision-making.\n\n⚡ Ready for professional technical analysis! 🔧📊',
+        content: '⚡ Expert AI Assistant v3.0.0\n\n🔧 Welcome to your AI-powered technical documentation companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Technical RAG Mode**: Upload technical documentation (PDF, TXT, CSV, JSON, XML, MD, YAML) and perform comprehensive analysis\n🔬 **Together AI Integration**: Access powerful technical LLMs like Llama 3.1-405B for complex engineering analysis\n🛠️ **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more specialized domains\n📊 **Analysis Depth**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)\n⚡ **Enhanced Mode**: Enhanced critical thinking for complex technical problems\n🧠 **Conversation Memory**: Maintains technical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general technical analysis\n• **Together AI**: Specialized engineering models (Llama 3.1 series, CodeLlama for code analysis)\n\n**Supported file types**: Technical docs (PDF/MD), Code files, API specs (JSON/YAML), System configs (XML/YAML)\n\n**Quick commands**:\n- **/help**: Show all available commands\n- **/config**: Configure application settings\n- **/clear**: Reset screen & conversation memory\n- **/files**: Show uploaded technical documents\n- **/files #**: Deep technical document analysis by number\n- **/depth [deep/standard/quick]**: Set analysis thoroughness\n\n📝 **Professional Focus**: Designed for engineering teams and technical decision-making.\n\n⚡ Ready for professional technical analysis! 🔧📊',
         timestamp: new Date()
       }
     ])
@@ -585,7 +585,7 @@ QUICK RESPONSE MODE ⚡:
         // Reset conversation completely - both visual and memory
         setMessages([{
           role: 'system',
-          content: '🧹 **COMPLETE RESET PERFORMED**\n\n✅ **Screen cleared**\n✅ **Conversation memory wiped**\n✅ **Context history reset**\n\n🚀 Starting fresh! The AI will not remember any previous conversations.\n\n💡 **Welcome back to TechLUIGI Engineering Assistant!**\nYour files are still available if you had any uploaded.\nType **/help** for available commands. 👤',
+          content: '🧹 **COMPLETE RESET PERFORMED**\n\n✅ **Screen cleared**\n✅ **Conversation memory wiped**\n✅ **Context history reset**\n\n🚀 Starting fresh! The AI will not remember any previous conversations.\n\n💡 **Welcome back to Expert AI Assistant!**\nYour files are still available if you had any uploaded.\nType **/help** for available commands. 👤',
           timestamp: new Date()
         }])
         // Additional state resets for a truly fresh start
@@ -996,7 +996,7 @@ QUICK RESPONSE MODE ⚡:
               <div className="flex items-center space-x-3">
                 <span className={`tech-star text-yellow-300 text-3xl ${enhancedMode ? 'animate-pulse' : 'floating-animation'}`}>✨</span>
                 <h1 className={`text-xl md:text-2xl font-bold tech-text text-white ${enhancedMode ? 'animate-pulse glow-text' : ''}`}>
-                TechLUIGI - Engineering Documentation AI
+                Expert AI Assistant
                 </h1>
                 <span className="tech-icon text-yellow-300 text-3xl">🔧</span>
                 {enhancedMode && (
@@ -1016,7 +1016,7 @@ QUICK RESPONSE MODE ⚡:
             <div className="mt-4 flex flex-wrap gap-3 items-center justify-center lg:justify-start">
               <div className="glass-effect px-4 py-2 rounded-lg">
                 <span className="text-sm text-white tech-text-small glow-text">
-                  👤 TechLUIGI Engineering Documentation AI v3.0.0
+                  👤 Expert AI Assistant v3.0.0
                 </span>
               </div>
               <div className="glass-effect px-4 py-2 rounded-lg">
@@ -1230,7 +1230,7 @@ QUICK RESPONSE MODE ⚡:
           <div className="flex items-center justify-center space-x-4">
             <span>⚙️ PROFESSIONAL DOCUMENTATION SYSTEM</span>
             <span className="tech-star">✨</span>
-            <span>TechLUIGI Engineering Assistant v3.0.0</span>
+            <span>Expert AI Assistant v3.0.0</span>
             <span className="tech-icon">🔧</span>
             {useRAG && <span className="text-amber-500">📄 DOCS ACTIVE</span>}
             {enhancedMode && <span className="text-yellow-400 animate-pulse">✨ ENHANCED ACTIVE ✨</span>}
