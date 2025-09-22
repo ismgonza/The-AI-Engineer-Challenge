@@ -7,7 +7,7 @@ interface Message {
   content: string
   timestamp: Date
   usedRAG?: boolean  // Track if this message was generated using RAG
-  usedPowerUp?: boolean  // Track if this message was generated with power-up mode
+  usedEnhanced?: boolean  // Track if this message was generated with enhanced mode
 }
 
 export default function Home() {
@@ -33,8 +33,8 @@ export default function Home() {
   // New state for file selection
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set())
   
-  // New state for power-up mode (critical thinking vs quick answers)
-  const [powerUpMode, setPowerUpMode] = useState(false)
+  // New state for enhanced mode (critical thinking vs quick answers)
+  const [enhancedMode, setEnhancedMode] = useState(false)
   
   // New state for sidebar
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -102,7 +102,7 @@ export default function Home() {
     setMessages([
       {
         role: 'system',
-        content: '⚡ TechLUIGI - Engineering Documentation Assistant v3.0.0\n\n🔧 Welcome to your AI-powered technical documentation companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Technical RAG Mode**: Upload technical documentation (PDF, TXT, CSV, JSON, XML, MD, YAML) and perform comprehensive analysis\n🔬 **Together AI Integration**: Access powerful technical LLMs like Llama 3.1-405B for complex engineering analysis\n🛠️ **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more specialized domains\n📊 **Analysis Depth**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)\n⚡ **Power-Up Mode**: Enhanced critical thinking for complex technical problems\n🧠 **Conversation Memory**: Maintains technical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general technical analysis\n• **Together AI**: Specialized engineering models (Llama 3.1 series, CodeLlama for code analysis)\n\n**Supported file types**: Technical docs (PDF/MD), Code files, API specs (JSON/YAML), System configs (XML/YAML)\n\n**Quick commands**:\n- **/help**: Show all available commands\n- **/config**: Configure application settings\n- **/clear**: Reset screen & conversation memory\n- **/files**: Show uploaded technical documents\n- **/files #**: Deep technical document analysis by number\n- **/depth [deep/standard/quick]**: Set analysis thoroughness\n\n📝 **Professional Focus**: Designed for engineering teams and technical decision-making.\n\n⚡ Ready for professional technical analysis! 🔧📊',
+        content: '⚡ TechLUIGI - Engineering Documentation Assistant v3.0.0\n\n🔧 Welcome to your AI-powered technical documentation companion!\n\n✨ **ADVANCED FEATURES**:\n🎯 **Technical RAG Mode**: Upload technical documentation (PDF, TXT, CSV, JSON, XML, MD, YAML) and perform comprehensive analysis\n🔬 **Together AI Integration**: Access powerful technical LLMs like Llama 3.1-405B for complex engineering analysis\n🛠️ **Engineering Specialties**: Software, Systems, Network, Security, DevOps, and more specialized domains\n📊 **Analysis Depth**: Deep (comprehensive), Standard (balanced), Quick (rapid overview)\n⚡ **Enhanced Mode**: Enhanced critical thinking for complex technical problems\n🧠 **Conversation Memory**: Maintains technical context across the entire session\n\n**PROVIDER OPTIONS**:\n• **OpenAI**: GPT-4o for general technical analysis\n• **Together AI**: Specialized engineering models (Llama 3.1 series, CodeLlama for code analysis)\n\n**Supported file types**: Technical docs (PDF/MD), Code files, API specs (JSON/YAML), System configs (XML/YAML)\n\n**Quick commands**:\n- **/help**: Show all available commands\n- **/config**: Configure application settings\n- **/clear**: Reset screen & conversation memory\n- **/files**: Show uploaded technical documents\n- **/files #**: Deep technical document analysis by number\n- **/depth [deep/standard/quick]**: Set analysis thoroughness\n\n📝 **Professional Focus**: Designed for engineering teams and technical decision-making.\n\n⚡ Ready for professional technical analysis! 🔧📊',
         timestamp: new Date()
       }
     ])
@@ -299,11 +299,11 @@ export default function Home() {
     setShowDocumentManager(expanded)
   }
 
-  // Generate enhanced developer message based on power-up mode
+  // Generate enhanced developer message based on enhanced mode
   const getEnhancedDeveloperMessage = () => {
     const baseMessage = developerMessage
     
-    if (powerUpMode) {
+    if (enhancedMode) {
       return `${baseMessage}
 
 CRITICAL THINKING MODE ACTIVATED ⚙️💪:
@@ -513,7 +513,7 @@ QUICK RESPONSE MODE ⚡:
         content: '',
         timestamp: new Date(),
         usedRAG: useRAG,  // Track whether RAG was used for this message
-        usedPowerUp: powerUpMode  // Track whether power-up was active for this message
+        usedEnhanced: enhancedMode  // Track whether enhanced mode was active for this message
       }
       setMessages(prev => [...prev, newAssistantMessage])
 
@@ -605,7 +605,7 @@ QUICK RESPONSE MODE ⚡:
 - **Analysis Depth**: ${analysisDepth.toUpperCase()}
 - **Document Mode**: ${useRAG ? '📄 Active' : '💬 Inactive'}
 - **Uploaded Documents**: ${uploadedFiles.length}
-- **Enhanced Mode**: ${powerUpMode ? '⚡ Active' : '📋 Standard'}
+- **Enhanced Mode**: ${enhancedMode ? '⚡ Active' : '📋 Standard'}
 - **Model**: ${model}`,
           timestamp: new Date()
         }])
@@ -614,7 +614,7 @@ QUICK RESPONSE MODE ⚡:
       case '/config':
         setMessages(prev => [...prev, {
           role: 'system',
-          content: `⚙️ **App Configuration**\n\n✅ **Current Settings:**\n- Provider: ${provider.toUpperCase()}\n- Specialty: ${engineeringSpecialty.charAt(0).toUpperCase() + engineeringSpecialty.slice(1)}\n- Analysis Depth: ${analysisDepth.toUpperCase()}\n- Document Mode: ${useRAG ? 'Active' : 'Inactive'}\n- Enhanced Mode: ${powerUpMode ? 'Active' : 'Standard'}\n\n💡 Use **/provider**, **/specialty**, and **/depth** commands to modify settings.`,
+          content: `⚙️ **App Configuration**\n\n✅ **Current Settings:**\n- Provider: ${provider.toUpperCase()}\n- Specialty: ${engineeringSpecialty.charAt(0).toUpperCase() + engineeringSpecialty.slice(1)}\n- Analysis Depth: ${analysisDepth.toUpperCase()}\n- Document Mode: ${useRAG ? 'Active' : 'Inactive'}\n- Enhanced Mode: ${enhancedMode ? 'Active' : 'Standard'}\n\n💡 Use **/provider**, **/specialty**, and **/depth** commands to modify settings.`,
           timestamp: new Date()
         }])
         break
@@ -994,12 +994,12 @@ QUICK RESPONSE MODE ⚡:
           <div className="tech-header p-6 rounded-t-lg">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center space-x-3">
-                <span className={`tech-star text-yellow-300 text-3xl ${powerUpMode ? 'animate-pulse' : 'floating-animation'}`}>✨</span>
-                <h1 className={`text-xl md:text-2xl font-bold tech-text text-white ${powerUpMode ? 'animate-pulse glow-text' : ''}`}>
+                <span className={`tech-star text-yellow-300 text-3xl ${enhancedMode ? 'animate-pulse' : 'floating-animation'}`}>✨</span>
+                <h1 className={`text-xl md:text-2xl font-bold tech-text text-white ${enhancedMode ? 'animate-pulse glow-text' : ''}`}>
                 TechLUIGI - Engineering Documentation AI
                 </h1>
                 <span className="tech-icon text-yellow-300 text-3xl">🔧</span>
-                {powerUpMode && (
+                {enhancedMode && (
                   <>
                     <span className="text-yellow-400 text-xl animate-bounce">✨</span>
                     <span className="text-yellow-300 text-lg animate-pulse">✨</span>
@@ -1016,7 +1016,7 @@ QUICK RESPONSE MODE ⚡:
             <div className="mt-4 flex flex-wrap gap-3 items-center justify-center lg:justify-start">
               <div className="glass-effect px-4 py-2 rounded-lg">
                 <span className="text-sm text-white tech-text-small glow-text">
-                  👤 TechASSISTANT Engineering Documentation AI v3.0.0
+                  👤 TechLUIGI Engineering Documentation AI v3.0.0
                 </span>
               </div>
               <div className="glass-effect px-4 py-2 rounded-lg">
@@ -1031,10 +1031,10 @@ QUICK RESPONSE MODE ⚡:
                   </span>
                 </div>
               )}
-              {powerUpMode && (
+              {enhancedMode && (
                 <div className="glass-effect px-4 py-2 rounded-lg border border-yellow-400/30">
                   <span className="text-sm text-yellow-300 tech-text-small glow-text animate-pulse">
-                    ✨ Power Mode
+                    ✨ Enhanced Mode
                   </span>
                 </div>
               )}
@@ -1065,7 +1065,7 @@ QUICK RESPONSE MODE ⚡:
                           📄 DOCS
                         </span>
                       )}
-                      {message.role === 'assistant' && message.usedPowerUp && (
+                      {message.role === 'assistant' && message.usedEnhanced && (
                         <span className="text-xs font-normal animate-pulse" style={{ 
                           fontFamily: 'Arial, sans-serif',
                           color: '#FFD700',
@@ -1110,13 +1110,13 @@ QUICK RESPONSE MODE ⚡:
                 disabled={isLoading}
                 rows={input.split('\n').length || 1}
                 className={`flex-1 tech-input p-4 text-slate-800 placeholder-slate-500/60 font-normal text-lg transition-all duration-300 resize-none ${
-                  powerUpMode ? 'border-2 bg-yellow-50 shadow-lg' : ''
+                  enhancedMode ? 'border-2 bg-yellow-50 shadow-lg' : ''
                 } ${isLoading ? 'animate-pulse' : ''}`}
                 style={{ 
                   fontFamily: 'Fira Code, Arial, sans-serif',
                   minHeight: '60px',
                   maxHeight: '200px',
-                  ...(powerUpMode && {
+                  ...(enhancedMode && {
                     borderColor: '#FFD700',
                     boxShadow: '0 0 25px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 215, 0, 0.4)',
                     animation: 'pulse-glow 2s infinite'
@@ -1125,7 +1125,7 @@ QUICK RESPONSE MODE ⚡:
                 placeholder={
                   isLoading 
                     ? "🔄 Processing..." 
-                    : powerUpMode 
+                    : enhancedMode 
                       ? "✨ Enhanced mode! Ask complex questions for deep analysis..."
                       : useRAG 
                         ? "🔍 Ask about your documents... (Shift+Enter for new line)"
@@ -1158,16 +1158,16 @@ QUICK RESPONSE MODE ⚡:
                   </span>
                 </div>
 
-                {/* Enhanced Power-Up Toggle */}
+                {/* Enhanced Mode Toggle */}
                 <div className="flex flex-col items-center space-y-2 group">
                   <div className="flex items-center space-x-3">
                     <span className="text-lg group-hover:animate-pulse transition-transform">✨</span>
                     <button
-                      onClick={() => setPowerUpMode(!powerUpMode)}
+                      onClick={() => setEnhancedMode(!enhancedMode)}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 focus:outline-none transform hover:scale-105 ${
-                        powerUpMode ? 'bg-yellow-500' : 'bg-red-500'
+                        enhancedMode ? 'bg-yellow-500' : 'bg-red-500'
                       }`}
-                      style={powerUpMode ? {
+                      style={enhancedMode ? {
                         backgroundColor: '#FFD700',
                         boxShadow: '0 0 15px rgba(255, 215, 0, 0.8), 0 0 25px rgba(255, 215, 0, 0.4)',
                         animation: 'pulse-glow 2s infinite'
@@ -1177,16 +1177,16 @@ QUICK RESPONSE MODE ⚡:
                     >
                       <span
                         className={`inline-block h-4 w-4 transform rounded-full bg-white transition-all duration-300 shadow-md ${
-                          powerUpMode ? 'translate-x-6' : 'translate-x-1'
+                          enhancedMode ? 'translate-x-6' : 'translate-x-1'
                         }`}
                       />
                     </button>
                   </div>
-                  <span className={`text-xs font-bold tracking-wider ${powerUpMode ? 'text-yellow-500 glow-text' : 'text-red-600'}`} style={powerUpMode ? {
+                  <span className={`text-xs font-bold tracking-wider ${enhancedMode ? 'text-yellow-500 glow-text' : 'text-red-600'}`} style={enhancedMode ? {
                     color: '#FFD700',
                     textShadow: '0 0 8px rgba(255, 215, 0, 0.8)'
                   } : {}}>
-                    POWER
+                    ENHANCED
                   </span>
                 </div>
               </div>
@@ -1195,9 +1195,9 @@ QUICK RESPONSE MODE ⚡:
                 type="submit"
                 disabled={isLoading || !input.trim()}
                 className={`tech-button px-6 py-3 text-white font-bold tech-text-small disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95 ${
-                  powerUpMode ? 'hover:bg-yellow-600' : ''
+                  enhancedMode ? 'hover:bg-yellow-600' : ''
                 } ${isLoading ? 'animate-pulse' : ''}`}
-                style={powerUpMode ? {
+                style={enhancedMode ? {
                   backgroundColor: '#FFD700',
                   boxShadow: '0 0 20px rgba(255, 215, 0, 0.9), 0 0 35px rgba(255, 215, 0, 0.5)',
                   animation: 'pulse-glow 1.5s infinite'
@@ -1205,8 +1205,8 @@ QUICK RESPONSE MODE ⚡:
                   boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
                 }}
               >
-                {powerUpMode 
-                  ? '✨ POWER' 
+                {enhancedMode 
+                  ? '✨ ENHANCED' 
                   : useRAG 
                     ? '📄 DOCS' 
                     : '📤 SEND'
@@ -1216,9 +1216,9 @@ QUICK RESPONSE MODE ⚡:
             <div className="text-xs mt-2 text-slate-600 font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
               Press ENTER to send, SHIFT+ENTER for new line, /help for commands 
               {useRAG && ' | 📄 DOCS Active'}
-              {powerUpMode && (
+              {enhancedMode && (
                 <span style={{ color: '#FFD700', textShadow: '0 0 2px rgba(255, 215, 0, 0.6)' }}>
-                  {' | ✨ Power Active'}
+                  {' | ✨ Enhanced Active'}
                 </span>
               )}
             </div>
@@ -1230,10 +1230,10 @@ QUICK RESPONSE MODE ⚡:
           <div className="flex items-center justify-center space-x-4">
             <span>⚙️ PROFESSIONAL DOCUMENTATION SYSTEM</span>
             <span className="tech-star">✨</span>
-            <span>TechASSISTANT Engineering Assistant v3.0.0</span>
+            <span>TechLUIGI Engineering Assistant v3.0.0</span>
             <span className="tech-icon">🔧</span>
             {useRAG && <span className="text-amber-500">📄 DOCS ACTIVE</span>}
-            {powerUpMode && <span className="text-yellow-400 animate-pulse">✨ ENHANCED ACTIVE ✨</span>}
+            {enhancedMode && <span className="text-yellow-400 animate-pulse">✨ ENHANCED ACTIVE ✨</span>}
           </div>
         </div>
       </div>
