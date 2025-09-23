@@ -395,6 +395,165 @@ response = client.chat.completions.create(
 - Text chunking and metadata handling
 - Error handling for corrupted files
 
+
+## 🔧 **Together AI Endpoint Modification Process**
+
+### **Process Overview**
+The integration of Together AI required modifying the existing OpenAI-based architecture to support dual providers. Here's the detailed process:
+
+#### **Step 1: Backend Architecture Changes**
+**File Modified**: `aimakerspace/openai_utils/chatmodel.py`
+
+**Original Structure**:
+```python
+class ChatOpenAI:
+    def __init__(self, model_name: str = "gpt-4o-mini", api_key: str = None):
+        self._client = OpenAI(api_key=api_key)
+        self._async_client = AsyncOpenAI(api_key=api_key)
+```
+
+**Modified Structure**:
+```python
+class ChatOpenAI:
+    def __init__(self, model_name: str = "gpt-4o-mini", api_key: str = None, provider: str = "openai"):
+        self.provider = provider
+        if provider == "together":
+            self._setup_together(api_key)
+        else:
+            self._setup_openai(api_key)
+    
+    def _setup_together(self, api_key: str = None):
+        from together import Together, AsyncTogether
+        self.together_api_key = api_key if api_key else os.getenv("TOGETHER_API_KEY")
+        self._client = Together(api_key=self.together_api_key)
+        self._async_client = AsyncTogether(api_key=self.together_api_key)
+    
+    def _setup_openai(self, api_key: str = None):
+        self._client = OpenAI(api_key=api_key)
+        self._async_client = AsyncOpenAI(api_key=api_key)
+```
+
+#### **Step 2: API Endpoint Modifications**
+**File Modified**: `api/app.py`
+
+**Changes Made**:
+1. **Enhanced Request Model**: Added provider and Together AI specific fields
+2. **Provider Detection**: Logic to determine which client to use
+3. **Model Mapping**: Provider-specific model selection
+4. **Error Handling**: Provider-specific error messages
+
+#### **Step 3: Frontend Integration**
+**File Modified**: `frontend/app/page.tsx`
+
+**Changes Made**:
+1. **State Management**: Added Together AI API key state
+2. **Provider Selection**: UI for switching between providers
+3. **Model Selection**: Dynamic model dropdown based on provider
+4. **API Key Management**: Smart graying of inactive provider keys
+
+### **What Made This Change Easy**
+
+#### **1. OpenAI-Compatible API Structure**
+Together AI provides OpenAI-compatible endpoints, making the integration seamless:
+```python
+# Same API call structure for both providers
+response = client.chat.completions.create(
+    model=model_name,
+    messages=messages,
+    stream=True
+)
+```
+
+**Why This Was Easy**:
+- No need to rewrite the entire API calling logic
+- Same request/response format
+- Streaming support works identically
+- Error handling patterns remain the same
+
+#### **2. Existing Abstraction Layer**
+The original code already had a `ChatOpenAI` class that abstracted the OpenAI client:
+- Easy to extend with provider parameter
+- Minimal changes to existing code
+- Backward compatibility maintained
+
+#### **3. Clear Documentation**
+Together AI provides excellent documentation:
+- Clear model names and capabilities
+- Python SDK with examples
+- OpenAI compatibility clearly documented
+
+### **What Made This Change Challenging**
+
+#### **1. Multiple API Key Management**
+**Challenge**: Users need both OpenAI and Together AI API keys
+**Solution**: Implemented smart UI that shows both fields but grays out inactive ones
+**Difficulty**: 🟡 Medium - Required careful state management
+
+#### **2. Model Selection Complexity**
+**Challenge**: Different providers have different model names and capabilities
+**Solution**: Created provider-specific model mapping with automatic switching
+**Difficulty**: 🟡 Medium - Required understanding of each provider's models
+
+#### **3. State Management in Frontend**
+**Challenge**: Complex UI state with multiple providers and API keys
+**Solution**: Implemented conditional rendering and smart defaults
+**Difficulty**: 🟡 Medium - Required careful React state management
+
+#### **4. Error Handling Differences**
+**Challenge**: Different providers may have different error formats
+**Solution**: Implemented provider-aware error handling
+**Difficulty**: 🟢 Easy - Together AI errors are similar to OpenAI
+
+### **Technical Implementation Details**
+
+#### **Provider Detection Logic**:
+```python
+def get_engineering_client(provider: str, api_key: str):
+    if provider == "together":
+        if not TOGETHER_AVAILABLE:
+            raise HTTPException(status_code=400, detail="Together AI not available")
+        return Together(api_key=api_key)
+    else:
+        return OpenAI(api_key=api_key)
+```
+
+#### **Model Selection Logic**:
+```python
+def get_engineering_model(provider: str, complexity: str = "general") -> str:
+    models = ENGINEERING_MODELS.get(provider, {})
+    return models.get(complexity, models["general"])
+```
+
+#### **Frontend Provider Switching**:
+```typescript
+const currentApiKey = provider === 'together' ? togetherApiKey : apiKey
+const response = await fetch(endpoint, {
+  body: JSON.stringify({
+    provider: provider,
+    api_key: currentApiKey,
+    // ... other fields
+  })
+})
+```
+
+### **Overall Assessment**
+
+**Integration Difficulty**: 🟡 **Medium**
+
+**What Made It Easy**:
+- OpenAI-compatible API structure
+- Existing abstraction layer
+- Clear documentation
+- Similar error handling
+
+**What Made It Challenging**:
+- Multiple API key management
+- Complex state management
+- Model selection logic
+- UI/UX complexity
+
+**Result**: The integration was successful and provides users with powerful dual-provider capabilities while maintaining a clean, professional interface.
+
 ## 🧪 **Testing & Validation**
 
 ### **Recommended Testing Scenarios**
