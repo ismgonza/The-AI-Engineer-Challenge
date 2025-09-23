@@ -505,8 +505,7 @@ QUICK RESPONSE MODE ⚡:
           api_key: currentApiKey,
           use_rag: useRAG,
           // Engineering analysis parameters
-          provider: provider
-
+          provider: provider,
           use_engineering_mode: true
         }),
       })
