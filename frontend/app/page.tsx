@@ -40,10 +40,7 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
   // App Configuration features (always enabled)
-  const [provider, setProvider] = useState('openai') // 'openai' or 'together'
-  const [engineeringSpecialty, setEngineeringSpecialty] = useState('software')
-  const [analysisDepth, setAnalysisDepth] = useState('standard')
-  const [togetherApiKey, setTogetherApiKey] = useState('')
+  const [provider, setProvider] = useState('openai') // 'openai' or 'together'  const [togetherApiKey, setTogetherApiKey] = useState('')
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -508,9 +505,8 @@ QUICK RESPONSE MODE ⚡:
           api_key: currentApiKey,
           use_rag: useRAG,
           // Engineering analysis parameters
-          provider: provider,
-          engineering_specialty: engineeringSpecialty,
-          analysis_depth: analysisDepth,
+          provider: provider
+
           use_engineering_mode: true
         }),
       })
@@ -576,8 +572,6 @@ QUICK RESPONSE MODE ⚡:
 - **/files**: Show uploaded technical documents
 - **/files #**: Analyze technical document by number
 - **/config**: Configure application settings ⚙️
-- **/depth [deep/standard/quick]**: Set analysis thoroughness
-- **/specialty [name]**: Set engineering specialty focus
 - **/provider [openai/together]**: Switch AI provider
 
 ⌨️ **Keyboard Shortcuts:**
@@ -616,8 +610,6 @@ QUICK RESPONSE MODE ⚡:
           role: 'system',
           content: `⚡ **System Status:**
 - **Provider**: ${provider.toUpperCase()} ${provider === 'together' && togetherApiKey ? '✅' : provider === 'openai' && apiKey ? '✅' : '❌'}
-- **Specialty**: ${engineeringSpecialty.charAt(0).toUpperCase() + engineeringSpecialty.slice(1)}
-- **Analysis Depth**: ${analysisDepth.toUpperCase()}
 - **Document Mode**: ${useRAG ? '📄 Active' : '💬 Inactive'}
 - **Uploaded Documents**: ${uploadedFiles.length}
 - **Enhanced Mode**: ${enhancedMode ? '⚡ Active' : '📋 Standard'}
@@ -629,53 +621,13 @@ QUICK RESPONSE MODE ⚡:
       case '/config':
         setMessages(prev => [...prev, {
           role: 'system',
-          content: `⚙️ **App Configuration**\n\n✅ **Current Settings:**\n- Provider: ${provider.toUpperCase()}\n- Specialty: ${engineeringSpecialty.charAt(0).toUpperCase() + engineeringSpecialty.slice(1)}\n- Analysis Depth: ${analysisDepth.toUpperCase()}\n- Document Mode: ${useRAG ? 'Active' : 'Inactive'}\n- Enhanced Mode: ${enhancedMode ? 'Active' : 'Standard'}\n\n💡 Use **/provider**, **/specialty**, and **/depth** commands to modify settings.`,
+          content: `⚙️ **App Configuration**\n\n✅ **Current Settings:**\n- Provider: ${provider.toUpperCase()}\n- Document Mode: ${useRAG ? 'Active' : 'Inactive'}\n- Enhanced Mode: ${enhancedMode ? 'Active' : 'Standard'}\n\n💡 Use **/provider** command to modify settings.`,
           timestamp: new Date()
         }])
         break
         
-      case '/depth':
-        const analysisLevels = ['deep', 'standard', 'quick']
-        const newDepth = commandParts[1]?.toLowerCase()
-        if (newDepth && analysisLevels.includes(newDepth)) {
-          setAnalysisDepth(newDepth)
-          setMessages(prev => [...prev, {
-            role: 'system',
-            content: `📊 Analysis depth set to **${newDepth.toUpperCase()}**\n\n${
-              newDepth === 'deep' ? '🔬 **Deep Analysis:**\n- Comprehensive technical analysis\n- Architectural implications\n- Long-term maintainability\n- Performance and scalability considerations' :
-              newDepth === 'standard' ? '📚 **Standard Analysis:**\n- Balanced technical analysis\n- Key technical aspects\n- Common issues and patterns\n- Practical recommendations' :
-              '⚡ **Quick Analysis:**\n- Rapid technical overview\n- Critical issues identification\n- Immediate concerns\n- Actionable insights'
-            }`,
-            timestamp: new Date()
-          }])
-        } else {
-          setMessages(prev => [...prev, {
-            role: 'system',
-            content: `❌ Invalid analysis depth. Use: **/depth [deep/standard/quick]**\n\n**Current**: ${analysisDepth.toUpperCase()}`,
-            timestamp: new Date()
-          }])
-        }
-        break
-        
-      case '/specialty':
-        const specialties = ['software', 'systems', 'network', 'security', 'data', 'devops', 'api', 'cloud', 'mobile', 'embedded']
-        const newSpecialty = commandParts[1]?.toLowerCase()
-        if (newSpecialty && specialties.includes(newSpecialty)) {
-          setEngineeringSpecialty(newSpecialty)
-          setMessages(prev => [...prev, {
-            role: 'system',
-            content: `🔧 Engineering specialty set to **${newSpecialty.charAt(0).toUpperCase() + newSpecialty.slice(1)}**\n\n✅ Enhanced focus on ${newSpecialty} engineering standards, best practices, and specialized knowledge.`,
-            timestamp: new Date()
-          }])
-        } else {
-          setMessages(prev => [...prev, {
-            role: 'system',
-            content: `❌ Invalid specialty. Available options:\n${specialties.map(s => `- **${s.charAt(0).toUpperCase() + s.slice(1)}**`).join('\n')}\n\n**Current**: ${engineeringSpecialty.charAt(0).toUpperCase() + engineeringSpecialty.slice(1)}`,
-            timestamp: new Date()
-          }])
-        }
-        break
-        
+              
+              
       case '/provider':
         const newProvider = commandParts[1]?.toLowerCase()
         if (newProvider === 'openai' || newProvider === 'together') {
@@ -802,38 +754,9 @@ QUICK RESPONSE MODE ⚡:
                       />
                     </div>
                     
-                    <div className="space-y-2">
-                      <label className="block text-xs font-semibold text-gray-300">🔧 Engineering Specialty</label>
-                      <select
-                        value={engineeringSpecialty}
-                        onChange={(e) => setEngineeringSpecialty(e.target.value)}
-                        className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
-                      >
-                        <option value="software">Software Engineering</option>
-                        <option value="systems">Systems Engineering</option>
-                        <option value="network">Network Engineering</option>
-                        <option value="security">Security Engineering</option>
-                        <option value="data">Data Engineering</option>
-                        <option value="devops">DevOps Engineering</option>
-                        <option value="api">API Engineering</option>
-                        <option value="cloud">Cloud Engineering</option>
-                        <option value="mobile">Mobile Engineering</option>
-                        <option value="embedded">Embedded Systems</option>
-                      </select>
-                    </div>
                     
-                    <div className="space-y-2">
-                      <label className="block text-xs font-semibold text-gray-300">📊 Analysis Depth</label>
-                      <select
-                        value={analysisDepth}
-                        onChange={(e) => setAnalysisDepth(e.target.value)}
-                        className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white text-sm focus:outline-none focus:border-blue-500"
-                      >
-                        <option value="deep">Deep (Comprehensive Analysis)</option>
-                        <option value="standard">Standard (Balanced Analysis)</option>
-                        <option value="quick">Quick (Rapid Overview)</option>
-                      </select>
-                    </div>
+                    
+                    
                 
                 <div className="space-y-2">
                   <label className="block text-xs font-semibold text-gray-300">🤖 Model</label>
@@ -1057,7 +980,7 @@ QUICK RESPONSE MODE ⚡:
               {useRAG && (
                 <div className="glass-effect px-4 py-2 rounded-lg border border-green-400/30">
                   <span className="text-sm text-green-300 tech-text-small glow-text">
-                    📄 DOCS Active
+                    📄 RAG Active
                   </span>
                 </div>
               )}
@@ -1092,7 +1015,7 @@ QUICK RESPONSE MODE ⚡:
                     <div className="flex items-center space-x-2">
                       {message.role === 'assistant' && message.usedRAG && (
                         <span className="text-red-500 text-xs font-normal" style={{ fontFamily: 'Arial, sans-serif' }}>
-                          📄 DOCS
+                          📄 RAG
                         </span>
                       )}
                       {message.role === 'assistant' && message.usedEnhanced && (

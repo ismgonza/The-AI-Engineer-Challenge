@@ -197,10 +197,7 @@ class ChatRequest(BaseModel):
     api_key: str                # OpenAI API key for authentication
     use_rag: bool = False       # Whether to use RAG (context from uploaded PDFs)
     # Add engineering analysis specific fields
-    provider: Optional[str] = "openai"  # "openai" or "together"
-    engineering_specialty: Optional[str] = None  # "software", "systems", "network", etc.
-    analysis_depth: Optional[str] = "standard"  # "deep", "standard", "quick" - analysis thoroughness
-    use_engineering_mode: bool = False  # Enable engineering-specific features
+    provider: Optional[str] = "openai"  # "openai" or "together"    use_engineering_mode: bool = False  # Enable engineering-specific features
 
 # Define data model for RAG responses
 class RAGResponse(BaseModel):
@@ -243,52 +240,6 @@ def get_engineering_model(provider: str, complexity: str = "general") -> str:
     models = ENGINEERING_MODELS.get(provider, ENGINEERING_MODELS["openai"])
     return models.get(complexity, models["general"])
 
-def create_engineering_system_prompt(specialty: str = None, analysis_depth: str = "standard") -> str:
-    """Create specialized engineering system prompt"""
-    base_prompt = """You are an Expert AI Assistant, an advanced engineering documentation assistant specializing in technical analysis and documentation review.
-
-CORE PRINCIPLES:
-- Provide accurate, technically sound analysis of engineering documentation
-- Use precise technical terminology while maintaining clarity
-- Reference industry standards, best practices, and established patterns
-- Identify potential issues, improvements, and optimization opportunities
-- Maintain focus on practical engineering applications
-
-ANALYSIS FRAMEWORK:
-- Structure responses with clear sections: Overview, Technical Analysis, Recommendations
-- Include confidence levels for technical assessments
-- Highlight critical technical considerations and potential risks
-- Suggest follow-up questions for deeper technical exploration
-- Reference relevant standards (IEEE, ISO, RFC, etc.) where applicable"""
-
-    if specialty:
-        specialty_focuses = {
-            "software": "Focus on software architecture, code quality, design patterns, and development best practices",
-            "systems": "Focus on system architecture, scalability, reliability, and infrastructure design", 
-            "network": "Focus on network protocols, security, performance, and infrastructure",
-            "security": "Focus on security architecture, threat analysis, compliance, and risk assessment",
-            "data": "Focus on data architecture, processing pipelines, storage solutions, and analytics",
-            "devops": "Focus on CI/CD, infrastructure as code, monitoring, and deployment strategies",
-            "api": "Focus on API design, documentation standards, integration patterns, and versioning",
-            "cloud": "Focus on cloud architecture, services integration, cost optimization, and scalability",
-            "mobile": "Focus on mobile app architecture, performance, platform-specific considerations",
-            "embedded": "Focus on embedded systems, hardware-software integration, real-time constraints"
-        }
-        focus = specialty_focuses.get(specialty.lower(), f"Focus on {specialty} engineering principles and best practices")
-        base_prompt += f"\n\nSPECIALTY FOCUS: {specialty.title()} Engineering\n- {focus}\n- Apply domain-specific technical knowledge and industry standards"
-    
-    if analysis_depth == "deep":
-        base_prompt += "\n\nANALYSIS DEPTH: Comprehensive\n- Perform thorough technical analysis\n- Consider architectural implications and long-term maintainability\n- Evaluate performance, scalability, and security considerations"
-    elif analysis_depth == "standard":
-        base_prompt += "\n\nANALYSIS DEPTH: Standard\n- Provide balanced technical analysis\n- Focus on key technical aspects and common issues\n- Include practical recommendations and next steps"
-    else:
-        base_prompt += "\n\nANALYSIS DEPTH: Quick\n- Provide rapid technical overview\n- Highlight critical issues and immediate concerns\n- Focus on actionable insights"
-
-    base_prompt += """
-
-PROFESSIONAL CONTEXT: This analysis is for engineering teams and technical decision-making. Maintain professional engineering standards and practices."""
-
-    return base_prompt
 
 @app.post("/api/upload-files")
 async def upload_files(
