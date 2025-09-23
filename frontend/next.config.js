@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Fix the cross-origin warning by explicitly allowing dev origins
+  allowedDevOrigins: ['127.0.0.1', 'localhost'],
+  
   async rewrites() {
     return [
       {
@@ -10,4 +13,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig; 
+module.exports = nextConfig;
