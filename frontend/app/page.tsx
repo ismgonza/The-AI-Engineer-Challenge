@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import api from "../lib/api"
+import { getApiUrl } from "../lib/config";
 
 interface Message {
   role: 'user' | 'assistant' | 'system'
@@ -139,7 +141,7 @@ export default function Home() {
     if (!apiKey) return
     
     try {
-      const response = await fetch(`/api/files?api_key=${encodeURIComponent(apiKey)}`)
+      const response = await api.getFiles(apiKey)
       if (response.ok) {
         const data = await response.json()
         const newFiles = data.files || []
@@ -192,11 +194,7 @@ export default function Home() {
     
     formData.append('api_key', apiKey)
 
-    try {
-      const response = await fetch('/api/upload-files', {
-        method: 'POST',
-        body: formData,
-      })
+      const response = await api.uploadFiles(formData);    try {
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -253,7 +251,7 @@ export default function Home() {
       const formData = new FormData()
       formData.append('api_key', apiKey)
       
-      const response = await fetch('/api/files', {
+      const response = await fetch(getApiUrl('/api/files'), {
         method: 'DELETE',
         body: formData,
       })
@@ -407,7 +405,7 @@ QUICK RESPONSE MODE ⚡:
           return
         }
 
-        const response = await fetch('/api/analyze-file', {
+        const response = await fetch(getApiUrl('/api/analyze-file'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -470,7 +468,7 @@ QUICK RESPONSE MODE ⚡:
 
     try {
       // Choose endpoint based on RAG mode
-      const endpoint = useRAG ? '/api/rag-chat' : '/api/chat'
+      const endpoint = useRAG ? getApiUrl('/api/rag-chat') : getApiUrl('/api/chat')
       
       // Prepare conversation history for the backend
       // Include the current user message in the messages array
