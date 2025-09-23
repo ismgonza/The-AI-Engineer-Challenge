@@ -214,9 +214,9 @@ class FileAnalysisRequest(BaseModel):
 # Engineering model mappings for Together AI
 ENGINEERING_MODELS = {
     "together": {
-        "general": "meta-llama/Llama-3.1-8B-Instruct-Turbo",
-        "advanced": "meta-llama/Llama-3.1-70B-Instruct-Turbo", 
-        "research": "meta-llama/Llama-3.1-405B-Instruct-Turbo",
+        "general": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+        "advanced": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", 
+        "research": "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
         "code": "meta-llama/CodeLlama-70b-Instruct-hf",  # Specialized for code analysis
     },
     "openai": {
@@ -434,7 +434,7 @@ Format your response as:
 10. [Question 10]"""
         
         # Use OpenAI to analyze the content
-        client = OpenAI(api_key=request.api_key)
+        client = get_engineering_client(request.provider, request.api_key)
         response = client.chat.completions.create(
             model=request.model,
             messages=[
@@ -518,7 +518,7 @@ INSTRUCTIONS:
 - Maintain conversation context and refer to previous messages when relevant"""
         
         # Initialize OpenAI client with user's API key
-        client = OpenAI(api_key=request.api_key)
+        client = get_engineering_client(request.provider, request.api_key)
         
         # Build conversation messages with RAG context
         conversation_messages = []
@@ -567,7 +567,7 @@ async def chat(request: ChatRequest):
             return await rag_chat(request)
         
         # Otherwise, use regular chat with full conversation history
-        client = OpenAI(api_key=request.api_key)
+        client = get_engineering_client(request.provider, request.api_key)
         
         # Build conversation messages for regular chat
         conversation_messages = []

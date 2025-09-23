@@ -130,7 +130,7 @@ export default function Home() {
     } else {
       // If current model is not a Together AI model, switch to default
       if (!model.includes('llama')) {
-        setModel('meta-llama/Llama-3.1-8B-Instruct-Turbo')
+        setModel('meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo')
       }
     }
   }, [provider, model])
@@ -773,9 +773,9 @@ QUICK RESPONSE MODE ⚡:
                       </>
                     ) : (
                       <>
-                        <option value="meta-llama/Llama-3.1-8B-Instruct-Turbo">Llama 3.1 8B (Fast)</option>
-                        <option value="meta-llama/Llama-3.1-70B-Instruct-Turbo">Llama 3.1 70B (Advanced)</option>
-                        <option value="meta-llama/Llama-3.1-405B-Instruct-Turbo">Llama 3.1 405B (Research)</option>
+                        <option value="meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo">Llama 3.1 8B (Fast)</option>
+                        <option value="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo">Llama 3.1 70B (Advanced)</option>
+                        <option value="meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo">Llama 3.1 405B (Research)</option>
                         <option value="meta-llama/CodeLlama-70b-Instruct-hf">CodeLlama 70B (Code Analysis)</option>
                       </>
                     )}
