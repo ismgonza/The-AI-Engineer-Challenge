@@ -40,7 +40,8 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
   // App Configuration features (always enabled)
-  const [provider, setProvider] = useState('openai') // 'openai' or 'together'  const [togetherApiKey, setTogetherApiKey] = useState('')
+  const [provider, setProvider] = useState('openai') // 'openai' or 'together'
+  const [togetherApiKey, setTogetherApiKey] = useState('')
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
