@@ -209,7 +209,6 @@ class RAGResponse(BaseModel):
 class FileAnalysisRequest(BaseModel):
     api_key: str
     filename_or_index: str  # Can be filename like "doc.pdf" or index like "1"
-    provider: str = "openai"
     model: Optional[str] = "gpt-4o-mini"
 
 # Engineering model mappings for Together AI
@@ -314,11 +313,11 @@ async def upload_files(
                 
                 # Split the extracted text into chunks
                 # CharacterTextSplitter creates overlapping chunks for better context
-                # chunk_size=500: Each chunk is ~1000 characters
-                # chunk_overlap=100: Adjacent chunks share 200 characters for continuity
+                # chunk_size=1000: Each chunk is ~1000 characters
+                # chunk_overlap=200: Adjacent chunks share 200 characters for continuity
                 text_splitter = CharacterTextSplitter(
-                    chunk_size=500,
-                    chunk_overlap=100
+                    chunk_size=1000,
+                    chunk_overlap=200
                 )
                 
                 chunks = []
